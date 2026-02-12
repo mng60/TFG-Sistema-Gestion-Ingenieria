@@ -23,26 +23,8 @@ app.get('/', (req, res) => {
   });
 });
 
-// Ruta de prueba del modelo User (temporal - solo para desarrollo)
-app.get('/api/test/users', async (req, res) => {
-  try {
-    const User = require('./src/models/User');
-    const users = await User.findAll();
-    res.json({ 
-      success: true,
-      count: users.length,
-      users: users 
-    });
-  } catch (error) {
-    res.status(500).json({ 
-      success: false,
-      error: error.message 
-    });
-  }
-});
-
 // Rutas API (se agregarán en sprints posteriores)
-// app.use('/api/auth', require('./src/routes/auth.routes'));
+app.use('/api/auth', require('./src/routes/auth.routes'));
 // app.use('/api/users', require('./src/routes/user.routes'));
 // app.use('/api/projects', require('./src/routes/project.routes'));
 
