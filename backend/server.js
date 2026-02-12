@@ -1,6 +1,7 @@
 ﻿// server.js - Archivo principal del servidor backend
 const express = require('express');
 const cors = require('cors');
+const { testConnection } = require('./src/config/database');
 require('dotenv').config();
 
 const app = express();
@@ -22,6 +23,24 @@ app.get('/', (req, res) => {
   });
 });
 
+// Ruta de prueba del modelo User (temporal - solo para desarrollo)
+app.get('/api/test/users', async (req, res) => {
+  try {
+    const User = require('./src/models/User');
+    const users = await User.findAll();
+    res.json({ 
+      success: true,
+      count: users.length,
+      users: users 
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false,
+      error: error.message 
+    });
+  }
+});
+
 // Rutas API (se agregarán en sprints posteriores)
 // app.use('/api/auth', require('./src/routes/auth.routes'));
 // app.use('/api/users', require('./src/routes/user.routes'));
@@ -33,9 +52,21 @@ app.use((req, res) => {
 });
 
 // Iniciar servidor
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor backend corriendo en http://localhost:${PORT}`);
-  console.log(`📝 Entorno: ${process.env.NODE_ENV || 'development'}`);
-});
+const startServer = async () => {
+  // Probar conexión a la base de datos
+  const dbConnected = await testConnection();
+  
+  if (!dbConnected) {
+    console.error('❌ No se pudo conectar a la base de datos. Verifica la configuración.');
+    process.exit(1);
+  }
+
+  app.listen(PORT, () => {
+    console.log(`🚀 Servidor backend corriendo en http://localhost:${PORT}`);
+    console.log(`📝 Entorno: ${process.env.NODE_ENV || 'development'}`);
+  });
+};
+
+startServer();
 
 module.exports = app;
