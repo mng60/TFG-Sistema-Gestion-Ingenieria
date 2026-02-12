@@ -123,4 +123,44 @@ MIT License - ver archivo LICENSE para más detalles
 🚧 **En desarrollo - Sprint 0** 🚧
 
 Fecha de inicio: 26 de enero de 2026  
+
+## 🔧 Solución de Problemas Comunes
+
+### Error: "No se puede cargar el archivo porque la ejecución de scripts está deshabilitada"
+
+**Problema:** Al ejecutar `npm install` en Windows PowerShell aparece un error de seguridad.
+
+**Solución:**
+```bash
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+Este comando permite ejecutar scripts locales sin comprometer la seguridad del sistema.
+
+### Alerta de Windows Defender Firewall al arrancar el servidor
+
+**Problema:** Windows bloquea la comunicación de Node.js en la red.
+
+**Solución:**
+- Hacer clic en "Permitir acceso" cuando aparezca la alerta
+- Esto solo es necesario la primera vez que se ejecuta el servidor
+- Permite la comunicación entre backend (puerto 5000) y frontend (puerto 3000)
+
+### El navegador no conecta a localhost:5000
+
+**Problema:** Al abrir `http://localhost:5000` aparece "ERR_CONNECTION_REFUSED"
+
+**Posibles causas y soluciones:**
+1. **El servidor no está corriendo:** Ejecuta `npm start` en la carpeta backend
+2. **El puerto está ocupado:** Cambia el puerto en el archivo `.env` (variable PORT)
+3. **Firewall bloqueando:** Revisa la configuración del firewall de Windows
+
+### Error al clonar el repositorio
+
+**Problema:** Git solicita credenciales o falla la autenticación.
+
+**Solución:**
+- Usa Git con HTTPS: `git clone https://github.com/mng60/TFG-Sistema-Gestion-Ingenieria.git`
+- Si usa autenticación de dos factores, genera un Personal Access Token en GitHub
+- Configurar credenciales: `git config --global user.name "Tu Nombre"` y `git config --global user.email "tu@email.com"`
+
 Fecha estimada de finalización: 18 de mayo de 2026
