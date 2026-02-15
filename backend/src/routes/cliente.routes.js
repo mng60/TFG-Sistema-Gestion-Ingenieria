@@ -57,4 +57,16 @@ router.patch('/:id/deactivate', checkRole('admin'), deactivateCliente);
 // DELETE /api/clientes/:id - Eliminar cliente (solo admin)
 router.delete('/:id', checkRole('admin'), deleteCliente);
 
+const { activarAccesoCliente } = require('../controllers/cliente.auth.controller');
+
+// Validación para activar acceso
+const activarAccesoValidation = [
+  body('password')
+    .isLength({ min: 6 })
+    .withMessage('La contraseña debe tener al menos 6 caracteres')
+];
+
+// POST /api/clientes/:id/activar-acceso - Activar acceso al portal (solo admin)
+router.post('/:id/activar-acceso', checkRole('admin'), activarAccesoValidation, activarAccesoCliente);
+
 module.exports = router;

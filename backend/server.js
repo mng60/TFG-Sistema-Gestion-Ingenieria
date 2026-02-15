@@ -30,6 +30,7 @@ app.use('/api/clientes', require('./src/routes/cliente.routes'));
 app.use('/api/proyectos', require('./src/routes/proyecto.routes'));
 app.use('/api/presupuestos', require('./src/routes/presupuesto.routes'));
 app.use('/api/documentos', require('./src/routes/documento.routes'));
+app.use('/api/portal', require('./src/routes/portal.routes'));
 
 // Manejo de errores 404
 app.use((req, res) => {
