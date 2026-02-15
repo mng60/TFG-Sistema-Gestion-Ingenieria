@@ -14,6 +14,7 @@ function Dashboard() {
   const [activeTab, setActiveTab] = useState('proyectos');
 
   useEffect(() => {
+    document.title = 'Portal de Clientes - Dashboard';
     cargarDatos();
   }, []);
 
@@ -38,7 +39,7 @@ function Dashboard() {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/login');  
   };
 
   const descargarDocumento = async (documentoId, nombre) => {

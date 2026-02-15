@@ -1,0 +1,30 @@
+{
+  "name": "tfg-sistema-gestion-ingenieria",
+  "version": "1.0.0",
+  "description": "Sistema integral de gestión para empresa de ingeniería eléctrica - TFG Grado Informática UCAM",
+  "author": "Miguel Cárdenas",
+  "license": "MIT",
+  "scripts": {
+    "start:backend": "cd backend && npm start",
+    "start:admin": "cd frontend-admin && npm start",
+    "start:cliente": "cd frontend-cliente && npm start",
+    "start:mobile": "cd mobile && npm start",
+    "install:all": "npm run install:backend && npm run install:admin && npm run install:cliente && npm run install:mobile",
+    "install:backend": "cd backend && npm install",
+    "install:admin": "cd frontend-admin && npm install",
+    "install:cliente": "cd frontend-cliente && npm install",
+    "install:mobile": "cd mobile && npm install"
+  },
+  "keywords": [
+    "gestion",
+    "ingenieria",
+    "electricidad",
+    "react",
+    "nodejs",
+    "postgresql"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mng60/TFG-Sistema-Gestion-Ingenieria"
+  }
+}

@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useEmpleadoAuth } from '../context/EmpleadoAuthContext';
 import '../styles/Login.css';
 
-function Login() {
+function EmpleadoLogin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
-  const { login } = useAuth();
+  const { login } = useEmpleadoAuth();
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    document.title = 'Panel Interno - Login';
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,7 +23,7 @@ function Login() {
 
     try {
       await login(email, password);
-      navigate('/dashboard');
+      navigate('/admin/dashboard');
     } catch (err) {
       setError(err.message || 'Error al iniciar sesión. Verifica tus credenciales.');
     } finally {
@@ -31,8 +35,8 @@ function Login() {
     <div className="login-container">
       <div className="login-box">
         <div className="login-header">
-          <h1>Portal de Clientes</h1>
-          <p>Sistema de Gestión de Ingeniería Eléctrica</p>
+          <h1>Panel Interno</h1>
+          <p>Sistema de Gestión - Empleados</p>
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">
@@ -49,7 +53,7 @@ function Login() {
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="tu@empresa.com"
+              placeholder="empleado@empresa.com"
               required
               disabled={loading}
             />
@@ -69,16 +73,16 @@ function Login() {
           </div>
 
           <button type="submit" className="login-button" disabled={loading}>
-            {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+            {loading ? 'Iniciando sesión...' : 'Acceder al Sistema'}
           </button>
         </form>
 
         <div className="login-footer">
-          <p>¿Problemas para acceder? Contacta con tu gestor de proyecto</p>
+          <p><small>Panel administrativo de gestión interna</small></p>
         </div>
       </div>
     </div>
   );
 }
 
-export default Login;
+export default EmpleadoLogin;
