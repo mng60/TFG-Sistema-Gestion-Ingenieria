@@ -1,6 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import Landing from './pages/Landing';
+import SobreNosotros from './pages/SobreNosotros';
+import Contacto from './pages/Contacto';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ProyectoCompleto from './pages/ProyectoCompleto';
@@ -28,7 +31,9 @@ function App() {
     <Router>
       <AuthProvider>
         <Routes>
-          <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="/" element={<Landing />} />
+          <Route path="/sobre-nosotros" element={<SobreNosotros />} />
+          <Route path="/contacto" element={<Contacto />} />
 
           <Route path="/login" element={
             <ClientePublicRoute>
@@ -54,7 +59,7 @@ function App() {
             </ClienteProtectedRoute>
           } />
 
-          <Route path="*" element={<Navigate to="/login" />} />
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </AuthProvider>
     </Router>

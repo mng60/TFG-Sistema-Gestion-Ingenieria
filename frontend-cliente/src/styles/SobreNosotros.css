@@ -1,0 +1,109 @@
+/* ══════════════════════════════════════════
+   SOBRE NOSOTROS
+   ══════════════════════════════════════════ */
+
+.sn-section { padding: 96px 80px; }
+
+/* Intro */
+.sn-intro {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 80px; align-items: start;
+  background: var(--off-white);
+}
+.sn-intro-text { display: flex; flex-direction: column; gap: 20px; }
+.sn-intro-text h2 {
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: clamp(36px, 4.5vw, 60px);
+  font-weight: 800; text-transform: uppercase; color: var(--black); line-height: 1;
+}
+.sn-intro-text p { font-size: 14.5px; line-height: 1.75; color: #444; }
+
+.sn-intro-visual { display: flex; flex-direction: column; gap: 20px; }
+.sn-intro-img {
+  height: 320px; border-radius: 2px;
+  background: url('https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80') center/cover;
+}
+.sn-intro-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+}
+.sn-stat {
+  background: var(--white); padding: 24px 20px;
+  display: flex; flex-direction: column; gap: 4px;
+  border-top: 3px solid var(--teal);
+}
+.sn-stat span {
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 36px; font-weight: 800; color: var(--teal-dark); line-height: 1;
+}
+.sn-stat label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gray); }
+
+/* Servicios */
+.sn-servicios { background: var(--white); }
+.sn-section-header { margin-bottom: 52px; }
+.sn-section-header h2 {
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: clamp(38px, 4.5vw, 60px);
+  font-weight: 800; text-transform: uppercase; color: var(--black); line-height: 1;
+}
+
+.sn-servicios-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+}
+.sn-servicio-card {
+  background: var(--off-white); padding: 36px 28px;
+  border-top: 3px solid transparent;
+  transition: background 0.25s, border-color 0.25s, transform 0.25s;
+}
+.sn-servicio-card:hover {
+  background: var(--teal); border-top-color: var(--teal-dark); transform: translateY(-4px);
+}
+.sn-servicio-icon { font-size: 28px; margin-bottom: 18px; }
+.sn-servicio-card h3 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 19px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.04em; color: var(--black); margin-bottom: 10px;
+  transition: color 0.25s;
+}
+.sn-servicio-card p { font-size: 13.5px; line-height: 1.65; color: var(--gray); transition: color 0.25s; }
+.sn-servicio-card:hover h3 { color: var(--white); }
+.sn-servicio-card:hover p  { color: rgba(255,255,255,0.8); }
+
+/* Valores */
+.sn-valores-section { background: var(--dark); }
+.sn-valores-section .sn-section-header h2 { color: var(--white); }
+.sn-valores-section .section-tag.light { color: rgba(255,255,255,0.5); }
+
+.sn-valores-list { display: flex; flex-direction: column; gap: 0; }
+.sn-valor-row {
+  display: grid; grid-template-columns: 60px 1fr 2fr;
+  gap: 32px; align-items: start;
+  padding: 28px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.sn-valor-row:first-child { border-top: 1px solid rgba(255,255,255,0.07); }
+
+.sn-valor-n {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: var(--teal);
+  padding-top: 4px;
+}
+.sn-valor-row h3 {
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 18px; font-weight: 700; text-transform: uppercase; color: var(--white);
+}
+.sn-valor-row p { font-size: 14px; line-height: 1.65; color: rgba(255,255,255,0.5); }
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .sn-intro { grid-template-columns: 1fr; gap: 48px; }
+  .sn-servicios-grid { grid-template-columns: repeat(2, 1fr); }
+  .sn-valor-row { grid-template-columns: 48px 1fr; }
+  .sn-valor-row p { grid-column: 2; }
+}
+@media (max-width: 768px) {
+  .sn-section { padding: 64px 28px; }
+  .sn-servicios-grid { grid-template-columns: 1fr; }
+  .sn-valor-row { grid-template-columns: 1fr; gap: 8px; }
+  .sn-intro-stats { grid-template-columns: repeat(3, 1fr); }
+}
