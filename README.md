@@ -1,166 +1,225 @@
-﻿# TFG - Sistema de Gestión para Ingeniería Eléctrica
+# TFG - Sistema de Gestión para Ingeniería Eléctrica
 
 Sistema integral de gestión desarrollado como Trabajo Fin de Grado para el Grado en Ingeniería Informática de la UCAM.
 
-## 📋 Descripción
+## Descripción
 
-Sistema completo que incluye:
-- **Backend API REST** (Node.js + Express + PostgreSQL)
-- **Frontend Web** (React)
-- **Aplicación Móvil** (React Native)
+Sistema completo de gestión de proyectos de ingeniería que incluye:
 
-## 🚀 Tecnologías
+- **Backend API REST** — Node.js + Express + PostgreSQL + Socket.io
+- **Portal Administración** — React (empleados e ingenieros)
+- **Portal Cliente** — React (acceso externo para clientes)
+- **Aplicación Móvil PWA** — React (para empleados en campo)
+
+## Tecnologías
 
 ### Backend
-- Node.js
-- Express.js
-- PostgreSQL
-- JWT para autenticación
+- Node.js + Express.js
+- PostgreSQL (con `pg`)
+- JWT (autenticación dual: empleados y clientes)
+- Socket.io (chat en tiempo real)
+- Multer (subida de archivos)
+- node-cron (limpieza automática de chats)
+- bcryptjs, express-validator
 
-### Frontend
-- React 18
-- React Router
-- Axios
+### Frontend Admin (puerto 3000)
+- React 18 + React Router
+- Context API (`EmpleadoAuthContext`)
+- Socket.io-client
+- CSS modular por componente
 
-### Mobile
-- React Native
-- Expo
-- React Navigation
+### Frontend Cliente (puerto 3001)
+- React 18 + React Router
+- Context API (`AuthContext`)
+- Socket.io-client
+- CSS modular por componente
 
-## 📁 Estructura del Proyecto
+### Mobile PWA (puerto 3002)
+- React 18 (PWA con Service Worker)
+- Socket.io-client
+- Instalable en Android/iOS desde el navegador
+
+## Estructura del Proyecto
+
 ```
 TFG-Sistema-Gestion-Ingenieria/
-├── backend/           # API REST
+├── backend/
 │   ├── src/
-│   │   ├── config/
-│   │   ├── controllers/
-│   │   ├── middlewares/
-│   │   ├── models/
-│   │   ├── routes/
-│   │   ├── services/
+│   │   ├── config/          # Conexión a BD
+│   │   ├── controllers/     # auth, chat, cliente, documento,
+│   │   │                    # portal, presupuesto, proyecto, user
+│   │   ├── jobs/            # cleanupChats.js (cron diario)
+│   │   ├── middlewares/     # auth, authAny, authCliente
+│   │   ├── models/          # Conversacion, Mensaje, Proyecto...
+│   │   ├── routes/          # auth, chat, cliente, documento,
+│   │   │                    # portal, presupuesto, proyecto, user
 │   │   └── utils/
-│   ├── package.json
 │   └── server.js
-├── frontend/          # Aplicación web React
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── services/
-│   │   ├── utils/
-│   │   ├── assets/
-│   │   └── styles/
-│   ├── public/
-│   └── package.json
-├── mobile/            # App móvil React Native
-│   ├── src/
-│   │   ├── components/
-│   │   ├── screens/
-│   │   ├── navigation/
-│   │   ├── services/
-│   │   ├── utils/
-│   │   └── assets/
-│   └── package.json
-└── docs/              # Documentación
-    ├── diagramas/
-    ├── guias/
-    └── sprint-reports/
+├── frontend-admin/          # Portal de empleados/administración
+│   └── src/
+│       ├── components/
+│       │   ├── Layout/      # AdminLayout (responsive sidebar)
+│       │   ├── chat/        # ChatLayout, ChatWindow, ChatHeader...
+│       │   └── modals/      # DocumentoModal y otros
+│       ├── context/         # EmpleadoAuthContext
+│       ├── pages/           # AdminDashboard, Clientes, Proyectos,
+│       │                    # ProyectoCompleto, Chat, Usuarios
+│       ├── services/
+│       └── styles/
+├── frontend-cliente/        # Portal externo para clientes
+│   └── src/
+│       ├── components/
+│       │   ├── Layout/      # ClienteLayout (responsive sidebar)
+│       │   └── chat/        # ChatLayout, ChatWindow, ChatHeader...
+│       ├── context/         # AuthContext
+│       ├── pages/           # Login, Dashboard, ProyectoCompleto, Chat
+│       ├── services/
+│       └── styles/
+├── mobile/                  # PWA móvil para empleados
+│   └── src/
+│       ├── components/
+│       │   └── chat/        # ChatLayout, ChatWindow, ChatHeader...
+│       ├── context/         # AuthContext
+│       ├── pages/           # Login, Proyectos, ProyectoCompleto,
+│       │                    # Chat, Perfil
+│       ├── services/
+│       └── styles/
+└── docs/
+    └── diagramas/
 ```
 
-## 🔧 Instalación
+## Funcionalidades implementadas
 
-### Requisitos previos
-- Node.js (v18 o superior)
-- PostgreSQL (v14 o superior)
-- npm o yarn
+### Portal Administración
+- Login con JWT (empleados)
+- Dashboard con resumen de proyectos y clientes
+- Gestión de clientes (CRUD)
+- Gestión de proyectos (CRUD, asignación de empleados, estados)
+- Vista detalle de proyecto: información, presupuestos, documentos
+- Subida y descarga de documentos (Multer)
+- Gestión de presupuestos
+- Gestión de usuarios del sistema
+- Chat en tiempo real con Socket.io (grupos por proyecto, conversaciones directas)
+- Notificación de mensajes no leídos en sidebar
+- Layout responsive con sidebar deslizante en móvil
+
+### Portal Cliente
+- Login con JWT (clientes)
+- Dashboard con cuadrícula de proyectos propios
+- Vista detalle de proyecto: información, presupuestos, documentos
+- Descarga de documentos
+- Aceptación de presupuestos
+- Chat en tiempo real con empleados del proyecto
+- Layout responsive con sidebar deslizante en móvil
+
+### Aplicación Móvil (PWA)
+- Login para empleados
+- Listado de proyectos asignados
+- Vista detalle de proyecto
+- Chat en tiempo real
+- Perfil de usuario
+- Instalable como PWA en Android e iOS
 
 ### Backend
+- API REST completa con autenticación dual (empleados / clientes)
+- Middleware `authAny` que normaliza ambos tipos de token
+- Chat con Socket.io: grupos de proyecto creados automáticamente al crear proyecto
+- Borrado automático de chats 3 días después de completar un proyecto (cron job)
+- Subida de archivos con Multer
+- CORS configurado para los tres frontends
+
+## Instalación y arranque
+
+### Requisitos previos
+- Node.js v18 o superior (backend/admin/cliente), v20+ recomendado
+- PostgreSQL v14 o superior
+- npm
+
+### 1. Backend
 ```bash
 cd backend
 npm install
-cp .env.example .env
-# Editar .env con tus credenciales
-npm run dev
+cp .env.example .env   # Configurar DB, JWT_SECRET, FRONTEND_URL, etc.
+npm run dev            # Puerto 5000
 ```
 
-### Frontend
+Variables de entorno relevantes en `backend/.env`:
+```
+DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD
+JWT_SECRET
+PORT=5000
+FRONTEND_URL=http://localhost:3000,http://localhost:3001,http://localhost:3002
+```
+
+### 2. Portal Administración
 ```bash
-cd frontend
+cd frontend-admin
 npm install
-cp .env.example .env
-npm start
+# Crear .env con REACT_APP_API_URL=http://localhost:5000/api
+npm start              # Puerto 3000
 ```
 
-### Mobile
+### 3. Portal Cliente
+```bash
+cd frontend-cliente
+npm install
+# Crear .env con REACT_APP_API_URL=http://localhost:5000/api
+npm start              # Puerto 3001
+```
+
+### 4. Aplicación Móvil (PWA)
 ```bash
 cd mobile
-npm install
-npm start
+npm install --legacy-peer-deps
+# Crear .env con REACT_APP_API_URL=http://<IP-LOCAL>:5000/api
+npm start              # Puerto 3002
 ```
 
-## 📖 Metodología
+Para instalar como PWA en el móvil: abrir `http://<IP-del-PC>:3002` desde el móvil en la misma red WiFi y seleccionar "Añadir a pantalla de inicio".
+
+## Metodología
 
 Desarrollo siguiendo metodología **Scrum** con 6 sprints:
 
-- **Sprint 0**: Configuración inicial (1 semana)
-- **Sprint 1**: Backend e infraestructura (3 semanas)
-- **Sprint 2**: Gestión de proyectos (3 semanas)
-- **Sprint 3**: Portal cliente y presupuestos (3 semanas)
-- **Sprint 4**: Aplicación móvil (3 semanas)
-- **Sprint 5**: IA y finalización (2 semanas)
+| Sprint | Descripción | Estado |
+|--------|-------------|--------|
+| Sprint 0 | Configuración inicial del proyecto | Completado |
+| Sprint 1 | Backend e infraestructura base | Completado |
+| Sprint 2 | Gestión de proyectos y documentos | Completado |
+| Sprint 3 | Portal cliente + portal admin completo | Completado |
+| Sprint 4 | Aplicación móvil PWA + chat responsive | Completado |
+| Sprint 5 | Finalización y mejoras | En curso |
 
-## 👨‍💻 Autor
+## Solución de problemas comunes
 
-**Miguel Sebastián Cárdenas Nugra**  
-Grado en Ingeniería Informática  
-Universidad Católica San Antonio de Murcia (UCAM)
-
-## 📄 Licencia
-
-MIT License - ver archivo LICENSE para más detalles
-
-## 📝 Estado del Proyecto
-
-🚧 **En desarrollo - Sprint 0** 🚧
-
-Fecha de inicio: 26 de enero de 2026  
-
-## 🔧 Solución de Problemas Comunes
-
-### Error: "No se puede cargar el archivo porque la ejecución de scripts está deshabilitada"
-
-**Problema:** Al ejecutar `npm install` en Windows PowerShell aparece un error de seguridad.
-
-**Solución:**
+### Error de scripts deshabilitados en PowerShell
 ```bash
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
-Este comando permite ejecutar scripts locales sin comprometer la seguridad del sistema.
 
-### Alerta de Windows Defender Firewall al arrancar el servidor
+### Alerta de Windows Defender Firewall
+Hacer clic en "Permitir acceso" la primera vez que se arranque el servidor.
 
-**Problema:** Windows bloquea la comunicación de Node.js en la red.
-
-**Solución:**
-- Hacer clic en "Permitir acceso" cuando aparezca la alerta
-- Esto solo es necesario la primera vez que se ejecuta el servidor
-- Permite la comunicación entre backend (puerto 5000) y frontend (puerto 3000)
+### Error de build en Node v24 (mobile)
+```bash
+cd mobile
+npm install ajv@^8 --legacy-peer-deps
+```
 
 ### El navegador no conecta a localhost:5000
+1. Verificar que el backend está corriendo (`npm run dev` en `/backend`)
+2. Comprobar que el puerto no está ocupado (variable `PORT` en `.env`)
+3. Revisar la configuración del firewall de Windows
 
-**Problema:** Al abrir `http://localhost:5000` aparece "ERR_CONNECTION_REFUSED"
+## Autor
 
-**Posibles causas y soluciones:**
-1. **El servidor no está corriendo:** Ejecuta `npm start` en la carpeta backend
-2. **El puerto está ocupado:** Cambia el puerto en el archivo `.env` (variable PORT)
-3. **Firewall bloqueando:** Revisa la configuración del firewall de Windows
+**Miguel Sebastián Cárdenas Nugra**
+Grado en Ingeniería Informática
+Universidad Católica San Antonio de Murcia (UCAM)
 
-### Error al clonar el repositorio
-
-**Problema:** Git solicita credenciales o falla la autenticación.
-
-**Solución:**
-- Usa Git con HTTPS: `git clone https://github.com/mng60/TFG-Sistema-Gestion-Ingenieria.git`
-- Si usa autenticación de dos factores, genera un Personal Access Token en GitHub
-- Configurar credenciales: `git config --global user.name "Tu Nombre"` y `git config --global user.email "tu@email.com"`
-
+Fecha de inicio: 26 de enero de 2026
 Fecha estimada de finalización: 18 de mayo de 2026
+
+## Licencia
+
+MIT License — ver archivo LICENSE para más detalles.
