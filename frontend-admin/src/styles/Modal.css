@@ -27,9 +27,10 @@
   background: white;
   border-radius: 16px;
   width: 100%;
-  max-width: 800px;
-  max-height: 90vh;
-  overflow-y: auto;
+  max-width: 900px;
+  max-height: 95vh;
+  display: flex;
+  flex-direction: column;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.3s ease-out;
 }
@@ -58,6 +59,7 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border-radius: 16px 16px 0 0;
+  flex-shrink: 0;
 }
 
 .modal-header h2 {
@@ -88,6 +90,8 @@
 
 .modal-form {
   padding: 30px;
+  overflow-y: auto;
+  flex: 1;
 }
 
 .modal-description {
@@ -168,6 +172,11 @@
   padding-top: 20px;
   border-top: 1px solid #e0e0e0;
   margin-top: 20px;
+  flex-shrink: 0; 
+  position: sticky;
+  bottom: 0;
+  background: white;
+  padding: 20px 0 0 0;
 }
 
 /* Responsive */

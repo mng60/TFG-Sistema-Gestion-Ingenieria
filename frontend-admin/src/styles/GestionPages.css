@@ -308,3 +308,141 @@
   background: #f8d7da;
   color: #721c24;
 }
+
+/* Proyecto clickeable */
+.proyecto-nombre-clickable {
+  transition: all 0.2s ease;
+  padding: 4px;
+  border-radius: 6px;
+}
+
+.proyecto-nombre-clickable:hover {
+  background: #f8f9fa;
+  color: #667eea;
+}
+
+.proyecto-nombre-clickable strong {
+  transition: color 0.2s ease;
+}
+
+.proyecto-nombre-clickable:hover strong {
+  color: #667eea;
+}
+
+/* Badges de rol */
+.badge-admin {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.badge-empleado {
+  background: #e9ecef;
+  color: #495057;
+}
+
+/* Preview del total en presupuestos */
+.total-preview {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  border-radius: 12px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.total-preview-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1rem;
+}
+
+.total-preview-total {
+  padding-top: 12px;
+  border-top: 2px solid rgba(255, 255, 255, 0.3);
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.total-preview-item span {
+  opacity: 0.9;
+}
+
+.total-preview-item strong {
+  font-size: 1.1rem;
+}
+
+.total-preview-total strong {
+  font-size: 1.5rem;
+}
+
+/* Botón success */
+.btn-success {
+  background: #28a745;
+  color: white;
+}
+
+.btn-success:hover {
+  background: #218838;
+  transform: scale(1.1);
+}
+
+/* Badges específicos de documentos */
+.badge-tipo {
+  background: #e9ecef;
+  color: #495057;
+  text-transform: capitalize;
+}
+
+.badge-publico {
+  background: #d4edda;
+  color: #155724;
+}
+
+.badge-privado {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.btn-download {
+  background: #3498db;
+  color: white;
+}
+
+.btn-download:hover {
+  background: #2980b9;
+  transform: scale(1.1);
+}
+
+.filter-indicator {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: #e3f2fd;
+  border-left: 3px solid #2196f3;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-indicator strong {
+  color: #1976d2;
+}
+
+.btn-remove-filter {
+  padding: 4px 12px;
+  background: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.btn-remove-filter:hover {
+  background: #1976d2;
+}

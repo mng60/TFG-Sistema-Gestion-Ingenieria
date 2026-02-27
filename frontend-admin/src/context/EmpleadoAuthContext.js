@@ -16,13 +16,13 @@ export const EmpleadoAuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Siempre pedir login
-    setEmpleado(null);
-    setLoading(false);
+    const empleadoGuardado = empleadoAuthService.getCurrentEmpleado();
+    const token = empleadoAuthService.getToken();
     
-    // Limpiar sesión al cargar
-    localStorage.removeItem('empleado_token');
-    localStorage.removeItem('empleado');
+    if (empleadoGuardado && token) {
+      setEmpleado(empleadoGuardado);
+    }
+    setLoading(false);
   }, []);
 
   const login = async (email, password) => {

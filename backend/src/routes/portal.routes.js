@@ -9,7 +9,8 @@ const {
   getPresupuestoDetalle,
   aceptarMiPresupuesto,
   getMisDocumentos,
-  descargarMiDocumento
+  descargarMiDocumento,
+  getEmpleadosProyecto
 } = require('../controllers/cliente.auth.controller');
 
 const router = express.Router();
@@ -72,5 +73,8 @@ router.get('/documentos/:id/download', authClienteMiddleware, descargarMiDocumen
 
 // GET /api/portal/documentos - Obtener documentos públicos del cliente
 router.get('/documentos', authClienteMiddleware, getMisDocumentos);
+
+// GET /api/portal/proyectos/:id/empleados - Empleados asignados al proyecto (para iniciar chat)
+router.get('/proyectos/:id/empleados', authClienteMiddleware, getEmpleadosProyecto);
 
 module.exports = router;

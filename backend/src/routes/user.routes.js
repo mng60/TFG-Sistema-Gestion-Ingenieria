@@ -8,6 +8,7 @@ const {
   deleteUser,
   updatePassword
 } = require('../controllers/user.controller');
+const User = require('../models/User');
 const authMiddleware = require('../middlewares/auth.middleware');
 const checkRole = require('../middlewares/role.middleware');
 
@@ -32,7 +33,27 @@ const updatePasswordValidation = [
 // Todas las rutas requieren autenticación
 router.use(authMiddleware);
 
-// GET /api/users - Obtener todos los usuarios (solo admin)
+// GET /api/users/empleados-chat - Listar empleados para chat (sin necesidad de admin)
+router.get('/empleados-chat', async (req, res) => {
+  try {
+    const users = await User.findAll();
+    
+    res.json({
+      success: true,
+      count: users.length,
+      users
+    });
+  } catch (error) {
+    console.error('Error en empleados-chat:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener empleados',
+      error: error.message
+    });
+  }
+});
+
+// GET /api/users - Obtener todos los usuarios (SOLO admin)
 router.get('/', checkRole('admin'), getAllUsers);
 
 // GET /api/users/:id - Obtener un usuario por ID

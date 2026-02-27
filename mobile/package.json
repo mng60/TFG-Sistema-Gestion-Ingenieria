@@ -1,26 +1,38 @@
-﻿{
-  "name": "tfg-mobile",
+{
+  "name": "sgi-mobile",
   "version": "1.0.0",
-  "description": "Aplicación móvil React Native para sistema de gestión",
-  "main": "index.js",
-  "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web"
-  },
-  "keywords": ["react-native", "expo", "mobile"],
-  "author": "Miguel Sebastián Cárdenas Nugra",
-  "license": "MIT",
+  "description": "PWA móvil para empleados — Sistema de Gestión de Ingeniería",
+  "private": true,
   "dependencies": {
+    "ajv": "^8.18.0",
+    "axios": "^1.6.2",
     "react": "^18.2.0",
-    "react-native": "^0.72.0",
-    "expo": "^49.0.0",
-    "@react-navigation/native": "^6.1.9",
-    "@react-navigation/stack": "^6.3.20",
-    "axios": "^1.6.2"
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.0",
+    "react-scripts": "5.0.1",
+    "socket.io-client": "^4.6.1"
   },
-  "devDependencies": {
-    "@babel/core": "^7.23.5"
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

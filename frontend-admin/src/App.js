@@ -5,6 +5,9 @@ import EmpleadoLogin from './pages/EmpleadoLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import Proyectos from './pages/Proyectos';
 import Clientes from './pages/Clientes';
+import Usuarios from './pages/Usuarios';
+import Chat from './pages/Chat';
+import ProyectoCompleto from './pages/ProyectoCompleto';
 import './styles/App.css';
 
 // Rutas protegidas para empleados
@@ -47,6 +50,24 @@ function App() {
           <Route path="/proyectos" element={
             <EmpleadoProtectedRoute>
               <Proyectos />
+            </EmpleadoProtectedRoute>
+          } />
+
+          <Route path="/proyectos/:id" element={
+            <EmpleadoProtectedRoute>
+              <ProyectoCompleto />
+            </EmpleadoProtectedRoute>
+          } />
+
+          <Route path="/usuarios" element={
+            <EmpleadoProtectedRoute>
+              <Usuarios />
+            </EmpleadoProtectedRoute>
+          } />
+
+          <Route path="/chat" element={
+            <EmpleadoProtectedRoute>
+              <Chat />
             </EmpleadoProtectedRoute>
           } />
 

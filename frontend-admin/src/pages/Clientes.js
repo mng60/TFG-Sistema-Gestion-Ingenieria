@@ -1,54 +1,51 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useEmpleadoAuth } from '../context/EmpleadoAuthContext';
+import AdminLayout from '../components/Layout/AdminLayout';
 import clienteService from '../services/clienteService';
 import Toast from '../components/Toast';
-import ActivarAccesoModal from '../components/ActivarAccesoModal';
 import ConfirmModal from '../components/ConfirmModal';
+import ActivarAccesoModal from '../components/ActivarAccesoModal';
 import '../styles/GestionPages.css';
 
 function Clientes() {
-  const { empleado, logout, isAdmin } = useEmpleadoAuth();
+  const { isAdmin } = useEmpleadoAuth();
   const navigate = useNavigate();
   const [clientes, setClientes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [filtroActivo, setFiltroActivo] = useState('true');
+  const [filtroActivo, setFiltroActivo] = useState('todos');
   const [showModal, setShowModal] = useState(false);
   const [showActivarModal, setShowActivarModal] = useState(false);
-  const [clienteParaActivar, setClienteParaActivar] = useState(null);
   const [modalMode, setModalMode] = useState('crear');
   const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
-  const [confirmModal, setConfirmModal] = useState(null);
   const [toast, setToast] = useState(null);
+  const [confirmModal, setConfirmModal] = useState(null);
 
   const [formData, setFormData] = useState({
     nombre_empresa: '',
     cif: '',
+    nombre_contacto: '',
     email: '',
     telefono: '',
     direccion: '',
     ciudad: '',
     codigo_postal: '',
-    provincia: '',
-    persona_contacto: '',
-    telefono_contacto: '',
-    email_contacto: '',
-    datos_fiscales: '',
-    notas: ''
+    activo: true
   });
 
   useEffect(() => {
     document.title = 'Panel Interno - Clientes';
     cargarClientes();
-  }, [filtroActivo]); // Removido search para que no recargue al escribir
+  }, [filtroActivo]);
 
   const cargarClientes = async () => {
     setLoading(true);
     try {
       const filtros = {};
-      //if (search) filtros.search = search;
-      if (filtroActivo !== 'todos') filtros.activo = filtroActivo === 'true';
+      if (filtroActivo !== 'todos') {
+        filtros.activo = filtroActivo === 'activos';
+      }
 
       const data = await clienteService.getAll(filtros);
       setClientes(data.clientes || []);
@@ -60,50 +57,34 @@ function Clientes() {
     }
   };
 
-  // Filtrar clientes localmente (sin llamadas al backend)
   const clientesFiltrados = clientes.filter(cliente => {
-    if (!search) return true; // Si no hay búsqueda, mostrar todos
+    if (!search) return true;
     
     const searchLower = search.toLowerCase();
     return (
       cliente.nombre_empresa?.toLowerCase().includes(searchLower) ||
       cliente.cif?.toLowerCase().includes(searchLower) ||
-      cliente.email?.toLowerCase().includes(searchLower) ||
-      cliente.ciudad?.toLowerCase().includes(searchLower)
+      cliente.nombre_contacto?.toLowerCase().includes(searchLower) ||
+      cliente.email?.toLowerCase().includes(searchLower)
     );
   });
-
-  // Buscar al presionar Enter o al hacer clic en buscar
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    cargarClientes();
-  };
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
-const abrirModalCrear = () => {
+  const abrirModalCrear = () => {
     setModalMode('crear');
     setFormData({
       nombre_empresa: '',
       cif: '',
+      nombre_contacto: '',
       email: '',
       telefono: '',
       direccion: '',
       ciudad: '',
       codigo_postal: '',
-      provincia: '',
-      persona_contacto: '',
-      telefono_contacto: '',
-      email_contacto: '',
-      datos_fiscales: '',
-      notas: ''
+      activo: true
     });
     setShowModal(true);
   };
@@ -114,25 +95,27 @@ const abrirModalCrear = () => {
     setFormData({
       nombre_empresa: cliente.nombre_empresa || '',
       cif: cliente.cif || '',
+      nombre_contacto: cliente.nombre_contacto || '',
       email: cliente.email || '',
       telefono: cliente.telefono || '',
       direccion: cliente.direccion || '',
       ciudad: cliente.ciudad || '',
       codigo_postal: cliente.codigo_postal || '',
-      provincia: cliente.provincia || '',
-      persona_contacto: cliente.persona_contacto || '',
-      telefono_contacto: cliente.telefono_contacto || '',
-      email_contacto: cliente.email_contacto || '',
-      datos_fiscales: cliente.datos_fiscales || '',
-      notas: cliente.notas || ''
+      activo: cliente.activo
     });
     setShowModal(true);
   };
 
+  const abrirModalActivar = (cliente) => {
+    setClienteSeleccionado(cliente);
+    setShowActivarModal(true);
+  };
+
   const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: type === 'checkbox' ? checked : value
     });
   };
 
@@ -155,31 +138,12 @@ const abrirModalCrear = () => {
     }
   };
 
-  const handleDesactivar = (cliente) => {
-    setConfirmModal({
-      title: 'Desactivar Cliente',
-      message: `¿Estás seguro de desactivar a ${cliente.nombre_empresa}? El cliente no podrá acceder al portal pero se conservará su información.`,
-      type: 'warning',
-      confirmText: 'Desactivar',
-      onConfirm: async () => {
-        try {
-          await clienteService.deactivate(cliente.id);
-          showToast('Cliente desactivado', 'success');
-          cargarClientes();
-        } catch (error) {
-          showToast('Error al desactivar cliente', 'error');
-        }
-      }
-    });
-  };
-
   const handleEliminar = (cliente) => {
     setConfirmModal({
-      title: '⚠️ Eliminar Cliente Permanentemente',
-      message: `¿ELIMINAR permanentemente a ${cliente.nombre_empresa}? Esta acción NO se puede deshacer y se perderán todos los datos asociados.`,
+      title: '⚠️ Eliminar Cliente',
+      message: `¿Eliminar al cliente "${cliente.nombre_empresa}"? Se eliminarán todos sus proyectos asociados.`,
       type: 'danger',
       confirmText: 'Sí, Eliminar',
-      cancelText: 'Cancelar',
       onConfirm: async () => {
         try {
           await clienteService.delete(cliente.id);
@@ -192,216 +156,134 @@ const abrirModalCrear = () => {
     });
   };
 
-  const abrirModalActivarAcceso = (cliente) => {
-    setClienteParaActivar(cliente);
-    setShowActivarModal(true);
-  };
-
-  const handleActivarAcceso = async (password) => {
-    try {
-      await clienteService.activarAcceso(clienteParaActivar.id, password);
-      showToast('Acceso al portal activado exitosamente', 'success');
-      setShowActivarModal(false);
-      setClienteParaActivar(null);
-      cargarClientes();
-    } catch (error) {
-      showToast(error.response?.data?.message || 'Error al activar acceso', 'error');
-    }
-  };
-
   if (loading) {
     return (
-      <div className="loading-container">
-        <div className="spinner"></div>
-        <p>Cargando clientes...</p>
-      </div>
+      <AdminLayout>
+        <div className="loading-container">
+          <div className="spinner"></div>
+          <p>Cargando clientes...</p>
+        </div>
+      </AdminLayout>
     );
   }
+
   return (
-    <div className="admin-layout">
-      {/* Toast de notificaciones */}
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
+    <AdminLayout>
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+
+      <header className="page-header">
+        <div>
+          <h1>Gestión de Clientes</h1>
+          <p>Administra la información de tus clientes</p>
+        </div>
+        {isAdmin() && (
+          <button className="btn-primary" onClick={abrirModalCrear}>
+            ➕ Nuevo Cliente
+          </button>
+        )}
+      </header>
+
+      <div className="filters-bar">
+        <input
+          type="text"
+          placeholder="🔍 Buscar por nombre, CIF, contacto o email..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="search-input"
         />
-      )}
+        
+        <select 
+          value={filtroActivo} 
+          onChange={(e) => setFiltroActivo(e.target.value)}
+          className="filter-select"
+        >
+          <option value="todos">Todos los clientes</option>
+          <option value="activos">Clientes activos</option>
+          <option value="inactivos">Clientes inactivos</option>
+        </select>
+      </div>
 
-      {/* Sidebar */}
-      <aside className="admin-sidebar">
-        <div className="sidebar-header">
-          <h2>SGI</h2>
-          <p>Sistema de Gestión</p>
-        </div>
-
-        <nav className="sidebar-nav">
-          <button className="nav-item" onClick={() => navigate('/dashboard')}>
-            📊 Dashboard
-          </button>
-          <button className="nav-item active" onClick={() => navigate('/clientes')}>
-            👥 Clientes
-          </button>
-          <button className="nav-item" onClick={() => navigate('/proyectos')}>
-            📁 Proyectos
-          </button>
-          <button className="nav-item" onClick={() => navigate('/presupuestos')}>
-            💰 Presupuestos
-          </button>
-          <button className="nav-item" onClick={() => navigate('/documentos')}>
-            📄 Documentos
-          </button>
-        </nav>
-
-        <div className="sidebar-footer">
-          <div className="user-info">
-            <p className="user-name">{empleado?.nombre}</p>
-            <p className="user-role">{empleado?.rol}</p>
-          </div>
-          <button onClick={handleLogout} className="btn-logout">
-            Cerrar Sesión
-          </button>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="admin-main">
-        <header className="page-header">
-          <div>
-            <h1>Gestión de Clientes</h1>
-            <p>Administra las empresas clientes del sistema</p>
-          </div>
-          {isAdmin() && (
-            <button className="btn-primary" onClick={abrirModalCrear}>
-              ➕ Nuevo Cliente
-            </button>
-          )}
-        </header>
-
-        {/* Filtros */}
-        <form onSubmit={handleSearchSubmit} className="filters-bar">
-          <input
-            type="text"
-            placeholder="Buscar por nombre, CIF, email o ciudad ..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="search-input"
-          />
-          
-          <select 
-            value={filtroActivo} 
-            onChange={(e) => setFiltroActivo(e.target.value)}
-            className="filter-select"
-          >
-            <option value="todos">Todos</option>
-            <option value="true">Activos</option>
-            <option value="false">Inactivos</option>
-          </select>
-
-          <button type="submit" className="btn-primary">
-            🔍 Buscar
-          </button>
-        </form>
-
-        {/* Lista de Clientes */}
-        <div className="content-card">
-          {clientesFiltrados.length === 0 ? (
-            <p className="empty-message">
+      <div className="content-card">
+        {clientesFiltrados.length === 0 ? (
+          <p className="empty-message">
             {search ? 'No se encontraron clientes con ese criterio' : 'No hay clientes registrados'}
-            </p>
-          ) : (
-            <div className="table-container">
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    <th>Empresa</th>
-                    <th>CIF</th>
-                    <th>Email</th>
-                    <th>Teléfono</th>
-                    <th>Ciudad</th>
-                    <th>Estado</th>
-                    <th>Portal</th>
-                    <th>Acciones</th>
+          </p>
+        ) : (
+          <div className="table-container">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Empresa</th>
+                  <th>CIF</th>
+                  <th>Contacto</th>
+                  <th>Email</th>
+                  <th>Teléfono</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {clientesFiltrados.map((cliente) => (
+                  <tr key={cliente.id}>
+                    <td><strong>{cliente.nombre_empresa}</strong></td>
+                    <td>{cliente.cif}</td>
+                    <td>{cliente.nombre_contacto}</td>
+                    <td>{cliente.email}</td>
+                    <td>{cliente.telefono || '-'}</td>
+                    <td>
+                      <span className={`badge ${cliente.activo ? 'badge-activo' : 'badge-inactivo'}`}>
+                        {cliente.activo ? 'Activo' : 'Inactivo'}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="action-buttons">
+                        <button 
+                          className="btn-sm btn-edit"
+                          onClick={() => abrirModalEditar(cliente)}
+                          title="Editar"
+                        >
+                          ✏️
+                        </button>
+                        {isAdmin() && (
+                          <>
+                            <button 
+                              className="btn-sm btn-access"
+                              onClick={() => abrirModalActivar(cliente)}
+                              title="Activar acceso portal"
+                            >
+                              🔑
+                            </button>
+                            <button 
+                              className="btn-sm btn-danger"
+                              onClick={() => handleEliminar(cliente)}
+                              title="Eliminar"
+                            >
+                              🗑️
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {clientesFiltrados.map((cliente) => (
-                    <tr key={cliente.id}>
-                      <td><strong>{cliente.nombre_empresa}</strong></td>
-                      <td>{cliente.cif}</td>
-                      <td>{cliente.email}</td>
-                      <td>{cliente.telefono}</td>
-                      <td>{cliente.ciudad}</td>
-                      <td>
-                        <span className={`badge ${cliente.activo ? 'badge-active' : 'badge-inactive'}`}>
-                          {cliente.activo ? 'Activo' : 'Inactivo'}
-                        </span>
-                      </td>
-                      <td>
-                        <span className={`badge ${cliente.activo_login ? 'badge-active' : 'badge-inactive'}`}>
-                          {cliente.activo_login ? 'Activado' : 'Sin acceso'}
-                        </span>
-                      </td>
-                      <td>
-                        <div className="action-buttons">
-                          <button 
-                            className="btn-sm btn-edit"
-                            onClick={() => abrirModalEditar(cliente)}
-                            title="Editar"
-                          >
-                            ✏️
-                          </button>
-                          {isAdmin() && cliente.activo && (
-                            <>
-                              {!cliente.activo_login && (
-                                <button 
-                                  className="btn-sm btn-access"
-                                  onClick={() => abrirModalActivarAcceso(cliente)}
-                                  title="Activar acceso portal"
-                                >
-                                  🔑
-                                </button>
-                              )}
-                              <button 
-                                className="btn-sm btn-warning"
-                                onClick={() => handleDesactivar(cliente)}
-                                title="Desactivar"
-                              >
-                                ⏸️
-                              </button>
-                              <button 
-                                className="btn-sm btn-danger"
-                                onClick={() => handleEliminar(cliente)}
-                                title="Eliminar"
-                              >
-                                🗑️
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      </main>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
 
-      {/* Modal Crear/Editar (igual que antes, sin cambios) */}
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-<div className="modal-header">
+            <div className="modal-header">
               <h2>{modalMode === 'crear' ? 'Nuevo Cliente' : 'Editar Cliente'}</h2>
               <button className="modal-close" onClick={() => setShowModal(false)}>✕</button>
             </div>
 
             <form onSubmit={handleSubmit} className="modal-form">
               <div className="form-grid">
-                <div className="form-group">
-                  <label>Nombre Empresa *</label>
+                <div className="form-group form-group-full">
+                  <label>Nombre de la Empresa *</label>
                   <input
                     type="text"
                     name="nombre_empresa"
@@ -418,7 +300,17 @@ const abrirModalCrear = () => {
                     name="cif"
                     value={formData.cif}
                     onChange={handleInputChange}
-                    maxLength="9"
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Nombre Contacto *</label>
+                  <input
+                    type="text"
+                    name="nombre_contacto"
+                    value={formData.nombre_contacto}
+                    onChange={handleInputChange}
                     required
                   />
                 </div>
@@ -474,54 +366,16 @@ const abrirModalCrear = () => {
                   />
                 </div>
 
-                <div className="form-group">
-                  <label>Provincia</label>
-                  <input
-                    type="text"
-                    name="provincia"
-                    value={formData.provincia}
-                    onChange={handleInputChange}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Persona Contacto</label>
-                  <input
-                    type="text"
-                    name="persona_contacto"
-                    value={formData.persona_contacto}
-                    onChange={handleInputChange}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Teléfono Contacto</label>
-                  <input
-                    type="tel"
-                    name="telefono_contacto"
-                    value={formData.telefono_contacto}
-                    onChange={handleInputChange}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Email Contacto</label>
-                  <input
-                    type="email"
-                    name="email_contacto"
-                    value={formData.email_contacto}
-                    onChange={handleInputChange}
-                  />
-                </div>
-
                 <div className="form-group form-group-full">
-                  <label>Notas</label>
-                  <textarea
-                    name="notas"
-                    value={formData.notas}
-                    onChange={handleInputChange}
-                    rows="3"
-                  />
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <input
+                      type="checkbox"
+                      name="activo"
+                      checked={formData.activo}
+                      onChange={handleInputChange}
+                    />
+                    <span>Cliente activo</span>
+                  </label>
                 </div>
               </div>
 
@@ -538,19 +392,20 @@ const abrirModalCrear = () => {
         </div>
       )}
 
-      {/* Modal Activar Acceso */}
-      {showActivarModal && clienteParaActivar && (
+      {showActivarModal && clienteSeleccionado && (
         <ActivarAccesoModal
-          cliente={clienteParaActivar}
-          onClose={() => {
+          cliente={clienteSeleccionado}
+          onClose={() => setShowActivarModal(false)}
+          onSuccess={() => {
+            showToast('Acceso al portal activado', 'success');
             setShowActivarModal(false);
-            setClienteParaActivar(null);
+            cargarClientes();
           }}
-          onConfirm={handleActivarAcceso}
+          onError={(error) => showToast(error, 'error')}
         />
       )}
 
-       {confirmModal && (
+      {confirmModal && (
         <ConfirmModal
           title={confirmModal.title}
           message={confirmModal.message}
@@ -561,7 +416,7 @@ const abrirModalCrear = () => {
           onClose={() => setConfirmModal(null)}
         />
       )}
-    </div>
+    </AdminLayout>
   );
 }
 

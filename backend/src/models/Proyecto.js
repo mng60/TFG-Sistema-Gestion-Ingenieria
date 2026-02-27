@@ -79,7 +79,18 @@ class Proyecto {
         SELECT 
           p.*,
           c.nombre_empresa as cliente_nombre,
-          u.nombre as responsable_nombre
+          u.nombre as responsable_nombre,
+          COALESCE((
+            SELECT SUM(pr.total)
+            FROM presupuestos pr
+            WHERE pr.proyecto_id = p.id
+            AND pr.aceptado = true
+          ), 0) as total_presupuestado,
+          (
+            SELECT COUNT(*)
+            FROM presupuestos pr
+            WHERE pr.proyecto_id = p.id
+          ) as num_presupuestos
         FROM proyectos p
         LEFT JOIN clientes c ON p.cliente_id = c.id
         LEFT JOIN users u ON p.responsable_id = u.id
@@ -87,39 +98,101 @@ class Proyecto {
       
       const conditions = [];
       const values = [];
-      
+      let paramCount = 1;
+
+      if (filters.current_user_rol !== 'admin') {
+        query = `
+          SELECT DISTINCT
+            p.*,
+            c.nombre_empresa as cliente_nombre,
+            u.nombre as responsable_nombre,
+            COALESCE((
+              SELECT SUM(pr.total)
+              FROM presupuestos pr
+              WHERE pr.proyecto_id = p.id
+              AND pr.aceptado = true
+            ), 0) as total_presupuestado,
+            (
+              SELECT COUNT(*)
+              FROM presupuestos pr
+              WHERE pr.proyecto_id = p.id
+            ) as num_presupuestos
+          FROM proyectos p
+          LEFT JOIN clientes c ON p.cliente_id = c.id
+          LEFT JOIN users u ON p.responsable_id = u.id
+          INNER JOIN proyecto_empleados pe ON p.id = pe.proyecto_id
+          WHERE pe.user_id = $${paramCount}
+          AND pe.activo = true
+        `;
+        values.push(filters.current_user_id);
+        paramCount++;
+      }
+
       // Filtro por estado
       if (filters.estado) {
-        conditions.push(`p.estado = $${conditions.length + 1}`);
+        conditions.push(`p.estado = $${paramCount}`);
         values.push(filters.estado);
+        paramCount++;
       }
       
       // Filtro por prioridad
       if (filters.prioridad) {
-        conditions.push(`p.prioridad = $${conditions.length + 1}`);
+        conditions.push(`p.prioridad = $${paramCount}`);
         values.push(filters.prioridad);
+        paramCount++;
       }
       
       // Filtro por cliente
       if (filters.cliente_id) {
-        conditions.push(`p.cliente_id = $${conditions.length + 1}`);
+        conditions.push(`p.cliente_id = $${paramCount}`);
         values.push(filters.cliente_id);
+        paramCount++;
       }
       
       // Filtro por responsable
       if (filters.responsable_id) {
-        conditions.push(`p.responsable_id = $${conditions.length + 1}`);
+        conditions.push(`p.responsable_id = $${paramCount}`);
         values.push(filters.responsable_id);
+        paramCount++;
       }
       
       // Búsqueda por nombre
       if (filters.search) {
-        conditions.push(`p.nombre ILIKE $${conditions.length + 1}`);
+        conditions.push(`p.nombre ILIKE $${paramCount}`);
         values.push(`%${filters.search}%`);
+        paramCount++;
       }
       
+      // Filtro por empleado compartido
+      if (filters.empleado_compartido_id) {
+        // Buscar proyectos donde ambos empleados estén asignados
+        query = `
+          SELECT DISTINCT
+            p.*,
+            c.nombre_empresa as cliente_nombre,
+            u.nombre as responsable_nombre,
+            COALESCE((
+              SELECT SUM(pr.total)
+              FROM presupuestos pr
+              WHERE pr.proyecto_id = p.id
+              AND pr.aceptado = true
+            ), 0) as total_presupuestado
+          FROM proyectos p
+          LEFT JOIN clientes c ON p.cliente_id = c.id
+          LEFT JOIN users u ON p.responsable_id = u.id
+          INNER JOIN proyecto_empleados pe1 ON p.id = pe1.proyecto_id
+          INNER JOIN proyecto_empleados pe2 ON p.id = pe2.proyecto_id
+          WHERE pe1.user_id = $${paramCount}
+          AND pe2.user_id = $${paramCount + 1}
+        `;
+        values.push(filters.current_user_id);
+        values.push(filters.empleado_compartido_id);
+        paramCount += 2;
+      }
+
       if (conditions.length > 0) {
-        query += ' WHERE ' + conditions.join(' AND ');
+        const connector = filters.current_user_rol !== 'admin' ? ' AND ' : ' WHERE ';
+        query += connector + conditions.join(' AND ');
       }
       
       query += ' ORDER BY p.created_at DESC';
@@ -259,21 +332,45 @@ class Proyecto {
   // Obtener estadísticas del proyecto
   static async getEstadisticas() {
     try {
-      const query = `
+      const queryProyectos = `
         SELECT 
-          COUNT(*) as total,
-          COUNT(CASE WHEN estado = 'pendiente' THEN 1 END) as pendientes,
+          COUNT(*) as total_proyectos,
+          COUNT(CASE WHEN estado = 'pendiente' THEN 1 END) as pendiente,
           COUNT(CASE WHEN estado = 'en_progreso' THEN 1 END) as en_progreso,
-          COUNT(CASE WHEN estado = 'pausado' THEN 1 END) as pausados,
-          COUNT(CASE WHEN estado = 'completado' THEN 1 END) as completados,
-          COUNT(CASE WHEN estado = 'cancelado' THEN 1 END) as cancelados,
-          SUM(presupuesto_estimado) as presupuesto_total_estimado,
-          SUM(presupuesto_real) as presupuesto_total_real
+          COUNT(CASE WHEN estado = 'pausado' THEN 1 END) as pausado,
+          COUNT(CASE WHEN estado = 'completado' THEN 1 END) as completado,
+          COUNT(CASE WHEN estado = 'cancelado' THEN 1 END) as cancelado
         FROM proyectos
       `;
-      
-      const result = await pool.query(query);
-      return result.rows[0];
+
+      const queryPresupuestos = `
+        SELECT 
+          COALESCE(SUM(subtotal), 0) as total_sin_iva,
+          COALESCE(SUM(total), 0) as total_con_iva
+        FROM presupuestos
+        WHERE aceptado = true
+      `;
+
+      const [resProyectos, resPresupuestos] = await Promise.all([
+        pool.query(queryProyectos),
+        pool.query(queryPresupuestos)
+      ]);
+
+      const p = resProyectos.rows[0];
+      const s = resPresupuestos.rows[0];
+
+      return {
+        total_proyectos: parseInt(p.total_proyectos) || 0,
+        por_estado: {
+          pendiente: parseInt(p.pendiente) || 0,
+          en_progreso: parseInt(p.en_progreso) || 0,
+          pausado: parseInt(p.pausado) || 0,
+          completado: parseInt(p.completado) || 0,
+          cancelado: parseInt(p.cancelado) || 0
+        },
+        presupuesto_total_estimado: parseFloat(s.total_sin_iva) || 0,
+        presupuesto_real_total: parseFloat(s.total_con_iva) || 0
+      };
     } catch (error) {
       throw error;
     }

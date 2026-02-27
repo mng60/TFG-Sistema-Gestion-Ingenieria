@@ -3,17 +3,23 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import ProyectoCompleto from './pages/ProyectoCompleto';
+import Chat from './pages/Chat';
+import ClienteLayout from './components/Layout/ClienteLayout';
 import './styles/App.css';
 
-// Rutas protegidas para clientes
+// Ruta protegida: requiere autenticación y envuelve con el layout del portal
 function ClienteProtectedRoute({ children }) {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? children : <Navigate to="/login" />;
+  const { isAuthenticated, loading } = useAuth();
+  if (loading) return null;
+  if (!isAuthenticated) return <Navigate to="/login" />;
+  return <ClienteLayout>{children}</ClienteLayout>;
 }
 
-// Rutas públicas de clientes
+// Ruta pública: redirige al dashboard si ya está autenticado
 function ClientePublicRoute({ children }) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
+  if (loading) return null;
   return !isAuthenticated ? children : <Navigate to="/dashboard" />;
 }
 
@@ -23,16 +29,28 @@ function App() {
       <AuthProvider>
         <Routes>
           <Route path="/" element={<Navigate to="/login" />} />
-          
+
           <Route path="/login" element={
             <ClientePublicRoute>
               <Login />
             </ClientePublicRoute>
           } />
-          
+
           <Route path="/dashboard" element={
             <ClienteProtectedRoute>
               <Dashboard />
+            </ClienteProtectedRoute>
+          } />
+
+          <Route path="/proyectos/:id" element={
+            <ClienteProtectedRoute>
+              <ProyectoCompleto />
+            </ClienteProtectedRoute>
+          } />
+
+          <Route path="/chat" element={
+            <ClienteProtectedRoute>
+              <Chat />
             </ClienteProtectedRoute>
           } />
 

@@ -220,14 +220,15 @@ const cambiarPasswordCliente = async (req, res) => {
   }
 };
 
-// Obtener presupuestos de los proyectos del cliente
+// Obtener presupuestos de los proyectos del cliente (acepta ?proyecto_id= para filtrar)
 const getMisPresupuestos = async (req, res) => {
   try {
     const clienteId = req.user.id;
+    const { proyecto_id } = req.query;
 
     const { pool } = require('../config/database');
-    const query = `
-      SELECT 
+    let query = `
+      SELECT
         p.*,
         pr.nombre as proyecto_nombre,
         u.nombre as creado_por_nombre
@@ -235,10 +236,18 @@ const getMisPresupuestos = async (req, res) => {
       JOIN proyectos pr ON p.proyecto_id = pr.id
       LEFT JOIN users u ON p.creado_por = u.id
       WHERE pr.cliente_id = $1
-      ORDER BY p.fecha_emision DESC
     `;
 
-    const result = await pool.query(query, [clienteId]);
+    const params = [clienteId];
+
+    if (proyecto_id) {
+      query += ' AND p.proyecto_id = $2';
+      params.push(proyecto_id);
+    }
+
+    query += ' ORDER BY p.fecha_emision DESC';
+
+    const result = await pool.query(query, params);
 
     res.json({
       success: true,
@@ -447,6 +456,50 @@ const descargarMiDocumento = async (req, res) => {
   }
 };
 
+// Obtener empleados asignados a uno de los proyectos del cliente (para iniciar chat)
+const getEmpleadosProyecto = async (req, res) => {
+  try {
+    const clienteId = req.user.id;
+    const { id: proyectoId } = req.params;
+
+    const { pool } = require('../config/database');
+
+    // Verificar que el proyecto pertenece al cliente autenticado
+    const checkQuery = 'SELECT id FROM proyectos WHERE id = $1 AND cliente_id = $2';
+    const checkResult = await pool.query(checkQuery, [proyectoId, clienteId]);
+
+    if (checkResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Proyecto no encontrado o no autorizado'
+      });
+    }
+
+    const query = `
+      SELECT u.id, u.nombre, u.email, u.rol, pe.rol_proyecto
+      FROM proyecto_empleados pe
+      JOIN users u ON pe.user_id = u.id
+      WHERE pe.proyecto_id = $1
+      ORDER BY u.nombre ASC
+    `;
+
+    const result = await pool.query(query, [proyectoId]);
+
+    res.json({
+      success: true,
+      count: result.rows.length,
+      empleados: result.rows
+    });
+  } catch (error) {
+    console.error('Error en getEmpleadosProyecto:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener empleados del proyecto',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   activarAccesoCliente,
   loginCliente,
@@ -457,5 +510,6 @@ module.exports = {
   getPresupuestoDetalle,
   aceptarMiPresupuesto,
   getMisDocumentos,
-  descargarMiDocumento
+  descargarMiDocumento,
+  getEmpleadosProyecto
 };

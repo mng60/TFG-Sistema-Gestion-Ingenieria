@@ -1,0 +1,392 @@
+/* ==================== HEADER DEL PROYECTO ==================== */
+.proyecto-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.btn-back {
+  background: #e9ecef;
+  color: #495057;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-back:hover {
+  background: #dee2e6;
+  transform: translateX(-4px);
+}
+
+.proyecto-header-info {
+  flex: 1;
+}
+
+.proyecto-header-info h1 {
+  font-size: 1.8rem;
+  color: #2c3e50;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.proyecto-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ==================== TABS ==================== */
+.tabs-container {
+  display: flex;
+  gap: 0;
+  background: white;
+  border-radius: 12px;
+  padding: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 20px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 14px 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  color: #7f8c8d;
+}
+
+.tab:hover {
+  background: #f8f9fa;
+  color: #495057;
+}
+
+.tab-active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.tab-active:hover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+/* ==================== CONTENIDO DE TABS ==================== */
+.tab-content {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tab-panel {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* ==================== SECCIONES DE INFORMACIÓN ==================== */
+.info-section {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.info-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.info-section h2 {
+  color: #2c3e50;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-header h2 {
+  margin-bottom: 0;
+}
+
+/* Grid de información */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.info-item-full {
+  grid-column: 1 / -1;
+}
+
+.info-item label {
+  color: #7f8c8d;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-item span {
+  color: #2c3e50;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* Descripción y notas */
+.info-descripcion,
+.info-notas {
+  color: #34495e;
+  line-height: 1.6;
+  background: #f8f9fa;
+  padding: 16px;
+  border-radius: 8px;
+  border-left: 4px solid #3498db;
+}
+
+/* ==================== EMPLEADOS ==================== */
+.empleados-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.empleado-card {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s ease;
+}
+
+.empleado-card:hover {
+  background: #e9ecef;
+  transform: translateY(-2px);
+}
+
+.empleado-avatar {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.empleado-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.empleado-info strong {
+  color: #2c3e50;
+  font-size: 1rem;
+}
+
+.empleado-rol {
+  color: #7f8c8d;
+  font-size: 0.85rem;
+}
+
+.btn-desasignar {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-desasignar:hover {
+  background: #c0392b;
+  transform: scale(1.1);
+}
+
+/* ==================== MENSAJES VACÍOS ==================== */
+.empty-message-small {
+  color: #95a5a6;
+  font-style: italic;
+  padding: 20px 0;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+/* ==================== BADGES ESPECÍFICOS ==================== */
+.badge-pendiente {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.badge-en_progreso {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.badge-pausado {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.badge-completado {
+  background: #d4edda;
+  color: #155724;
+}
+
+.badge-cancelado {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+.badge-baja {
+  background: #d4edda;
+  color: #155724;
+}
+
+.badge-media {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.badge-alta {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.badge-urgente {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.badge-borrador {
+  background: #e9ecef;
+  color: #495057;
+}
+
+.badge-enviado {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.badge-aceptado {
+  background: #d4edda;
+  color: #155724;
+}
+
+.badge-rechazado {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.badge-tipo {
+  background: #e9ecef;
+  color: #495057;
+  text-transform: capitalize;
+}
+
+.badge-publico {
+  background: #d4edda;
+  color: #155724;
+}
+
+.badge-privado {
+  background: #fff3cd;
+  color: #856404;
+}
+
+/* Botón success */
+.btn-success {
+  background: #28a745;
+  color: white;
+}
+
+.btn-success:hover {
+  background: #218838;
+  transform: scale(1.1);
+}
+
+.btn-download {
+  background: #3498db;
+  color: white;
+}
+
+.btn-download:hover {
+  background: #2980b9;
+  transform: scale(1.1);
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .empleados-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .proyecto-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .tabs-container {
+    overflow-x: auto;
+  }
+
+  .tab {
+    white-space: nowrap;
+  }
+}

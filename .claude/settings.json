@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(for dir in \"backend/src/services\" \"frontend-admin/src/assets\" \"frontend-admin/src/utils\" \"frontend-cliente/src/assets\" \"frontend-cliente/src/utils\" \"mobile/src/assets\" \"mobile/src/navigation\" \"mobile/src/screens\" \"mobile/src/utils\")",
+      "Bash(do rm -rf \"$dir\")"
+    ]
+  }
+}

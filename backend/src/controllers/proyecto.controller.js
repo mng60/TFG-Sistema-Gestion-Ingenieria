@@ -1,11 +1,92 @@
 const Proyecto = require('../models/Proyecto');
 const Cliente = require('../models/Cliente');
 const User = require('../models/User');
+const { pool } = require('../config/database');
+
+// Helpers para gestión automática del grupo de chat del proyecto
+const crearGrupoChat = async (proyectoId, nombreProyecto, clienteId) => {
+  try {
+    const result = await pool.query(
+      `INSERT INTO conversaciones (nombre, tipo, proyecto_id, created_at, updated_at)
+       VALUES ($1, 'proyecto_grupo', $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+       RETURNING id`,
+      [`Grupo: ${nombreProyecto}`, proyectoId]
+    );
+    const conversacionId = result.rows[0].id;
+
+    // Añadir cliente como participante
+    if (clienteId) {
+      await pool.query(
+        `INSERT INTO conversacion_participantes (conversacion_id, user_id, tipo_usuario, joined_at)
+         VALUES ($1, $2, 'cliente', CURRENT_TIMESTAMP)
+         ON CONFLICT DO NOTHING`,
+        [conversacionId, clienteId]
+      );
+    }
+
+    console.log(`💬 Grupo de chat creado para proyecto ${proyectoId} (conversación ${conversacionId})`);
+    return conversacionId;
+  } catch (error) {
+    console.error('Error al crear grupo de chat del proyecto:', error.message);
+  }
+};
+
+const agregarEmpleadoAGrupo = async (proyectoId, empleadoId) => {
+  try {
+    const conv = await pool.query(
+      `SELECT id FROM conversaciones WHERE proyecto_id = $1 AND tipo = 'proyecto_grupo' LIMIT 1`,
+      [proyectoId]
+    );
+    if (conv.rows.length === 0) return;
+
+    await pool.query(
+      `INSERT INTO conversacion_participantes (conversacion_id, user_id, tipo_usuario, joined_at)
+       VALUES ($1, $2, 'empleado', CURRENT_TIMESTAMP)
+       ON CONFLICT DO NOTHING`,
+      [conv.rows[0].id, empleadoId]
+    );
+  } catch (error) {
+    console.error('Error al añadir empleado al grupo de chat:', error.message);
+  }
+};
+
+const quitarEmpleadoDeGrupo = async (proyectoId, empleadoId) => {
+  try {
+    const conv = await pool.query(
+      `SELECT id FROM conversaciones WHERE proyecto_id = $1 AND tipo = 'proyecto_grupo' LIMIT 1`,
+      [proyectoId]
+    );
+    if (conv.rows.length === 0) return;
+
+    await pool.query(
+      `DELETE FROM conversacion_participantes
+       WHERE conversacion_id = $1 AND user_id = $2 AND tipo_usuario = 'empleado'`,
+      [conv.rows[0].id, empleadoId]
+    );
+  } catch (error) {
+    console.error('Error al quitar empleado del grupo de chat:', error.message);
+  }
+};
+
+const programarBorradoChat = async (proyectoId) => {
+  try {
+    await pool.query(
+      `UPDATE conversaciones
+       SET deletion_scheduled_at = CURRENT_TIMESTAMP + INTERVAL '3 days'
+       WHERE proyecto_id = $1 AND tipo = 'proyecto_grupo' AND deletion_scheduled_at IS NULL`,
+      [proyectoId]
+    );
+    console.log(`🗑️ Borrado programado del chat para proyecto ${proyectoId} en 3 días`);
+  } catch (error) {
+    console.error('Error al programar borrado del chat:', error.message);
+  }
+};
 
 // Obtener todos los proyectos
 const getAllProyectos = async (req, res) => {
   try {
-    const { estado, prioridad, cliente_id, responsable_id, search } = req.query;
+    const { estado, prioridad, cliente_id, responsable_id, search, empleado_id } = req.query;
+    const empleadoActual = req.user; 
     
     const filters = {};
     if (estado) filters.estado = estado;
@@ -13,6 +94,14 @@ const getAllProyectos = async (req, res) => {
     if (cliente_id) filters.cliente_id = cliente_id;
     if (responsable_id) filters.responsable_id = responsable_id;
     if (search) filters.search = search;
+    
+    filters.current_user_id = empleadoActual.id;
+    filters.current_user_rol = empleadoActual.rol;
+
+    // Filtro por proyectos compartidos con otro empleado
+    if (empleado_id) {
+      filters.empleado_compartido_id = empleado_id;
+    }
     
     const proyectos = await Proyecto.findAll(filters);
     
@@ -85,6 +174,9 @@ const createProyecto = async (req, res) => {
 
     const nuevoProyecto = await Proyecto.create(proyectoData);
 
+    // Crear automáticamente el grupo de chat del proyecto
+    await crearGrupoChat(nuevoProyecto.id, nuevoProyecto.nombre, nuevoProyecto.cliente_id);
+
     res.status(201).json({
       success: true,
       message: 'Proyecto creado exitosamente',
@@ -138,6 +230,11 @@ const updateProyecto = async (req, res) => {
     }
 
     const proyectoActualizado = await Proyecto.update(id, proyectoData);
+
+    // Si el proyecto se marca como completado, programar borrado del chat
+    if (proyectoData.estado === 'completado' && proyectoExistente.estado !== 'completado') {
+      await programarBorradoChat(id);
+    }
 
     res.json({
       success: true,
@@ -208,6 +305,9 @@ const asignarEmpleado = async (req, res) => {
 
     const asignacion = await Proyecto.asignarEmpleado(id, user_id, rol_proyecto);
 
+    // Añadir empleado al grupo de chat del proyecto
+    await agregarEmpleadoAGrupo(id, user_id);
+
     res.status(201).json({
       success: true,
       message: 'Empleado asignado exitosamente',
@@ -243,6 +343,9 @@ const desasignarEmpleado = async (req, res) => {
         message: 'Asignación no encontrada o empleado ya desasignado'
       });
     }
+
+    // Quitar empleado del grupo de chat del proyecto
+    await quitarEmpleadoDeGrupo(id, userId);
 
     res.json({
       success: true,
@@ -300,7 +403,7 @@ const getEstadisticas = async (req, res) => {
 
     res.json({
       success: true,
-      estadisticas
+      ...estadisticas
     });
   } catch (error) {
     console.error('Error en getEstadisticas:', error);

@@ -11,7 +11,7 @@ const {
 } = require('../controllers/documento.controller');
 const authMiddleware = require('../middlewares/auth.middleware');
 const checkRole = require('../middlewares/role.middleware');
-const upload = require('../config/multer');
+const { uploadDocumentos } = require('../config/multer');
 
 const router = express.Router();
 
@@ -47,7 +47,18 @@ router.get('/:id', getDocumentoById);
 router.get('/:id/download', downloadDocumento);
 
 // POST /api/documentos/upload - Subir documento (solo admin)
-router.post('/upload', checkRole('admin'), upload.single('file'), uploadDocumento);
+router.post('/upload', checkRole('admin'), (req, res, next) => {
+  uploadDocumentos.single('file')(req, res, (err) => {
+    if (err) {
+      // Error de multer (tipo no permitido, tamaño, etc.)
+      return res.status(400).json({
+        success: false,
+        message: err.message || 'Error al procesar el archivo'
+      });
+    }
+    next();
+  });
+}, uploadDocumento);
 
 // PUT /api/documentos/:id - Actualizar documento (solo admin)
 router.put('/:id', checkRole('admin'), documentoUpdateValidation, updateDocumento);

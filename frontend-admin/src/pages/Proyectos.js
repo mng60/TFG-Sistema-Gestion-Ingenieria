@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useEmpleadoAuth } from '../context/EmpleadoAuthContext';
+import AdminLayout from '../components/Layout/AdminLayout';
 import proyectoService from '../services/proyectoService';
 import clienteService from '../services/clienteService';
 import Toast from '../components/Toast';
 import ConfirmModal from '../components/ConfirmModal';
+import usuarioService from '../services/usuarioService';
 import '../styles/GestionPages.css';
 
 function Proyectos() {
-  const { empleado, logout, isAdmin } = useEmpleadoAuth();
+  const { empleado, isAdmin } = useEmpleadoAuth();
   const navigate = useNavigate();
   const [proyectos, setProyectos] = useState([]);
   const [clientes, setClientes] = useState([]);
@@ -47,6 +49,20 @@ function Proyectos() {
 
   useEffect(() => {
     document.title = 'Panel Interno - Proyectos';
+    
+    // Obtener filtros de la URL
+    const params = new URLSearchParams(window.location.search);
+    const clienteIdURL = params.get('cliente_id');
+    const empleadoIdURL = params.get('empleado_id');
+    
+    if (clienteIdURL) {
+      // El filtro se aplicará en cargarDatos
+    }
+
+    if (empleadoIdURL) {
+      // El filtro se aplicará en cargarDatos
+    }
+    
     cargarDatos();
   }, [filtroEstado, filtroPrioridad]);
 
@@ -57,13 +73,36 @@ function Proyectos() {
       if (filtroEstado !== 'todos') filtros.estado = filtroEstado;
       if (filtroPrioridad !== 'todos') filtros.prioridad = filtroPrioridad;
 
-      const [proyectosData, clientesData] = await Promise.all([
+      const params = new URLSearchParams(window.location.search);
+      const clienteIdURL = params.get('cliente_id');
+      const empleadoIdURL = params.get('empleado_id');
+      
+      if (clienteIdURL) {
+        filtros.cliente_id = clienteIdURL;
+      }
+      
+      if (empleadoIdURL) {
+        filtros.empleado_compartido_id = empleadoIdURL;
+      }
+
+      const requests = [
         proyectoService.getAll(filtros),
         clienteService.getAll({ activo: true })
-      ]);
+      ];
+
+      if (isAdmin()) {
+        requests.push(usuarioService.getAll());
+      }
+
+      const results = await Promise.all(requests);
+
+      const proyectosData = results[0];
+      const clientesData = results[1];
+      const usuariosData = isAdmin() ? results[2] : { users: [] };
 
       setProyectos(proyectosData.proyectos || []);
       setClientes(clientesData.clientes || []);
+      setUsuarios(usuariosData.users || []);
     } catch (error) {
       console.error('Error al cargar datos:', error);
       showToast('Error al cargar datos', 'error');
@@ -89,11 +128,6 @@ function Proyectos() {
     setToast({ message, type });
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
   const abrirModalCrear = () => {
     setModalMode('crear');
     setFormData({
@@ -115,6 +149,11 @@ function Proyectos() {
   };
 
   const abrirModalEditar = (proyecto) => {
+    if (proyecto.estado === 'completado') {
+      showToast('No se pueden editar proyectos completados', 'warning');
+      return;
+    }
+
     setModalMode('editar');
     setProyectoSeleccionado(proyecto);
     setFormData({
@@ -155,11 +194,21 @@ function Proyectos() {
     e.preventDefault();
     
     try {
+      const dataToSend = {
+        ...formData,
+        fecha_inicio: formData.fecha_inicio || null,
+        fecha_fin_estimada: formData.fecha_fin_estimada || null,
+        fecha_fin_real: formData.fecha_fin_real || null,
+        presupuesto_estimado: formData.presupuesto_estimado || null,
+        presupuesto_real: formData.presupuesto_real || null,
+        responsable_id: formData.responsable_id || null
+      };
+
       if (modalMode === 'crear') {
-        await proyectoService.create(formData);
+        await proyectoService.create(dataToSend);
         showToast('Proyecto creado exitosamente', 'success');
       } else {
-        await proyectoService.update(proyectoSeleccionado.id, formData);
+        await proyectoService.update(proyectoSeleccionado.id, dataToSend);
         showToast('Proyecto actualizado exitosamente', 'success');
       }
       
@@ -214,216 +263,179 @@ function Proyectos() {
     }).format(cantidad);
   };
 
-  const getBadgeEstado = (estado) => {
-    const badges = {
-      pendiente: 'badge-pendiente',
-      en_progreso: 'badge-en_progreso',
-      pausado: 'badge-pausado',
-      completado: 'badge-completado',
-      cancelado: 'badge-cancelado'
-    };
-    return badges[estado] || '';
-  };
-
-  const getBadgePrioridad = (prioridad) => {
-    const badges = {
-      baja: 'badge-baja',
-      media: 'badge-media',
-      alta: 'badge-alta',
-      urgente: 'badge-urgente'
-    };
-    return badges[prioridad] || '';
-  };
-
   if (loading) {
     return (
-      <div className="loading-container">
-        <div className="spinner"></div>
-        <p>Cargando proyectos...</p>
-      </div>
+      <AdminLayout>
+        <div className="loading-container">
+          <div className="spinner"></div>
+          <p>Cargando proyectos...</p>
+        </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="admin-layout">
-      {/* Toast */}
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
+    <AdminLayout>
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+
+      <header className="page-header">
+        <div>
+          <h1>Gestión de Proyectos</h1>
+          <p>Administra los proyectos de la empresa</p>
+          {/* Indicador de filtro activo */}
+          {(() => {
+            const params = new URLSearchParams(window.location.search);
+            const clienteIdURL = params.get('cliente_id');
+            const empleadoIdURL = params.get('empleado_id');
+            
+            if (!clienteIdURL && !empleadoIdURL) return null;
+            
+            const clienteNombre = clientes.find(c => c.id === parseInt(clienteIdURL))?.nombre_empresa;
+            const empleadoNombre = usuarios.find(u => u.id === parseInt(empleadoIdURL))?.nombre;
+            
+            return (
+              <div className="filter-indicator">
+                <span>
+                  <strong>🔍 Filtrado por:</strong>{' '}
+                  {clienteIdURL && (clienteNombre || `Cliente ID ${clienteIdURL}`)}
+                  {empleadoIdURL && (empleadoNombre || `Empleado ID ${empleadoIdURL}`)}
+                </span>
+                <button onClick={() => navigate('/proyectos')} className="btn-remove-filter">
+                  ✕ Quitar filtro
+                </button>
+              </div>
+            );
+          })()}
+        </div>
+        {isAdmin() && (
+          <button className="btn-primary" onClick={abrirModalCrear}>
+            ➕ Nuevo Proyecto
+          </button>
+        )}
+      </header>
+
+      <div className="filters-bar">
+        <input
+          type="text"
+          placeholder="🔍 Buscar por nombre, cliente, ubicación o responsable..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="search-input"
         />
-      )}
+        
+        <select 
+          value={filtroEstado} 
+          onChange={(e) => setFiltroEstado(e.target.value)}
+          className="filter-select"
+        >
+          <option value="todos">Todos los estados</option>
+          <option value="pendiente">Pendientes</option>
+          <option value="en_progreso">En Progreso</option>
+          <option value="pausado">Pausados</option>
+          <option value="completado">Completados</option>
+          <option value="cancelado">Cancelados</option>
+        </select>
 
-      {/* Sidebar */}
-      <aside className="admin-sidebar">
-        <div className="sidebar-header">
-          <h2>SGI</h2>
-          <p>Sistema de Gestión</p>
-        </div>
+        <select 
+          value={filtroPrioridad} 
+          onChange={(e) => setFiltroPrioridad(e.target.value)}
+          className="filter-select"
+        >
+          <option value="todos">Todas las prioridades</option>
+          <option value="baja">Baja</option>
+          <option value="media">Media</option>
+          <option value="alta">Alta</option>
+          <option value="urgente">Urgente</option>
+        </select>
+      </div>
 
-        <nav className="sidebar-nav">
-          <button className="nav-item" onClick={() => navigate('/dashboard')}>
-            📊 Dashboard
-          </button>
-          <button className="nav-item" onClick={() => navigate('/clientes')}>
-            👥 Clientes
-          </button>
-          <button className="nav-item active" onClick={() => navigate('/proyectos')}>
-            📁 Proyectos
-          </button>
-          <button className="nav-item" onClick={() => navigate('/presupuestos')}>
-            💰 Presupuestos
-          </button>
-          <button className="nav-item" onClick={() => navigate('/documentos')}>
-            📄 Documentos
-          </button>
-        </nav>
-
-        <div className="sidebar-footer">
-          <div className="user-info">
-            <p className="user-name">{empleado?.nombre}</p>
-            <p className="user-role">{empleado?.rol}</p>
-          </div>
-          <button onClick={handleLogout} className="btn-logout">
-            Cerrar Sesión
-          </button>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="admin-main">
-        <header className="page-header">
-          <div>
-            <h1>Gestión de Proyectos</h1>
-            <p>Administra todos los proyectos de ingeniería</p>
-          </div>
-          {isAdmin() && (
-            <button className="btn-primary" onClick={abrirModalCrear}>
-              ➕ Nuevo Proyecto
-            </button>
-          )}
-        </header>
-
-        {/* Filtros */}
-        <div className="filters-bar">
-          <input
-            type="text"
-            placeholder="🔍 Buscar por nombre, cliente, ubicación o responsable..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="search-input"
-          />
-          
-          <select 
-            value={filtroEstado} 
-            onChange={(e) => setFiltroEstado(e.target.value)}
-            className="filter-select"
-          >
-            <option value="todos">Todos los estados</option>
-            <option value="pendiente">Pendiente</option>
-            <option value="en_progreso">En Progreso</option>
-            <option value="pausado">Pausado</option>
-            <option value="completado">Completado</option>
-            <option value="cancelado">Cancelado</option>
-          </select>
-
-          <select 
-            value={filtroPrioridad} 
-            onChange={(e) => setFiltroPrioridad(e.target.value)}
-            className="filter-select"
-          >
-            <option value="todos">Todas las prioridades</option>
-            <option value="baja">Baja</option>
-            <option value="media">Media</option>
-            <option value="alta">Alta</option>
-            <option value="urgente">Urgente</option>
-          </select>
-        </div>
-
-        {/* Lista de Proyectos */}
-        <div className="content-card">
-          {proyectosFiltrados.length === 0 ? (
-            <p className="empty-message">
-              {search ? 'No se encontraron proyectos con ese criterio' : 'No hay proyectos registrados'}
-            </p>
-          ) : (
-            <div className="table-container">
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    <th>Proyecto</th>
-                    <th>Cliente</th>
-                    <th>Responsable</th>
-                    <th>Estado</th>
-                    <th>Prioridad</th>
-                    <th>Inicio</th>
-                    <th>Presupuesto</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {proyectosFiltrados.map((proyecto) => (
-                    <tr key={proyecto.id}>
-                      <td>
-                        <strong>{proyecto.nombre}</strong>
-                        {proyecto.ubicacion && (
-                          <div style={{ fontSize: '0.85rem', color: '#7f8c8d' }}>
-                            📍 {proyecto.ubicacion}
-                          </div>
+      <div className="content-card">
+        {proyectosFiltrados.length === 0 ? (
+          <p className="empty-message">
+            {search ? 'No se encontraron proyectos con ese criterio' : 'No hay proyectos registrados'}
+          </p>
+        ) : (
+          <div className="table-container">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Proyecto</th>
+                  <th>Cliente</th>
+                  <th>Responsable</th>
+                  <th>Estado</th>
+                  <th>Prioridad</th>
+                  <th>Fecha Fin</th>
+                  <th>Presupuestado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {proyectosFiltrados.map((proyecto) => (
+                  <tr key={proyecto.id}>
+                    <td 
+                      className="proyecto-nombre-clickable"
+                      onClick={() => navigate(`/proyectos/${proyecto.id}`)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <strong>{proyecto.nombre}</strong>
+                    </td>
+                    <td>{proyecto.cliente_nombre || '-'}</td>
+                    <td>{proyecto.responsable_nombre || 'Sin asignar'}</td>
+                    <td>
+                      <span className={`badge badge-${proyecto.estado}`}>
+                        {proyecto.estado.replace('_', ' ')}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`badge badge-${proyecto.prioridad}`}>
+                        {proyecto.prioridad}
+                      </span>
+                    </td>
+                    <td>{formatearFecha(proyecto.fecha_fin_estimada)}</td>
+                    <td>
+                      {proyecto.total_presupuestado > 0 
+                        ? formatearMoneda(proyecto.total_presupuestado)
+                        : <span style={{ color: '#95a5a6', fontSize: '0.85rem' }}>Sin presupuesto</span>
+                      }
+                    </td>
+                    <td>
+                      <div className="action-buttons">
+                        {isAdmin() && (
+                          <>
+                            <button 
+                              className="btn-sm btn-edit"
+                              onClick={() => abrirModalEditar(proyecto)}
+                              title="Editar"
+                            >
+                              ✏️
+                            </button>
+                            <button 
+                              className="btn-sm btn-warning"
+                              onClick={() => abrirModalAsignar(proyecto)}
+                              title="Asignar empleado"
+                            >
+                              👤
+                            </button>
+                            <button 
+                              className="btn-sm btn-danger"
+                              onClick={() => handleEliminar(proyecto)}
+                              title="Eliminar"
+                            >
+                              🗑️
+                            </button>
+                          </>
                         )}
-                      </td>
-                      <td>{proyecto.cliente_nombre}</td>
-                      <td>{proyecto.responsable_nombre || '-'}</td>
-                      <td>
-                        <span className={`badge ${getBadgeEstado(proyecto.estado)}`}>
-                          {proyecto.estado.replace('_', ' ')}
-                        </span>
-                      </td>
-                      <td>
-                        <span className={`badge ${getBadgePrioridad(proyecto.prioridad)}`}>
-                          {proyecto.prioridad}
-                        </span>
-                      </td>
-                      <td>{formatearFecha(proyecto.fecha_inicio)}</td>
-                      <td>{formatearMoneda(proyecto.presupuesto_estimado)}</td>
-                      <td>
-                        <div className="action-buttons">
-                          <button 
-                            className="btn-sm btn-edit"
-                            onClick={() => abrirModalEditar(proyecto)}
-                            title="Editar"
-                          >
-                            ✏️
-                          </button>
-                          {isAdmin() && (
-                            <>
-                              <button 
-                                className="btn-sm btn-access"
-                                onClick={() => abrirModalAsignar(proyecto)}
-                                title="Asignar empleados"
-                              >
-                                👤
-                              </button>
-                              <button 
-                                className="btn-sm btn-danger"
-                                onClick={() => handleEliminar(proyecto)}
-                                title="Eliminar"
-                              >
-                                🗑️
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      </main>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Modal Crear/Editar Proyecto */}
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -442,7 +454,7 @@ function Proyectos() {
                     value={formData.nombre}
                     onChange={handleInputChange}
                     required
-                    placeholder="Ej: Instalación Eléctrica Edificio Central"
+                    placeholder="Ej: Instalación eléctrica industrial"
                   />
                 </div>
 
@@ -482,7 +494,11 @@ function Proyectos() {
                     onChange={handleInputChange}
                   >
                     <option value="">Sin asignar...</option>
-                    <option value={empleado.id}>{empleado.nombre}</option>
+                    {usuarios.map(user => (
+                      <option key={user.id} value={user.id}>
+                        {user.nombre} ({user.rol})
+                      </option>
+                    ))}
                   </select>
                 </div>
 
@@ -534,32 +550,6 @@ function Proyectos() {
                     name="fecha_fin_estimada"
                     value={formData.fecha_fin_estimada}
                     onChange={handleInputChange}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Presupuesto Estimado (€)</label>
-                  <input
-                    type="number"
-                    name="presupuesto_estimado"
-                    value={formData.presupuesto_estimado}
-                    onChange={handleInputChange}
-                    step="0.01"
-                    min="0"
-                    placeholder="0.00"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Presupuesto Real (€)</label>
-                  <input
-                    type="number"
-                    name="presupuesto_real"
-                    value={formData.presupuesto_real}
-                    onChange={handleInputChange}
-                    step="0.01"
-                    min="0"
-                    placeholder="0.00"
                   />
                 </div>
 
@@ -622,7 +612,12 @@ function Proyectos() {
                   required
                 >
                   <option value="">Seleccionar empleado...</option>
-                  <option value={empleado.id}>{empleado.nombre} (Tú)</option>
+                  {usuarios.map(user => (
+                    <option key={user.id} value={user.id}>
+                      {user.nombre} ({user.rol})
+                      {user.id === empleado.id && ' - Tú'}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -663,7 +658,7 @@ function Proyectos() {
           onClose={() => setConfirmModal(null)}
         />
       )}
-    </div>
+    </AdminLayout>
   );
 }
 

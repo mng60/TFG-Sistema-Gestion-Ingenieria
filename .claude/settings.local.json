@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la \"c:\\\\Users\\\\migue\\\\Documents\\\\4o\\\\TFG-Visual\\\\TFG-Sistema-Gestion-Ingenieria\\\\backend\\\\src\\\\controllers\"\" | grep -E \"portal)",
+      "Bash(cliente \")",
+      "Bash(node -e:*)"
+    ]
+  }
+}
