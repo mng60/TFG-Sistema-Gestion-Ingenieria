@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useEmpleadoAuth } from '../context/EmpleadoAuthContext';
 import AdminLayout from '../components/Layout/AdminLayout';
 import proyectoService from '../services/proyectoService';
@@ -8,10 +8,12 @@ import Toast from '../components/Toast';
 import ConfirmModal from '../components/ConfirmModal';
 import usuarioService from '../services/usuarioService';
 import '../styles/GestionPages.css';
+import {Search} from 'lucide-react'
 
 function Proyectos() {
   const { empleado, isAdmin } = useEmpleadoAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [proyectos, setProyectos] = useState([]);
   const [clientes, setClientes] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
@@ -49,41 +51,13 @@ function Proyectos() {
 
   useEffect(() => {
     document.title = 'Panel Interno - Proyectos';
-    
-    // Obtener filtros de la URL
-    const params = new URLSearchParams(window.location.search);
-    const clienteIdURL = params.get('cliente_id');
-    const empleadoIdURL = params.get('empleado_id');
-    
-    if (clienteIdURL) {
-      // El filtro se aplicará en cargarDatos
-    }
-
-    if (empleadoIdURL) {
-      // El filtro se aplicará en cargarDatos
-    }
-    
     cargarDatos();
-  }, [filtroEstado, filtroPrioridad]);
+  }, []);
 
   const cargarDatos = async () => {
     setLoading(true);
     try {
       const filtros = {};
-      if (filtroEstado !== 'todos') filtros.estado = filtroEstado;
-      if (filtroPrioridad !== 'todos') filtros.prioridad = filtroPrioridad;
-
-      const params = new URLSearchParams(window.location.search);
-      const clienteIdURL = params.get('cliente_id');
-      const empleadoIdURL = params.get('empleado_id');
-      
-      if (clienteIdURL) {
-        filtros.cliente_id = clienteIdURL;
-      }
-      
-      if (empleadoIdURL) {
-        filtros.empleado_compartido_id = empleadoIdURL;
-      }
 
       const requests = [
         proyectoService.getAll(filtros),
@@ -111,18 +85,30 @@ function Proyectos() {
     }
   };
 
-  // Filtrado local
-  const proyectosFiltrados = proyectos.filter(proyecto => {
-    if (!search) return true;
-    
-    const searchLower = search.toLowerCase();
-    return (
-      proyecto.nombre?.toLowerCase().includes(searchLower) ||
-      proyecto.cliente_nombre?.toLowerCase().includes(searchLower) ||
-      proyecto.ubicacion?.toLowerCase().includes(searchLower) ||
-      proyecto.responsable_nombre?.toLowerCase().includes(searchLower)
-    );
-  });
+  // Filtrado local (search + filtros de URL)
+  const proyectosFiltrados = (() => {
+    const params = new URLSearchParams(location.search);
+    const clienteIdURL = params.get('cliente_id') ? parseInt(params.get('cliente_id')) : null;
+    const soloEmpleadoIdURL = params.get('solo_empleado_id') ? parseInt(params.get('solo_empleado_id')) : null;
+    const empleadoIdURL = params.get('empleado_id') ? parseInt(params.get('empleado_id')) : null;
+
+    return proyectos.filter(proyecto => {
+      if (filtroEstado !== 'todos' && proyecto.estado !== filtroEstado) return false;
+      if (filtroPrioridad !== 'todos' && proyecto.prioridad !== filtroPrioridad) return false;
+      if (clienteIdURL && proyecto.cliente_id !== clienteIdURL) return false;
+      const ids = (proyecto.empleados_ids || []).map(String);
+      if (soloEmpleadoIdURL && !ids.includes(String(soloEmpleadoIdURL))) return false;
+      if (empleadoIdURL && !ids.includes(String(empleadoIdURL))) return false;
+      if (!search) return true;
+      const sl = search.toLowerCase();
+      return (
+        proyecto.nombre?.toLowerCase().includes(sl) ||
+        proyecto.cliente_nombre?.toLowerCase().includes(sl) ||
+        proyecto.ubicacion?.toLowerCase().includes(sl) ||
+        proyecto.responsable_nombre?.toLowerCase().includes(sl)
+      );
+    });
+  })();
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
@@ -284,22 +270,25 @@ function Proyectos() {
           <p>Administra los proyectos de la empresa</p>
           {/* Indicador de filtro activo */}
           {(() => {
-            const params = new URLSearchParams(window.location.search);
+            const params = new URLSearchParams(location.search);
             const clienteIdURL = params.get('cliente_id');
             const empleadoIdURL = params.get('empleado_id');
-            
-            if (!clienteIdURL && !empleadoIdURL) return null;
-            
-            const clienteNombre = clientes.find(c => c.id === parseInt(clienteIdURL))?.nombre_empresa;
-            const empleadoNombre = usuarios.find(u => u.id === parseInt(empleadoIdURL))?.nombre;
-            
+            const soloEmpleadoIdURL = params.get('solo_empleado_id');
+
+            if (!clienteIdURL && !empleadoIdURL && !soloEmpleadoIdURL) return null;
+
+            const nombreURL = params.get('nombre');
+            const clienteNombre = nombreURL || clientes.find(c => c.id === parseInt(clienteIdURL))?.nombre_empresa;
+            const empleadoNombre = nombreURL || usuarios.find(u => u.id === parseInt(empleadoIdURL || soloEmpleadoIdURL))?.nombre;
+            const label = soloEmpleadoIdURL
+              ? `Proyectos de ${empleadoNombre || `Empleado ID ${soloEmpleadoIdURL}`}`
+              : empleadoIdURL
+                ? `Proyectos compartidos con ${empleadoNombre || `Empleado ID ${empleadoIdURL}`}`
+                : `Cliente: ${clienteNombre || `ID ${clienteIdURL}`}`;
+
             return (
               <div className="filter-indicator">
-                <span>
-                  <strong>🔍 Filtrado por:</strong>{' '}
-                  {clienteIdURL && (clienteNombre || `Cliente ID ${clienteIdURL}`)}
-                  {empleadoIdURL && (empleadoNombre || `Empleado ID ${empleadoIdURL}`)}
-                </span>
+                <span><strong>Filtrado por:</strong> {label}</span>
                 <button onClick={() => navigate('/proyectos')} className="btn-remove-filter">
                   ✕ Quitar filtro
                 </button>
@@ -315,9 +304,10 @@ function Proyectos() {
       </header>
 
       <div className="filters-bar">
+        <Search size={16} color="black" className="search-icon" />
         <input
           type="text"
-          placeholder="🔍 Buscar por nombre, cliente, ubicación o responsable..."
+          placeholder="Buscar por nombre, cliente, ubicación o responsable..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="search-input"

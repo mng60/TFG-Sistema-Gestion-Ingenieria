@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Search } from 'lucide-react';
 
 function ConversationList({ conversaciones, conversacionActiva, onSelectConversacion, onNewConversacion, currentUser }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -57,9 +58,10 @@ function ConversationList({ conversaciones, conversacionActiva, onSelectConversa
       </div>
 
       <div className="conversation-search">
+        <Search size={16} color="black" className="search-icon" />
         <input
           type="text"
-          placeholder="🔍 Buscar chat..."
+          placeholder="Buscar chat..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />

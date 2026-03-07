@@ -73,7 +73,7 @@ function ChatHeaderGrupo({ conversacion, currentUser, onConversacionEliminada, s
           <div className="header-details">
             <h3>{conversacion.nombre || 'Grupo'}</h3>
             <span className="header-subtitle">
-              📁 {cantidadParticipantes} participantes
+              {cantidadParticipantes} participantes
             </span>
           </div>
         </div>
@@ -102,16 +102,16 @@ function ChatHeaderGrupo({ conversacion, currentUser, onConversacionEliminada, s
 
               <div className="chat-menu-dropdown">
                 <button onClick={() => handleMenuAction('info')}>
-                  📋 Ver información del grupo
+                  Ver información del grupo
                 </button>
 
                 <div className="menu-divider"></div>
 
                 <button onClick={() => handleMenuAction('silenciar')}>
-                  🔔 Silenciar notificaciones
+                  Silenciar notificaciones
                 </button>
                 <button onClick={() => handleMenuAction('eliminar')} className="menu-danger">
-                  🗑️ Eliminar grupo
+                  Eliminar grupo
                 </button>
               </div>
             </>

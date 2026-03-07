@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Download } from 'lucide-react';
 
 function ArchivosPanel({ conversacionId, onClose }) {
   const [archivos, setArchivos] = useState({ imagenes: [], documentos: [], audios: [] });
@@ -82,9 +83,6 @@ function ArchivosPanel({ conversacionId, onClose }) {
             ← Volver
           </button>
           <h3>Archivos Compartidos ({totalArchivos})</h3>
-          <button className="btn-close-panel" onClick={onClose}>
-            ✕
-          </button>
         </div>
 
         {/* Tabs */}
@@ -93,19 +91,19 @@ function ArchivosPanel({ conversacionId, onClose }) {
             className={`archivos-tab ${tipoActivo === 'imagenes' ? 'active' : ''}`}
             onClick={() => setTipoActivo('imagenes')}
           >
-            📸 Fotos ({archivos.imagenes.length})
+            Fotos ({archivos.imagenes.length})
           </button>
           <button
             className={`archivos-tab ${tipoActivo === 'documentos' ? 'active' : ''}`}
             onClick={() => setTipoActivo('documentos')}
           >
-            📂 Documentos ({archivos.documentos.length})
+            Documentos ({archivos.documentos.length})
           </button>
           <button
             className={`archivos-tab ${tipoActivo === 'audios' ? 'active' : ''}`}
             onClick={() => setTipoActivo('audios')}
           >
-            🎵 Audios ({archivos.audios.length})
+            Audios ({archivos.audios.length})
           </button>
         </div>
 
@@ -178,7 +176,7 @@ function ArchivosPanel({ conversacionId, onClose }) {
                           className="btn-descargar"
                           onClick={() => handleDescargar(archivo)}
                         >
-                          ⬇️
+                          <Download size={18} />
                         </button>
                       </div>
                     ))}

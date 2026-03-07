@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Paperclip } from 'lucide-react';
 import ArchivosPanel from './ArchivosPanel';
 
 function InfoPanelGrupo({ conversacion, currentUser, onClose }) {
@@ -94,7 +95,7 @@ function InfoPanelGrupo({ conversacion, currentUser, onClose }) {
           <div className="info-section">
             <h3>Acciones rápidas</h3>
             <button className="info-action-btn" onClick={() => setShowArchivos(true)}>
-              📎 Ver archivos compartidos
+              <Paperclip size={14} color="grey" /> Ver archivos compartidos
             </button>
             {proyecto && (
               <button

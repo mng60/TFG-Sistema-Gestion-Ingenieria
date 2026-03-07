@@ -32,11 +32,20 @@
   padding: 10px 15px;
   background: #f8f9fa;
   border-bottom: 1px solid #e9ecef;
+  position: relative;
+}
+
+.conversation-search .search-icon {
+  position: absolute;
+  left: 26px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
 }
 
 .conversation-search input {
   width: 100%;
-  padding: 10px 15px;
+  padding: 10px 15px 10px 36px;
   border: 1px solid #e0e0e0;
   border-radius: 20px;
   font-size: 0.95rem;
@@ -626,18 +635,23 @@
 }
 
 .btn-send {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #4DB6A8;
   color: white;
 }
 
 .btn-send:hover {
-  background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+  background: #3da398;
 }
 
 .btn-voice.recording {
-  background: #e74c3c;
+  background: #4DB6A8;
   color: white;
   animation: pulse 1.5s infinite;
+}
+
+.btn-cancel-recording {
+  background: #e74c3c;
+  color: white;
 }
 
 @keyframes pulse {
@@ -853,7 +867,9 @@
 
 .info-action-btn {
   width: 100%;
-  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   padding: 12px 16px;
   border: 1px solid #e0e0e0;
   background: white;
@@ -1298,6 +1314,9 @@
   font-size: 1rem;
   font-weight: 600;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-download-image:hover,
@@ -1309,6 +1328,9 @@
 .btn-close-viewer {
   font-size: 1.5rem;
   padding: 5px 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .image-viewer-content {

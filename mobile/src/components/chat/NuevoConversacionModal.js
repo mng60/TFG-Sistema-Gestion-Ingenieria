@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Handshake, CircleUserRound } from 'lucide-react';
 import clienteService from '../../services/clienteService';
 import usuarioService from '../../services/usuarioService';
 import proyectoService from '../../services/proyectoService';
@@ -128,14 +129,24 @@ function NuevoConversacionModal({ onClose, onCrear, currentUser, showToast }) {
         <form onSubmit={handleSubmit} className="modal-form">
           <div className="form-group">
             <label>Tipo de Conversación *</label>
-            <select
-              value={tipo}
-              onChange={(e) => { setTipo(e.target.value); setParticipanteId(''); }}
-              required
-            >
-              <option value="empleado_cliente">💬 Chat con Cliente</option>
-              <option value="empleado_empleado">👥 Chat con Empleado</option>
-            </select>
+            <div className="tipo-selector">
+              <button
+                type="button"
+                className={`tipo-btn ${tipo === 'empleado_cliente' ? 'active' : ''}`}
+                onClick={() => { setTipo('empleado_cliente'); setParticipanteId(''); }}
+              >
+                <Handshake size={20} />
+                Chat con Cliente
+              </button>
+              <button
+                type="button"
+                className={`tipo-btn ${tipo === 'empleado_empleado' ? 'active' : ''}`}
+                onClick={() => { setTipo('empleado_empleado'); setParticipanteId(''); }}
+              >
+                <CircleUserRound size={20} />
+                Chat con Empleado
+              </button>
+            </div>
             <small style={{ color: '#7f8c8d', fontSize: '0.85rem', marginTop: '5px', display: 'block' }}>
               Los grupos de proyecto se crean automáticamente al crear un proyecto.
             </small>

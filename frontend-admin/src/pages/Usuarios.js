@@ -6,6 +6,7 @@ import usuarioService from '../services/usuarioService';
 import Toast from '../components/Toast';
 import ConfirmModal from '../components/ConfirmModal';
 import '../styles/GestionPages.css';
+import {Search} from 'lucide-react'
 
 function Usuarios() {
   const { empleado, isAdmin } = useEmpleadoAuth();
@@ -39,7 +40,7 @@ function Usuarios() {
     }
 
     cargarUsuarios();
-  }, [filtroRol, isAdmin, navigate]);
+  }, []);
 
   const cargarUsuarios = async () => {
     setLoading(true);
@@ -175,9 +176,10 @@ function Usuarios() {
       </header>
 
       <div className="filters-bar">
+        <Search size={16} color="black" className="search-icon" />
         <input
           type="text"
-          placeholder="🔍 Buscar por nombre o email..."
+          placeholder="Buscar por nombre o email..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="search-input"

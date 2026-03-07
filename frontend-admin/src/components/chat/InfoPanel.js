@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ArchivosPanel from './ArchivosPanel';
+import { Paperclip } from 'lucide-react';
 
 function InfoPanel({ participant, conversacion, currentUser, onClose }) {
   const [infoAdicional, setInfoAdicional] = useState(null);
@@ -43,9 +44,6 @@ function InfoPanel({ participant, conversacion, currentUser, onClose }) {
         <div className="info-panel-header">
           <button className="btn-back" onClick={onClose}>
             ← Volver
-          </button>
-          <button className="btn-close-panel" onClick={onClose}>
-            ✕
           </button>
         </div>
 
@@ -103,26 +101,30 @@ function InfoPanel({ participant, conversacion, currentUser, onClose }) {
           <div className="info-section">
             <h3>Acciones rápidas</h3>
 
-            <button 
+            <button
               className="info-action-btn"
               onClick={() => setShowArchivos(true)}
             >
-              📎 Ver archivos compartidos
+              <Paperclip size={14} color="grey" /> Ver archivos compartidos
             </button>
 
-            <button 
-              className="info-action-btn"
-              onClick={() => {
-                if (participant.tipo_usuario === 'cliente') {
-                  navigate(`/proyectos?cliente_id=${participant.user_id}`);
-                } else {
-                  navigate(`/proyectos?empleado_id=${participant.user_id}`);
-                }
-                onClose();
-              }}
-            >
-              📁 Ver proyectos
-            </button>
+            {currentUser.rol === 'admin' && (
+              participant.tipo_usuario === 'cliente' ? (
+                <button
+                  className="info-action-btn"
+                  onClick={() => { navigate(`/proyectos?cliente_id=${participant.user_id}&nombre=${encodeURIComponent(participant.nombre)}`); onClose(); }}
+                >
+                  📁 Ver proyectos del cliente
+                </button>
+              ) : (
+                <button
+                  className="info-action-btn"
+                  onClick={() => { navigate(`/proyectos?solo_empleado_id=${participant.user_id}&nombre=${encodeURIComponent(participant.nombre)}`); onClose(); }}
+                >
+                  📁 Ver todos sus proyectos
+                </button>
+              )
+            )}
           </div>
         </div>
 

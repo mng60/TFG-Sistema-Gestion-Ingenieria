@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Download, X } from 'lucide-react';
 
 function ImageViewer({ imageUrl, imageName, onClose }) {
   const [downloading, setDownloading] = useState(false);
@@ -38,10 +39,10 @@ function ImageViewer({ imageUrl, imageName, onClose }) {
             onClick={handleDownload}
             disabled={downloading}
           >
-            {downloading ? '⏳ Descargando...' : '⬇️ Descargar'}
+            {downloading ? '⏳ Descargando...' : <Download size={20} />}
           </button>
           <button className="btn-close-viewer" onClick={onClose}>
-            ✕
+            <X size={29}/>
           </button>
         </div>
 

@@ -40,7 +40,9 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
     };
 
     const handleUserTyping = (data) => {
-      if (data.userId !== currentUser.id) {
+      if (data.conversacion_id !== conversacion.id) return;
+      const isMe = data.userId === currentUser.id && data.tipoUsuario === 'empleado';
+      if (!isMe) {
         setIsTyping(data.isTyping);
         if (data.isTyping) {
           setTimeout(() => setIsTyping(false), 3000);

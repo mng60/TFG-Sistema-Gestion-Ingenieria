@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { Camera, FileText, Headphones } from 'lucide-react';
 
 function AttachmentMenu({ onSelect, onClose }) {
   const menuRef = useRef(null);
@@ -16,23 +17,23 @@ function AttachmentMenu({ onSelect, onClose }) {
 
   const opciones = [
     { 
-      id: 'foto', 
+      id: 'foto',
       label: 'Foto/Imagen', 
-      icon: '📸',
+      icon: <Camera size={35} color="blue"/>,
       accept: 'image/*',
       tipo_mensaje: 'imagen'
     },
     { 
       id: 'documento', 
       label: 'Documento', 
-      icon: '📄',
+      icon: <FileText size={35} color="orange"/>,
       accept: '.pdf,.doc,.docx,.xls,.xlsx,.txt,.zip,.rar',
       tipo_mensaje: 'archivo'
     },
     { 
       id: 'audio', 
       label: 'Audio', 
-      icon: '🎤',
+      icon: <Headphones size={35} color="red"/>,
       accept: 'audio/*',
       tipo_mensaje: 'audio'
     }

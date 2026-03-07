@@ -27,13 +27,10 @@ function ChatHeader({ conversacion, currentUser, onConversacionEliminada }) {
         setShowInfoPanel(true);
         break;
       case 'proyectos':
-        // Si es cliente, filtrar por sus proyectos
         if (otherParticipant?.tipo_usuario === 'cliente') {
-          navigate(`/proyectos?cliente_id=${otherParticipant.user_id}`);
-        } 
-        // Si es empleado, filtrar por proyectos compartidos
-        else if (otherParticipant?.tipo_usuario === 'empleado') {
-          navigate(`/proyectos?empleado_id=${otherParticipant.user_id}`);
+          navigate(`/proyectos?cliente_id=${otherParticipant.user_id}&nombre=${encodeURIComponent(otherParticipant.nombre)}`);
+        } else if (otherParticipant?.tipo_usuario === 'empleado') {
+          navigate(`/proyectos?empleado_id=${otherParticipant.user_id}&nombre=${encodeURIComponent(otherParticipant.nombre)}`);
         }
         break;
       case 'silenciar':
@@ -106,28 +103,28 @@ function ChatHeader({ conversacion, currentUser, onConversacionEliminada }) {
           {showMenu && (
             <div className="chat-menu-dropdown">
               <button onClick={() => handleMenuAction('info')}>
-                📋 Ver info del contacto
+                Ver info del contacto
               </button>
               
               {otherParticipant?.tipo_usuario === 'cliente' && (
                   <button onClick={() => handleMenuAction('proyectos')}>
-                    📁 Ver proyectos
+                    Ver proyectos
                   </button>
               )}
 
               {otherParticipant?.tipo_usuario === 'empleado' && (
                 <button onClick={() => handleMenuAction('proyectos')}>
-                  📁 Proyectos compartidos
+                  Proyectos compartidos
                 </button>
               )}
 
               <div className="menu-divider"></div>
 
               <button onClick={() => handleMenuAction('silenciar')}>
-                🔔 Silenciar notificaciones
+                Silenciar notificaciones
               </button>
               <button onClick={() => handleMenuAction('eliminar')} className="menu-danger">
-                🗑️ Eliminar conversación
+                Eliminar conversación
               </button>
             </div>
           )}

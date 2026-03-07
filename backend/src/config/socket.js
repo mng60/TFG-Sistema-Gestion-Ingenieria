@@ -102,6 +102,7 @@ const initializeSocket = (io) => {
       socket.to(`conversacion_${conversacion_id}`).emit('user_typing', {
         userId: socket.userId,
         tipoUsuario: socket.tipoUsuario,
+        conversacion_id,
         isTyping
       });
     });

@@ -85,23 +85,18 @@ const programarBorradoChat = async (proyectoId) => {
 // Obtener todos los proyectos
 const getAllProyectos = async (req, res) => {
   try {
-    const { estado, prioridad, cliente_id, responsable_id, search, empleado_id } = req.query;
-    const empleadoActual = req.user; 
-    
+    const { estado, prioridad, cliente_id, responsable_id, search } = req.query;
+    const empleadoActual = req.user;
+
     const filters = {};
     if (estado) filters.estado = estado;
     if (prioridad) filters.prioridad = prioridad;
     if (cliente_id) filters.cliente_id = cliente_id;
     if (responsable_id) filters.responsable_id = responsable_id;
     if (search) filters.search = search;
-    
+
     filters.current_user_id = empleadoActual.id;
     filters.current_user_rol = empleadoActual.rol;
-
-    // Filtro por proyectos compartidos con otro empleado
-    if (empleado_id) {
-      filters.empleado_compartido_id = empleado_id;
-    }
     
     const proyectos = await Proyecto.findAll(filters);
     

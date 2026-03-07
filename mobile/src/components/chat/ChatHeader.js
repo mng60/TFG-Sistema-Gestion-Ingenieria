@@ -106,7 +106,7 @@ function ChatHeader({ conversacion, currentUser, onConversacionEliminada }) {
           {showMenu && (
             <div className="chat-menu-dropdown">
               <button onClick={() => handleMenuAction('info')}>
-                📋 Ver info del contacto
+                Ver info del contacto
               </button>
               
               {otherParticipant?.tipo_usuario === 'cliente' && (
@@ -117,17 +117,17 @@ function ChatHeader({ conversacion, currentUser, onConversacionEliminada }) {
 
               {otherParticipant?.tipo_usuario === 'empleado' && (
                 <button onClick={() => handleMenuAction('proyectos')}>
-                  📁 Proyectos compartidos
+                  Proyectos compartidos
                 </button>
               )}
 
               <div className="menu-divider"></div>
 
               <button onClick={() => handleMenuAction('silenciar')}>
-                🔔 Silenciar notificaciones
+                Silenciar notificaciones
               </button>
               <button onClick={() => handleMenuAction('eliminar')} className="menu-danger">
-                🗑️ Eliminar conversación
+                Eliminar conversación
               </button>
             </div>
           )}

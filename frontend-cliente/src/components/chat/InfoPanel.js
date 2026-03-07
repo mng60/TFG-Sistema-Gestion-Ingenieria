@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Paperclip } from 'lucide-react';
 import ArchivosPanel from './ArchivosPanel';
 
 function InfoPanel({ participant, conversacion, currentUser, onClose }) {
@@ -36,7 +37,6 @@ function InfoPanel({ participant, conversacion, currentUser, onClose }) {
       <div className="info-panel" onClick={(e) => e.stopPropagation()}>
         <div className="info-panel-header">
           <button className="btn-back" onClick={onClose}>← Volver</button>
-          <button className="btn-close-panel" onClick={onClose}>✕</button>
         </div>
 
         <div className="info-panel-content">
@@ -83,7 +83,7 @@ function InfoPanel({ participant, conversacion, currentUser, onClose }) {
           <div className="info-section">
             <h3>Acciones rápidas</h3>
             <button className="info-action-btn" onClick={() => setShowArchivos(true)}>
-              📎 Ver archivos compartidos
+              <Paperclip size={14} color="grey" /> Ver archivos compartidos
             </button>
           </div>
         </div>

@@ -76,7 +76,7 @@ class Proyecto {
   static async findAll(filters = {}) {
     try {
       let query = `
-        SELECT 
+        SELECT
           p.*,
           c.nombre_empresa as cliente_nombre,
           u.nombre as responsable_nombre,
@@ -90,12 +90,18 @@ class Proyecto {
             SELECT COUNT(*)
             FROM presupuestos pr
             WHERE pr.proyecto_id = p.id
-          ) as num_presupuestos
+          ) as num_presupuestos,
+          ARRAY(
+            SELECT pe_arr.user_id
+            FROM proyecto_empleados pe_arr
+            WHERE pe_arr.proyecto_id = p.id
+            AND pe_arr.activo = true
+          ) as empleados_ids
         FROM proyectos p
         LEFT JOIN clientes c ON p.cliente_id = c.id
         LEFT JOIN users u ON p.responsable_id = u.id
       `;
-      
+
       const conditions = [];
       const values = [];
       let paramCount = 1;
@@ -116,7 +122,13 @@ class Proyecto {
               SELECT COUNT(*)
               FROM presupuestos pr
               WHERE pr.proyecto_id = p.id
-            ) as num_presupuestos
+            ) as num_presupuestos,
+            ARRAY(
+              SELECT pe_arr.user_id
+              FROM proyecto_empleados pe_arr
+              WHERE pe_arr.proyecto_id = p.id
+              AND pe_arr.activo = true
+            ) as empleados_ids
           FROM proyectos p
           LEFT JOIN clientes c ON p.cliente_id = c.id
           LEFT JOIN users u ON p.responsable_id = u.id
@@ -163,33 +175,6 @@ class Proyecto {
         paramCount++;
       }
       
-      // Filtro por empleado compartido
-      if (filters.empleado_compartido_id) {
-        // Buscar proyectos donde ambos empleados estén asignados
-        query = `
-          SELECT DISTINCT
-            p.*,
-            c.nombre_empresa as cliente_nombre,
-            u.nombre as responsable_nombre,
-            COALESCE((
-              SELECT SUM(pr.total)
-              FROM presupuestos pr
-              WHERE pr.proyecto_id = p.id
-              AND pr.aceptado = true
-            ), 0) as total_presupuestado
-          FROM proyectos p
-          LEFT JOIN clientes c ON p.cliente_id = c.id
-          LEFT JOIN users u ON p.responsable_id = u.id
-          INNER JOIN proyecto_empleados pe1 ON p.id = pe1.proyecto_id
-          INNER JOIN proyecto_empleados pe2 ON p.id = pe2.proyecto_id
-          WHERE pe1.user_id = $${paramCount}
-          AND pe2.user_id = $${paramCount + 1}
-        `;
-        values.push(filters.current_user_id);
-        values.push(filters.empleado_compartido_id);
-        paramCount += 2;
-      }
-
       if (conditions.length > 0) {
         const connector = filters.current_user_rol !== 'admin' ? ' AND ' : ' WHERE ';
         query += connector + conditions.join(' AND ');

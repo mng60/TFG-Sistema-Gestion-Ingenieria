@@ -7,6 +7,7 @@ import Toast from '../components/Toast';
 import ConfirmModal from '../components/ConfirmModal';
 import ActivarAccesoModal from '../components/ActivarAccesoModal';
 import '../styles/GestionPages.css';
+import { Search } from 'lucide-react';
 
 function Clientes() {
   const { isAdmin } = useEmpleadoAuth();
@@ -37,17 +38,12 @@ function Clientes() {
   useEffect(() => {
     document.title = 'Panel Interno - Clientes';
     cargarClientes();
-  }, [filtroActivo]);
+  }, []);
 
   const cargarClientes = async () => {
     setLoading(true);
     try {
-      const filtros = {};
-      if (filtroActivo !== 'todos') {
-        filtros.activo = filtroActivo === 'activos';
-      }
-
-      const data = await clienteService.getAll(filtros);
+      const data = await clienteService.getAll();
       setClientes(data.clientes || []);
     } catch (error) {
       console.error('Error al cargar clientes:', error);
@@ -58,8 +54,11 @@ function Clientes() {
   };
 
   const clientesFiltrados = clientes.filter(cliente => {
+    if (filtroActivo !== 'todos') {
+      const esActivo = filtroActivo === 'activos';
+      if (cliente.activo !== esActivo) return false;
+    }
     if (!search) return true;
-    
     const searchLower = search.toLowerCase();
     return (
       cliente.nombre_empresa?.toLowerCase().includes(searchLower) ||
@@ -184,9 +183,10 @@ function Clientes() {
       </header>
 
       <div className="filters-bar">
+        <Search size={16} color="black" className="search-icon" />
         <input
           type="text"
-          placeholder="🔍 Buscar por nombre, CIF, contacto o email..."
+          placeholder="Buscar por nombre, CIF, contacto o email..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="search-input"

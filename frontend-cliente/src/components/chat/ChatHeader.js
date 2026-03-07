@@ -47,7 +47,7 @@ function ChatHeader({ conversacion, currentUser }) {
               />
               <div className="chat-menu-dropdown">
                 <button onClick={() => { setShowMenu(false); setShowInfoPanel(true); }}>
-                  📋 Ver info del contacto
+                  Ver info del contacto
                 </button>
               </div>
             </>

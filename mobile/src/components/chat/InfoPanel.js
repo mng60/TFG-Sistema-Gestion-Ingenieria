@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Paperclip } from 'lucide-react';
 import ArchivosPanel from './ArchivosPanel';
 
 function InfoPanel({ participant, conversacion, currentUser, onClose }) {
@@ -43,9 +44,6 @@ function InfoPanel({ participant, conversacion, currentUser, onClose }) {
         <div className="info-panel-header">
           <button className="btn-back" onClick={onClose}>
             ← Volver
-          </button>
-          <button className="btn-close-panel" onClick={onClose}>
-            ✕
           </button>
         </div>
 
@@ -107,7 +105,7 @@ function InfoPanel({ participant, conversacion, currentUser, onClose }) {
               className="info-action-btn"
               onClick={() => setShowArchivos(true)}
             >
-              📎 Ver archivos compartidos
+              <Paperclip size={14} color="grey" /> Ver archivos compartidos
             </button>
 
             <button 

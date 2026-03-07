@@ -1,13 +1,29 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Mic, Square, SendHorizontal, Paperclip } from 'lucide-react';
 import AttachmentMenu from './AttachmentMenu';
 
 function ChatFooter({ onSendMessage, onTyping, onSendFile }) {
   const [mensaje, setMensaje] = useState('');
   const [showAttachmentMenu, setShowAttachmentMenu] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
   const [isTyping, setIsTyping] = useState(false);
   const [uploading, setUploading] = useState(false);
   const inputRef = useRef(null);
   const typingTimeoutRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const recordingTimerRef = useRef(null);
+  const cancelRecordingRef = useRef(false);
+
+  useEffect(() => {
+    return () => {
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+        mediaRecorderRef.current.stop();
+      }
+      if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
+    };
+  }, []);
 
   const handleInputChange = (e) => {
     setMensaje(e.target.value);
@@ -72,47 +88,149 @@ function ChatFooter({ onSendMessage, onTyping, onSendFile }) {
     }
   };
 
+  const handleVoiceRecord = async () => {
+    if (!isRecording) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+        const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+          ? 'audio/webm;codecs=opus'
+          : MediaRecorder.isTypeSupported('audio/webm')
+          ? 'audio/webm'
+          : 'audio/mp4';
+
+        const mediaRecorder = new MediaRecorder(stream, { mimeType });
+        mediaRecorderRef.current = mediaRecorder;
+        audioChunksRef.current = [];
+        cancelRecordingRef.current = false;
+
+        mediaRecorder.ondataavailable = (e) => {
+          if (e.data && e.data.size > 0) audioChunksRef.current.push(e.data);
+        };
+
+        mediaRecorder.onstop = async () => {
+          stream.getTracks().forEach((t) => t.stop());
+          clearInterval(recordingTimerRef.current);
+          setRecordingTime(0);
+          setIsRecording(false);
+
+          if (cancelRecordingRef.current) {
+            cancelRecordingRef.current = false;
+            return;
+          }
+
+          const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
+          const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
+          const file = new File([audioBlob], `audio_${Date.now()}.${ext}`, { type: mimeType });
+
+          if (file.size > 0) {
+            setUploading(true);
+            try {
+              await onSendFile(file, 'audio');
+            } catch (err) {
+              alert('Error al enviar el audio');
+            } finally {
+              setUploading(false);
+            }
+          }
+        };
+
+        mediaRecorder.start(250);
+        setIsRecording(true);
+        setRecordingTime(0);
+
+        recordingTimerRef.current = setInterval(() => {
+          setRecordingTime((t) => t + 1);
+        }, 1000);
+
+      } catch (err) {
+        alert('No se pudo acceder al micrófono. Comprueba los permisos.');
+      }
+    } else {
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+        mediaRecorderRef.current.stop();
+      }
+      clearInterval(recordingTimerRef.current);
+    }
+  };
+
+  const handleCancelRecording = () => {
+    cancelRecordingRef.current = true;
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.stop();
+    }
+    clearInterval(recordingTimerRef.current);
+  };
+
+  const formatRecordingTime = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+
   return (
     <div className="chat-footer">
       <form onSubmit={handleSubmit} className="message-input-form">
         <div className="footer-button-group">
-          <button
-            type="button"
-            className="btn-footer btn-attachment"
-            onClick={() => setShowAttachmentMenu(!showAttachmentMenu)}
-            title="Adjuntar archivo"
-            disabled={uploading}
-          >
-            {uploading ? '⏳' : '📎'}
-          </button>
-          {showAttachmentMenu && (
-            <AttachmentMenu
-              onSelect={handleAttachment}
-              onClose={() => setShowAttachmentMenu(false)}
-            />
+          {isRecording ? (
+            <button
+              type="button"
+              className="btn-footer btn-cancel-recording"
+              onClick={handleCancelRecording}
+              title="Cancelar grabación"
+            >
+              <Square size={18} color="white" />
+            </button>
+          ) : (
+            <>
+              <button
+                type="button"
+                className="btn-footer btn-attachment"
+                onClick={() => setShowAttachmentMenu(!showAttachmentMenu)}
+                title="Adjuntar archivo"
+                disabled={uploading}
+              >
+                {uploading ? '⏳' : <Paperclip size={18} color="grey" /> }
+              </button>
+              {showAttachmentMenu && (
+                <AttachmentMenu
+                  onSelect={handleAttachment}
+                  onClose={() => setShowAttachmentMenu(false)}
+                />
+              )}
+            </>
           )}
         </div>
 
         <div className="message-input-container">
-          <textarea
-            ref={inputRef}
-            value={mensaje}
-            onChange={handleInputChange}
-            onKeyPress={handleKeyPress}
-            placeholder={uploading ? 'Subiendo archivo...' : 'Escribe un mensaje...'}
-            rows="1"
-            className="message-input"
-            disabled={uploading}
-          />
+          {isRecording ? (
+            <div className="recording-indicator">
+              <span className="recording-dot" />
+              <span>Grabando {formatRecordingTime(recordingTime)}</span>
+            </div>
+          ) : (
+            <textarea
+              ref={inputRef}
+              value={mensaje}
+              onChange={handleInputChange}
+              onKeyPress={handleKeyPress}
+              placeholder={uploading ? 'Subiendo archivo...' : 'Escribe un mensaje...'}
+              rows="1"
+              className="message-input"
+              disabled={uploading}
+            />
+          )}
         </div>
 
-        {mensaje.trim() ? (
+        {mensaje.trim() && !isRecording ? (
           <button type="submit" className="btn-footer btn-send" title="Enviar" disabled={uploading}>
-            ➤
+            <SendHorizontal size={18} color="white" />
           </button>
         ) : (
-          <button type="button" className="btn-footer btn-voice" disabled={uploading}>
-            🎤
+          <button
+            type="button"
+            className={`btn-footer btn-voice ${isRecording ? 'recording' : ''}`}
+            onClick={handleVoiceRecord}
+            title={isRecording ? 'Enviar audio' : 'Grabar audio'}
+            disabled={uploading}
+          >
+            {isRecording ? <SendHorizontal size={18} color="white" /> : <Mic size={18} />}
           </button>
         )}
       </form>

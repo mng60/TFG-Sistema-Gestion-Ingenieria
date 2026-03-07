@@ -148,6 +148,41 @@
   min-height: 80px;
 }
 
+.tipo-selector {
+  display: flex;
+  gap: 10px;
+}
+
+.tipo-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 10px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #2c3e50;
+  font-family: inherit;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.tipo-btn:hover {
+  border-color: #667eea;
+  background: #f5f3ff;
+}
+
+.tipo-btn.active {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.08);
+  color: #667eea;
+  font-weight: 600;
+}
+
 .error-alert {
   background: #f8d7da;
   color: #721c24;

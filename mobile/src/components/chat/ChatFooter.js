@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { Mic, Square, SendHorizontal, Paperclip } from 'lucide-react';
 import AttachmentMenu from './AttachmentMenu';
 
 function ChatFooter({ onSendMessage, onTyping, onSendFile, showToast }) {
@@ -13,6 +14,7 @@ function ChatFooter({ onSendMessage, onTyping, onSendFile, showToast }) {
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const recordingTimerRef = useRef(null);
+  const cancelRecordingRef = useRef(false);
 
   // Limpiar al desmontar
   useEffect(() => {
@@ -105,14 +107,22 @@ function ChatFooter({ onSendMessage, onTyping, onSendFile, showToast }) {
         const mediaRecorder = new MediaRecorder(stream, { mimeType });
         mediaRecorderRef.current = mediaRecorder;
         audioChunksRef.current = [];
+        cancelRecordingRef.current = false;
 
         mediaRecorder.ondataavailable = (e) => {
           if (e.data && e.data.size > 0) audioChunksRef.current.push(e.data);
         };
 
         mediaRecorder.onstop = async () => {
-          // Detener todas las pistas del stream
           stream.getTracks().forEach((t) => t.stop());
+          clearInterval(recordingTimerRef.current);
+          setRecordingTime(0);
+          setIsRecording(false);
+
+          if (cancelRecordingRef.current) {
+            cancelRecordingRef.current = false;
+            return;
+          }
 
           const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
           const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
@@ -129,11 +139,6 @@ function ChatFooter({ onSendMessage, onTyping, onSendFile, showToast }) {
               setUploading(false);
             }
           }
-
-          // Reset timer
-          clearInterval(recordingTimerRef.current);
-          setRecordingTime(0);
-          setIsRecording(false);
         };
 
         mediaRecorder.start(250); // Recoger datos cada 250ms
@@ -158,6 +163,14 @@ function ChatFooter({ onSendMessage, onTyping, onSendFile, showToast }) {
     }
   };
 
+  const handleCancelRecording = () => {
+    cancelRecordingRef.current = true;
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.stop();
+    }
+    clearInterval(recordingTimerRef.current);
+  };
+
   const formatRecordingTime = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
   return (
@@ -165,21 +178,33 @@ function ChatFooter({ onSendMessage, onTyping, onSendFile, showToast }) {
       <form onSubmit={handleSubmit} className="message-input-form">
         {/* Botón adjuntar */}
         <div className="footer-button-group">
-          <button
-            type="button"
-            className="btn-footer btn-attachment"
-            onClick={() => setShowAttachmentMenu(!showAttachmentMenu)}
-            title="Adjuntar archivo"
-            disabled={uploading || isRecording}
-          >
-            {uploading ? '⏳' : '📎'}
-          </button>
-
-          {showAttachmentMenu && (
-            <AttachmentMenu
-              onSelect={handleAttachment}
-              onClose={() => setShowAttachmentMenu(false)}
-            />
+          {isRecording ? (
+            <button
+              type="button"
+              className="btn-footer btn-cancel-recording"
+              onClick={handleCancelRecording}
+              title="Cancelar grabación"
+            >
+              <Square size={18} color="white" />
+            </button>
+          ) : (
+            <>
+              <button
+                type="button"
+                className="btn-footer btn-attachment"
+                onClick={() => setShowAttachmentMenu(!showAttachmentMenu)}
+                title="Adjuntar archivo"
+                disabled={uploading}
+              >
+                {uploading ? '⏳' : <Paperclip size={18} color="grey" />}
+              </button>
+              {showAttachmentMenu && (
+                <AttachmentMenu
+                  onSelect={handleAttachment}
+                  onClose={() => setShowAttachmentMenu(false)}
+                />
+              )}
+            </>
           )}
         </div>
 
@@ -212,7 +237,7 @@ function ChatFooter({ onSendMessage, onTyping, onSendFile, showToast }) {
             title="Enviar"
             disabled={uploading}
           >
-            ➤
+            <SendHorizontal size={18} color="white" />
           </button>
         ) : (
           <button
@@ -222,7 +247,7 @@ function ChatFooter({ onSendMessage, onTyping, onSendFile, showToast }) {
             title={isRecording ? 'Enviar audio' : 'Grabar audio'}
             disabled={uploading}
           >
-            {isRecording ? '⏹️' : '🎤'}
+            {isRecording ? <SendHorizontal size={18} color="white" /> : <Mic size={18} />}
           </button>
         )}
       </form>
