@@ -48,10 +48,11 @@ class Conversacion {
               json_build_object(
                 'user_id', cp.user_id,
                 'tipo_usuario', cp.tipo_usuario,
-                'nombre', CASE 
+                'nombre', CASE
                   WHEN cp.tipo_usuario = 'empleado' THEN u.nombre
                   WHEN cp.tipo_usuario = 'cliente' THEN COALESCE(cl.persona_contacto, cl.nombre_empresa)
-                END
+                END,
+                'rol', u.rol
               )
             )
             FROM conversacion_participantes cp

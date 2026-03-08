@@ -26,46 +26,52 @@ function Login() {
   };
 
   return (
-    <div className="login-page">
-      <div className="login-logo">
-        <h1>SGI</h1>
-        <p>Sistema de Gestión de Ingeniería</p>
-      </div>
+    <div className="login-container">
+      <div className="login-box">
+        <div className="login-header">
+          <h1>Panel Interno</h1>
+          <p>Sistema de Gestión - Empleados</p>
+        </div>
 
-      <div className="login-card">
-        <h2>Acceso Empleados</h2>
+        <form onSubmit={handleSubmit} className="login-form">
+          {error && <div className="error-message">{error}</div>}
 
-        {error && <div className="login-error">{error}</div>}
-
-        <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Correo electrónico</label>
+            <label htmlFor="email">Email</label>
             <input
               type="email"
+              id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="empleado@empresa.com"
               required
               autoComplete="email"
+              disabled={loading}
             />
           </div>
 
           <div className="form-group">
-            <label>Contraseña</label>
+            <label htmlFor="password">Contraseña</label>
             <input
               type="password"
+              id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               required
               autoComplete="current-password"
+              disabled={loading}
             />
           </div>
 
-          <button type="submit" className="btn-login" disabled={loading}>
-            {loading ? 'Entrando...' : 'Iniciar Sesión'}
+          <button type="submit" className="login-button" disabled={loading}>
+            {loading ? 'Iniciando sesión...' : 'Acceder al Sistema'}
           </button>
         </form>
+
+        <div className="login-footer">
+          <p><small>Panel de gestión interna</small></p>
+        </div>
       </div>
     </div>
   );

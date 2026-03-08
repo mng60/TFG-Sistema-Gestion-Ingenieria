@@ -93,19 +93,19 @@ function ArchivosPanel({ conversacionId, onClose }) {
             className={`archivos-tab ${tipoActivo === 'imagenes' ? 'active' : ''}`}
             onClick={() => setTipoActivo('imagenes')}
           >
-            📸 Fotos ({archivos.imagenes.length})
+            Fotos ({archivos.imagenes.length})
           </button>
           <button
             className={`archivos-tab ${tipoActivo === 'documentos' ? 'active' : ''}`}
             onClick={() => setTipoActivo('documentos')}
           >
-            📂 Documentos ({archivos.documentos.length})
+            Documentos ({archivos.documentos.length})
           </button>
           <button
             className={`archivos-tab ${tipoActivo === 'audios' ? 'active' : ''}`}
             onClick={() => setTipoActivo('audios')}
           >
-            🎵 Audios ({archivos.audios.length})
+            Audios ({archivos.audios.length})
           </button>
         </div>
 

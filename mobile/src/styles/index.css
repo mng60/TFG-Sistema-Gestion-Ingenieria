@@ -1,6 +1,6 @@
 :root {
-  --color-primary: #667eea;
-  --color-primary-dark: #4DB6A8;
+  --color-primary: #4DB6A8;
+  --color-primary-dark: #3A9089;
   --color-bg: #f5f7fa;
   --color-card: #ffffff;
   --color-text: #2c3e50;
@@ -72,7 +72,7 @@ a {
 .badge-baja { background: #dcfce7; color: #16a34a; }
 .badge-publico { background: #dbeafe; color: #1d4ed8; }
 .badge-privado { background: #f3f4f6; color: #6b7280; }
-.badge-tipo { background: #f0f4ff; color: #667eea; }
+.badge-tipo { background: #edf8f7; color: #4DB6A8; }
 
 /* Spinner */
 .spinner {

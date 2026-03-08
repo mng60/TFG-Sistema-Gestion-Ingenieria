@@ -88,8 +88,13 @@ function ChatHeader({ conversacion, currentUser, onConversacionEliminada }) {
           {/* Nombre y tipo */}
           <div className="header-details">
             <h3>{otherParticipant?.nombre || 'Usuario'}</h3>
-            <span className="header-subtitle">
-              {otherParticipant?.tipo_usuario === 'empleado' ? 'Empleado' : 'Cliente'}
+            <span className="header-subtitle" style={{
+              background: otherParticipant?.tipo_usuario === 'cliente' ? '#e67e22'
+                : otherParticipant?.rol === 'admin' ? '#8e44ad' : '#3498db',
+              color: 'white', padding: '2px 8px', borderRadius: 10, fontSize: '0.72rem', fontWeight: 600
+            }}>
+              {otherParticipant?.tipo_usuario === 'cliente' ? 'Cliente'
+                : otherParticipant?.rol === 'admin' ? 'Administrador' : 'Empleado'}
             </span>
           </div>
         </div>

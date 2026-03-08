@@ -7,7 +7,9 @@ const {
   uploadDocumento,
   downloadDocumento,
   updateDocumento,
-  deleteDocumento
+  deleteDocumento,
+  getAccesoEmpleados,
+  setAccesoEmpleados
 } = require('../controllers/documento.controller');
 const authMiddleware = require('../middlewares/auth.middleware');
 const checkRole = require('../middlewares/role.middleware');
@@ -59,6 +61,12 @@ router.post('/upload', checkRole('admin'), (req, res, next) => {
     next();
   });
 }, uploadDocumento);
+
+// GET /api/documentos/:id/acceso-empleados - Obtener empleados con acceso (admin)
+router.get('/:id/acceso-empleados', checkRole('admin'), getAccesoEmpleados);
+
+// PUT /api/documentos/:id/acceso-empleados - Establecer empleados con acceso (admin)
+router.put('/:id/acceso-empleados', checkRole('admin'), setAccesoEmpleados);
 
 // PUT /api/documentos/:id - Actualizar documento (solo admin)
 router.put('/:id', checkRole('admin'), documentoUpdateValidation, updateDocumento);

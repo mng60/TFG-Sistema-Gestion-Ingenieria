@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search } from 'lucide-react';
+import { Search, Plus } from 'lucide-react';
 
 function ConversationList({ 
   conversaciones, 
@@ -43,19 +43,21 @@ function ConversationList({
 
   const getTipoLabel = (conversacion) => {
     if (conversacion.tipo === 'proyecto_grupo') {
-      return { text: '📁 Grupo', color: '#27ae60' };
+      return { text: 'Grupo', color: '#27ae60' };
     }
-    
     const otherParticipant = getOtherParticipant(conversacion);
-    return {
-      text: otherParticipant?.tipo_usuario === 'empleado' ? 'Empleado' : 'Cliente',
-      color: '#667eea'
-    };
+    if (otherParticipant?.tipo_usuario === 'cliente') {
+      return { text: 'Cliente', color: '#e67e22' };
+    }
+    if (otherParticipant?.rol === 'admin') {
+      return { text: 'Administrador', color: '#8e44ad' };
+    }
+    return { text: 'Empleado', color: '#3498db' };
   };
 
   const getAvatarContent = (conversacion) => {
     if (conversacion.tipo === 'proyecto_grupo') {
-      return '📁';
+      return conversacion.nombre?.charAt(0).toUpperCase() || 'G';
     }
     const otherParticipant = getOtherParticipant(conversacion);
     return otherParticipant?.nombre?.charAt(0).toUpperCase() || '?';
@@ -161,7 +163,7 @@ function ConversationList({
 
       {/* Botón nueva conversación */}
       <button className="btn-new-chat" onClick={onNewConversacion}>
-        ➕ Nuevo chat
+        <Plus size={16}/> Nuevo chat
       </button>
     </div>
   );

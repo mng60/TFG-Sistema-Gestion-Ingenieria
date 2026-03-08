@@ -111,7 +111,9 @@ function ProyectoCompleto() {
 
           {activeTab === 'documentos' && (
             <DocumentosList
+              proyectoId={id}
               documentos={documentos}
+              empleadosProyecto={empleados}
               isAdmin={isAdmin()}
               onReload={cargarDocumentos}
               showToast={showToast}

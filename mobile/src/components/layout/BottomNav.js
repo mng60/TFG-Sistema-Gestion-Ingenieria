@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { FolderOpen, MessagesSquare, CircleUserRound } from 'lucide-react';
 
 function BottomNav() {
   const navigate = useNavigate();
@@ -47,7 +48,7 @@ function BottomNav() {
         className={`bottom-nav-item ${isActive('/proyectos') ? 'active' : ''}`}
         onClick={() => navigate('/proyectos')}
       >
-        <span className="bottom-nav-icon">📁</span>
+        <span className="bottom-nav-icon"><FolderOpen size={22}/></span>
         Proyectos
       </button>
 
@@ -56,7 +57,7 @@ function BottomNav() {
         onClick={handleChat}
       >
         <span className="bottom-nav-icon">
-          💬
+          <MessagesSquare size={22}/>
           {mensajesNoLeidos > 0 && (
             <span className="bottom-nav-badge">
               {mensajesNoLeidos > 99 ? '99+' : mensajesNoLeidos}
@@ -70,7 +71,7 @@ function BottomNav() {
         className={`bottom-nav-item ${isActive('/perfil') ? 'active' : ''}`}
         onClick={() => navigate('/perfil')}
       >
-        <span className="bottom-nav-icon">👤</span>
+        <span className="bottom-nav-icon"><CircleUserRound size={22}/></span>
         Perfil
       </button>
     </nav>

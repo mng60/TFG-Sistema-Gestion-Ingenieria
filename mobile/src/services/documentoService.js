@@ -28,6 +28,22 @@ const documentoService = {
     link.click();
     link.remove();
     window.URL.revokeObjectURL(url);
+  },
+
+  setAccesoEmpleados: async (id, userIds) => {
+    const response = await api.put(`/documentos/${id}/acceso-empleados`, { user_ids: userIds });
+    return response.data;
+  },
+
+  upload: async (formDataPayload) => {
+    const token = localStorage.getItem('empleado_token');
+    const response = await axios.post(`${API_URL}/documentos/upload`, formDataPayload, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    return response.data;
   }
 };
 

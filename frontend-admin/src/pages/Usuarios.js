@@ -6,7 +6,7 @@ import usuarioService from '../services/usuarioService';
 import Toast from '../components/Toast';
 import ConfirmModal from '../components/ConfirmModal';
 import '../styles/GestionPages.css';
-import {Search} from 'lucide-react'
+import { Search, Plus } from 'lucide-react'
 
 function Usuarios() {
   const { empleado, isAdmin } = useEmpleadoAuth();
@@ -171,7 +171,7 @@ function Usuarios() {
           <p>Administra empleados y permisos del sistema</p>
         </div>
         <button className="btn-primary" onClick={abrirModalCrear}>
-          ➕ Nuevo Usuario
+          <Plus size={18}/> Nuevo Usuario
         </button>
       </header>
 

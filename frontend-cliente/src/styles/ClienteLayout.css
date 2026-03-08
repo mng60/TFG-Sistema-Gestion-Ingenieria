@@ -10,7 +10,7 @@
 .cliente-sidebar {
   width: 260px;
   min-width: 260px;
-  background: #4DB6A8;
+  background: #1B3A4B;
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -65,6 +65,7 @@
 .nav-item {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 12px;
   padding: 12px 20px;
   color: rgba(255,255,255,0.75);
@@ -82,9 +83,9 @@
 }
 
 .nav-item.active {
-  background: rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.12);
   color: white;
-  border-left-color: #3498db;
+  border-left-color: #4DB6A8;
 }
 
 .nav-icon {

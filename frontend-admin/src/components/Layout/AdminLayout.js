@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useEmpleadoAuth } from '../../context/EmpleadoAuthContext';
 import '../../styles/AdminLayout.css';
+import { MessagesSquare, UserRoundCog, BookUser, ChartColumnDecreasing, FolderOpen } from 'lucide-react';
 
 function AdminLayout({ children }) {
   const { empleado, logout, isAdmin } = useEmpleadoAuth();
@@ -94,25 +95,25 @@ function AdminLayout({ children }) {
             className={`nav-item ${isActive('/dashboard')}`}
             onClick={() => handleNav('/dashboard')}
           >
-            📊 Dashboard
+            <ChartColumnDecreasing size={18}/> Dashboard
           </button>
           <button
             className={`nav-item ${isActive('/clientes')}`}
             onClick={() => handleNav('/clientes')}
           >
-            👥 Clientes
+            <BookUser size={18}/> Clientes
           </button>
           <button
             className={`nav-item ${isActive('/proyectos')}`}
             onClick={() => handleNav('/proyectos')}
           >
-            📁 Proyectos
+            <FolderOpen size={18}/> Proyectos
           </button>
           <button
             className={`nav-item ${isActive('/chat')}`}
             onClick={handleChatNav}
           >
-            💬 Chat
+            <MessagesSquare size={18}/> Chat
             {mensajesNoLeidos > 0 && (
               <span className="notification-badge">{mensajesNoLeidos}</span>
             )}
@@ -122,7 +123,7 @@ function AdminLayout({ children }) {
               className={`nav-item ${isActive('/usuarios')}`}
               onClick={() => handleNav('/usuarios')}
             >
-              👤 Usuarios
+              <UserRoundCog size={18}/> Usuarios
             </button>
           )}
         </nav>

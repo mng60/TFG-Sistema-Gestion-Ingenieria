@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import proyectoService from '../services/proyectoService';
 import EditarProyectoModal from './modals/EditarProyectoModal';
 import AsignarEmpleadoModal from './modals/AsignarEmpleadoModal';
+import { Plus } from 'lucide-react';
 
 function ProyectoInfo({ 
   proyecto, 
@@ -108,7 +109,7 @@ function ProyectoInfo({
           <h2>Empleados Asignados ({empleadosProyecto.length})</h2>
           {isAdmin && (
             <button className="btn-secondary" onClick={() => setShowAsignarModal(true)}>
-              ➕ Asignar Empleado
+              <Plus size={16}/> Asignar Empleado
             </button>
           )}
         </div>

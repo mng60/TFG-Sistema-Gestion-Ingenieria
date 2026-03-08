@@ -56,7 +56,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #4DB6A8 0%, #3A9089 100%);
   color: white;
   border-radius: 16px 16px 0 0;
   flex-shrink: 0;
@@ -139,8 +139,8 @@
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #4DB6A8;
+  box-shadow: 0 0 0 3px rgba(77, 182, 168, 0.15);
 }
 
 .form-group textarea {
@@ -172,14 +172,14 @@
 }
 
 .tipo-btn:hover {
-  border-color: #667eea;
-  background: #f5f3ff;
+  border-color: #4DB6A8;
+  background: #edf8f7;
 }
 
 .tipo-btn.active {
-  border-color: #667eea;
-  background: rgba(102, 126, 234, 0.08);
-  color: #667eea;
+  border-color: #4DB6A8;
+  background: rgba(77, 182, 168, 0.1);
+  color: #3A9089;
   font-weight: 600;
 }
 
@@ -202,7 +202,7 @@
 
 .modal-actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 12px;
   padding-top: 20px;
   border-top: 1px solid #e0e0e0;

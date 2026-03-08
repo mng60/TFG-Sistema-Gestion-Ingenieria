@@ -30,13 +30,10 @@ function ConversationList({ conversaciones, conversacionActiva, onSelectConversa
     return other?.nombre || 'Usuario';
   };
 
-  const getTipoLabel = (conversacion) => {
-    if (conversacion.tipo === 'proyecto_grupo') return { text: '📁 Grupo', color: '#27ae60' };
-    return { text: 'Empleado', color: '#667eea' };
-  };
-
   const getAvatarContent = (conversacion) => {
-    if (conversacion.tipo === 'proyecto_grupo') return '📁';
+    if (conversacion.tipo === 'proyecto_grupo') {
+      return conversacion.nombre?.charAt(0).toUpperCase() || 'G';
+    }
     const other = getOtherParticipant(conversacion);
     return other?.nombre?.charAt(0).toUpperCase() || '?';
   };
@@ -75,7 +72,6 @@ function ConversationList({ conversaciones, conversacionActiva, onSelectConversa
         ) : (
           conversacionesFiltradas.map(conversacion => {
             const isActive = conversacionActiva?.id === conversacion.id;
-            const tipoInfo = getTipoLabel(conversacion);
 
             return (
               <div
@@ -99,9 +95,6 @@ function ConversationList({ conversaciones, conversacionActiva, onSelectConversa
                   </div>
 
                   <div className="conversation-preview">
-                    <span className="participant-type" style={{ background: tipoInfo.color }}>
-                      {tipoInfo.text}
-                    </span>
                     {conversacion.ultimo_mensaje && (
                       <p className="last-message">
                         {conversacion.ultimo_mensaje.tipo_mensaje === 'archivo'

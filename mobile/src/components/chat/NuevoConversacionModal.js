@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Handshake, CircleUserRound } from 'lucide-react';
+import { Handshake, CircleUserRound, Plus } from 'lucide-react';
 import clienteService from '../../services/clienteService';
 import usuarioService from '../../services/usuarioService';
 import proyectoService from '../../services/proyectoService';
@@ -186,7 +186,7 @@ function NuevoConversacionModal({ onClose, onCrear, currentUser, showToast }) {
               Cancelar
             </button>
             <button type="submit" className="btn-primary" disabled={!participanteId}>
-              Crear Chat
+              <Plus size={15} /> Crear Chat
             </button>
           </div>
         </form>

@@ -28,9 +28,6 @@ function ChatHeader({ conversacion, currentUser }) {
           </div>
           <div className="header-details">
             <h3>{otherParticipant?.nombre || 'Usuario'}</h3>
-            <span className="header-subtitle">
-              {otherParticipant?.tipo_usuario === 'empleado' ? 'Empleado' : 'Usuario'}
-            </span>
           </div>
         </div>
 

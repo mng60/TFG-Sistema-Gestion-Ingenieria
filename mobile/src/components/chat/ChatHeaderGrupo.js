@@ -65,7 +65,7 @@ function ChatHeaderGrupo({ conversacion, currentUser, onConversacionEliminada, s
         <div className="chat-header-info">
           <div className="header-avatar">
             <div className="avatar-circle">
-              📁
+              {conversacion.nombre?.charAt(0).toUpperCase() || 'G'}
             </div>
             <div className="status-indicator online"></div>
           </div>
@@ -73,7 +73,7 @@ function ChatHeaderGrupo({ conversacion, currentUser, onConversacionEliminada, s
           <div className="header-details">
             <h3>{conversacion.nombre || 'Grupo'}</h3>
             <span className="header-subtitle">
-              📁 {cantidadParticipantes} participantes
+              {cantidadParticipantes} participantes
             </span>
           </div>
         </div>

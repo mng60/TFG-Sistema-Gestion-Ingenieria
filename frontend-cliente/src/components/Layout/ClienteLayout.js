@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import '../../styles/ClienteLayout.css';
+import { FolderOpen, MessagesSquare } from 'lucide-react';
 
 function ClienteLayout({ children }) {
   const { cliente, logout } = useAuth();
@@ -32,8 +33,7 @@ function ClienteLayout({ children }) {
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
             onClick={() => setSidebarOpen(false)}
           >
-            <span className="nav-icon">📁</span>
-            <span>Mis Proyectos</span>
+            <FolderOpen size={18}/> Mis Proyectos
           </NavLink>
 
           <NavLink
@@ -41,8 +41,7 @@ function ClienteLayout({ children }) {
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
             onClick={() => setSidebarOpen(false)}
           >
-            <span className="nav-icon">💬</span>
-            <span>Chat</span>
+            <MessagesSquare size={18}/> Chat
           </NavLink>
         </nav>
 

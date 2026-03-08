@@ -13,7 +13,10 @@ const getAllDocumentos = async (req, res) => {
     if (proyecto_id) filters.proyecto_id = proyecto_id;
     if (es_publico !== undefined) filters.es_publico = es_publico === 'true';
     
-    const documentos = await Documento.findAll(filters);
+    const documentos = await Documento.findAll(filters, {
+      userId: req.user?.id,
+      isAdmin: req.user?.rol === 'admin'
+    });
     
     res.json({
       success: true,
@@ -199,7 +202,14 @@ const updateDocumento = async (req, res) => {
       });
     }
 
-    const documentoActualizado = await Documento.update(id, documentoData);
+    const dataMerged = {
+      nombre:         documentoData.nombre         ?? documentoExistente.nombre,
+      tipo_documento: documentoData.tipo_documento ?? documentoExistente.tipo_documento,
+      descripcion:    documentoData.descripcion    ?? documentoExistente.descripcion,
+      version:        documentoData.version        ?? documentoExistente.version,
+      es_publico:     documentoData.es_publico     !== undefined ? documentoData.es_publico : documentoExistente.es_publico,
+    };
+    const documentoActualizado = await Documento.update(id, dataMerged);
 
     res.json({
       success: true,
@@ -251,6 +261,31 @@ const deleteDocumento = async (req, res) => {
   }
 };
 
+// Obtener empleados con acceso a un documento
+const getAccesoEmpleados = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const empleados = await Documento.getAccesoEmpleados(id);
+    res.json({ success: true, empleados });
+  } catch (error) {
+    console.error('Error en getAccesoEmpleados:', error);
+    res.status(500).json({ success: false, message: 'Error al obtener acceso', error: error.message });
+  }
+};
+
+// Establecer empleados con acceso a un documento
+const setAccesoEmpleados = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { user_ids } = req.body;
+    await Documento.setAccesoEmpleados(id, user_ids || []);
+    res.json({ success: true, message: 'Acceso actualizado' });
+  } catch (error) {
+    console.error('Error en setAccesoEmpleados:', error);
+    res.status(500).json({ success: false, message: 'Error al actualizar acceso', error: error.message });
+  }
+};
+
 module.exports = {
   getAllDocumentos,
   getDocumentoById,
@@ -258,5 +293,7 @@ module.exports = {
   uploadDocumento,
   downloadDocumento,
   updateDocumento,
-  deleteDocumento
+  deleteDocumento,
+  getAccesoEmpleados,
+  setAccesoEmpleados
 };

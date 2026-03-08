@@ -8,7 +8,7 @@ import Toast from '../components/Toast';
 import ConfirmModal from '../components/ConfirmModal';
 import usuarioService from '../services/usuarioService';
 import '../styles/GestionPages.css';
-import {Search} from 'lucide-react'
+import { Search, Plus } from 'lucide-react'
 
 function Proyectos() {
   const { empleado, isAdmin } = useEmpleadoAuth();
@@ -298,7 +298,7 @@ function Proyectos() {
         </div>
         {isAdmin() && (
           <button className="btn-primary" onClick={abrirModalCrear}>
-            ➕ Nuevo Proyecto
+            <Plus size={18}/> Nuevo Proyecto
           </button>
         )}
       </header>

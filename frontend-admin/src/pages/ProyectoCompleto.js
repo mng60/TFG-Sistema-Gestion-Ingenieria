@@ -202,6 +202,7 @@ function ProyectoCompleto() {
           <ProyectoDocumentos
             proyectoId={id}
             documentos={documentos}
+            empleadosProyecto={empleadosProyecto}
             isAdmin={isAdmin()}
             onReload={cargarDocumentos}
             showToast={showToast}

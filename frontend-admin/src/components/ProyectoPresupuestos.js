@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import presupuestoService from '../services/presupuestoService';
 import PresupuestoModal from './modals/PresupuestoModal';
+import { Plus } from 'lucide-react';
 
 function ProyectoPresupuestos({ 
   proyectoId, 
@@ -101,7 +102,7 @@ function ProyectoPresupuestos({
         <h2>Presupuestos del Proyecto</h2>
         {isAdmin && proyecto.estado !== 'completado' && proyecto.estado !== 'cancelado' && (
           <button className="btn-primary" onClick={() => abrirModalPresupuesto()}>
-            ➕ Nuevo Presupuesto
+            <Plus size={16}/> Nuevo Presupuesto
           </button>
         )}
       </div>

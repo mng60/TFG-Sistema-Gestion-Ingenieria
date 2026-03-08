@@ -1,18 +1,23 @@
 import React, { useState, useEffect } from 'react';
+import { Plus, Users } from 'lucide-react';
 import proyectoService from '../../services/proyectoService';
 import usuarioService from '../../services/usuarioService';
 import ConfirmModal from '../common/ConfirmModal';
 import '../../styles/Modal.css';
 
-function AsignarModal({ proyectoId, onClose, onSuccess }) {
+function AsignarModal({ proyectoId, empleadosAsignados, onClose, onSuccess }) {
   const [empleados, setEmpleados] = useState([]);
   const [seleccionado, setSeleccionado] = useState(null);
   const [rolProyecto, setRolProyecto] = useState('técnico');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    usuarioService.getEmpleadosChat().then((d) => setEmpleados(d.empleados || []));
+    usuarioService.getEmpleadosChat().then((d) => setEmpleados(d.users || d.empleados || []));
   }, []);
+
+  const idsAsignados = new Set(empleadosAsignados.map(e => e.user_id || e.id));
+
+  const empleadosFiltrados = empleados.filter(emp => !idsAsignados.has(emp.id));
 
   const handleAsignar = async () => {
     if (!seleccionado) return;
@@ -51,33 +56,39 @@ function AsignarModal({ proyectoId, onClose, onSuccess }) {
             <label>Seleccionar empleado</label>
           </div>
           <div className="empleados-picker">
-            {empleados.map((emp) => (
-              <div
-                key={emp.id}
-                className={`empleado-picker-item ${seleccionado?.id === emp.id ? 'selected' : ''}`}
-                onClick={() => setSeleccionado(emp)}
-              >
-                <div style={{
-                  width: 36, height: 36, borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #667eea, #764ba2)',
-                  color: 'white', display: 'flex', alignItems: 'center',
-                  justifyContent: 'center', fontWeight: 700, flexShrink: 0
-                }}>
-                  {(emp.nombre || '?').charAt(0).toUpperCase()}
+            {empleadosFiltrados.length === 0 ? (
+              <p style={{ textAlign: 'center', color: '#aaa', fontSize: '0.88rem', padding: '20px 0' }}>
+                Todos los empleados ya están asignados
+              </p>
+            ) : (
+              empleadosFiltrados.map((emp) => (
+                <div
+                  key={emp.id}
+                  className={`empleado-picker-item ${seleccionado?.id === emp.id ? 'selected' : ''}`}
+                  onClick={() => setSeleccionado(emp)}
+                >
+                  <div style={{
+                    width: 36, height: 36, borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #4DB6A8, #3A9089)',
+                    color: 'white', display: 'flex', alignItems: 'center',
+                    justifyContent: 'center', fontWeight: 700, flexShrink: 0
+                  }}>
+                    {(emp.nombre || '?').charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{emp.nombre}</div>
+                    <div style={{ fontSize: '0.78rem', color: '#7f8c8d' }}>{emp.email}</div>
+                  </div>
+                  {seleccionado?.id === emp.id && <span style={{ marginLeft: 'auto', color: '#4DB6A8' }}>✓</span>}
                 </div>
-                <div>
-                  <div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{emp.nombre}</div>
-                  <div style={{ fontSize: '0.78rem', color: '#7f8c8d' }}>{emp.email}</div>
-                </div>
-                {seleccionado?.id === emp.id && <span style={{ marginLeft: 'auto', color: '#667eea' }}>✓</span>}
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
         <div className="modal-actions">
           <button className="btn-secondary" onClick={onClose}>Cancelar</button>
           <button className="btn-primary" onClick={handleAsignar} disabled={!seleccionado || loading}>
-            {loading ? 'Asignando...' : 'Asignar'}
+            <Plus size={15} /> {loading ? 'Asignando...' : 'Asignar'}
           </button>
         </div>
       </div>
@@ -112,15 +123,16 @@ function EmpleadosList({ proyectoId, empleados, isAdmin, onReload, showToast }) 
       <div className="tab-section-header">
         <h3>Equipo ({empleados.length})</h3>
         {isAdmin && (
-          <button className="btn-asignar" onClick={() => setShowAsignar(true)}>
-            ➕ Asignar
+          <button className="btn-asignar" onClick={() => setShowAsignar(true)}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+            <Plus size={14} /> Asignar
           </button>
         )}
       </div>
 
       {empleados.length === 0 ? (
         <div className="empty-state">
-          <span className="empty-icon">👥</span>
+          <Users size={44} color="#ccc" />
           <p>No hay empleados asignados</p>
         </div>
       ) : (
@@ -149,6 +161,7 @@ function EmpleadosList({ proyectoId, empleados, isAdmin, onReload, showToast }) 
       {showAsignar && (
         <AsignarModal
           proyectoId={proyectoId}
+          empleadosAsignados={empleados}
           onClose={() => setShowAsignar(false)}
           onSuccess={() => {
             setShowAsignar(false);
