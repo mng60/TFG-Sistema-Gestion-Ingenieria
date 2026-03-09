@@ -1,5 +1,9 @@
 const { pool } = require('../config/database');
 
+// Añadir columna foto_url si no existe
+pool.query(`ALTER TABLE clientes ADD COLUMN IF NOT EXISTS foto_url VARCHAR(500)`)
+  .catch(err => console.error('Error añadiendo foto_url a clientes:', err.message));
+
 class Cliente {
   // Crear un nuevo cliente
   static async create(clienteData) {
@@ -164,14 +168,14 @@ class Cliente {
     }
   }
 
-  // Desactivar cliente (soft delete)
+  // Desactivar cliente (soft delete + revoca acceso portal)
   static async deactivate(id) {
     try {
       const query = `
-        UPDATE clientes 
-        SET activo = false, updated_at = CURRENT_TIMESTAMP
+        UPDATE clientes
+        SET activo = false, activo_login = false, updated_at = CURRENT_TIMESTAMP
         WHERE id = $1
-        RETURNING id, nombre_empresa, activo
+        RETURNING id, nombre_empresa, activo, activo_login
       `;
       
       const result = await pool.query(query, [id]);

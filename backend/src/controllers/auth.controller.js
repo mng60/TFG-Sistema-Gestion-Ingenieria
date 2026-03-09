@@ -59,35 +59,56 @@ const register = async (req, res) => {
   }
 };
 
+const MAX_INTENTOS = 5;
+const LOCK_MINUTOS = 15;
+
 // Login de usuario
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    const { pool } = require('../config/database');
 
-    // Buscar usuario por email
-    const user = await User.findByEmail(email);
+    // Buscar usuario por email (SELECT * para tener login_attempts y locked_until)
+    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    const user = result.rows[0];
+
     if (!user) {
-      return res.status(401).json({
+      return res.status(401).json({ success: false, message: 'Credenciales inválidas' });
+    }
+
+    // Comprobar bloqueo
+    if (user.locked_until && new Date(user.locked_until) > new Date()) {
+      const minutos = Math.ceil((new Date(user.locked_until) - new Date()) / 60000);
+      return res.status(429).json({
         success: false,
-        message: 'Credenciales inválidas'
+        message: `Cuenta bloqueada por demasiados intentos. Inténtalo en ${minutos} min o solicita un reset de contraseña.`,
+        bloqueado: true
       });
     }
 
     // Verificar contraseña
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
+      const intentos = (user.login_attempts || 0) + 1;
+      const bloqueado = intentos >= MAX_INTENTOS;
+      await pool.query(
+        `UPDATE users SET login_attempts = $1, locked_until = $2 WHERE id = $3`,
+        [intentos, bloqueado ? new Date(Date.now() + LOCK_MINUTOS * 60000) : null, user.id]
+      );
+      const restantes = MAX_INTENTOS - intentos;
       return res.status(401).json({
         success: false,
-        message: 'Credenciales inválidas'
+        message: bloqueado
+          ? `Cuenta bloqueada ${LOCK_MINUTOS} min por demasiados intentos. Solicita un reset de contraseña.`
+          : `Credenciales inválidas. ${restantes} intento${restantes !== 1 ? 's' : ''} restante${restantes !== 1 ? 's' : ''}.`,
+        bloqueado
       });
     }
 
-    // Generar token
-    const token = generateToken({
-      id: user.id,
-      email: user.email,
-      rol: user.rol
-    });
+    // Login correcto — resetear intentos
+    await pool.query('UPDATE users SET login_attempts = 0, locked_until = NULL WHERE id = $1', [user.id]);
+
+    const token = generateToken({ id: user.id, email: user.email, rol: user.rol });
 
     res.json({
       success: true,
@@ -98,17 +119,14 @@ const login = async (req, res) => {
         nombre: user.nombre,
         email: user.email,
         rol: user.rol,
-        telefono: user.telefono
+        telefono: user.telefono,
+        foto_url: user.foto_url || null
       }
     });
 
   } catch (error) {
     console.error('Error en login:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al iniciar sesión',
-      error: error.message
-    });
+    res.status(500).json({ success: false, message: 'Error al iniciar sesión', error: error.message });
   }
 };
 
@@ -133,22 +151,69 @@ const getProfile = async (req, res) => {
         email: user.email,
         rol: user.rol,
         telefono: user.telefono,
+        foto_url: user.foto_url || null,
         created_at: user.created_at
       }
     });
 
   } catch (error) {
     console.error('Error en getProfile:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al obtener perfil',
-      error: error.message
-    });
+    res.status(500).json({ success: false, message: 'Error al obtener perfil', error: error.message });
+  }
+};
+
+// Actualizar perfil propio (nombre, telefono)
+const updateProfile = async (req, res) => {
+  try {
+    const { nombre, telefono } = req.body;
+    if (!nombre || !nombre.trim()) {
+      return res.status(400).json({ success: false, message: 'El nombre es obligatorio' });
+    }
+    const updated = await User.updatePerfil(req.user.id, { nombre: nombre.trim(), telefono });
+    res.json({ success: true, user: updated });
+  } catch (error) {
+    console.error('Error en updateProfile:', error);
+    res.status(500).json({ success: false, message: 'Error al actualizar perfil', error: error.message });
+  }
+};
+
+// Cambiar contraseña propia
+const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const user = await User.findByEmail(req.user.email);
+    if (!user) return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+
+    const valid = await bcrypt.compare(currentPassword, user.password);
+    if (!valid) return res.status(400).json({ success: false, message: 'Contraseña actual incorrecta' });
+
+    const hashed = await bcrypt.hash(newPassword, await bcrypt.genSalt(10));
+    await User.updatePassword(req.user.id, hashed);
+    res.json({ success: true, message: 'Contraseña actualizada' });
+  } catch (error) {
+    console.error('Error en changePassword:', error);
+    res.status(500).json({ success: false, message: 'Error al cambiar contraseña', error: error.message });
+  }
+};
+
+// Subir/actualizar foto de perfil
+const uploadAvatar = async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ success: false, message: 'No se subió ningún archivo' });
+    const fotoUrl = `/uploads/avatares/${req.file.filename}`;
+    const updated = await User.updateFoto(req.user.id, fotoUrl);
+    res.json({ success: true, foto_url: fotoUrl, user: updated });
+  } catch (error) {
+    console.error('Error en uploadAvatar:', error);
+    res.status(500).json({ success: false, message: 'Error al subir foto', error: error.message });
   }
 };
 
 module.exports = {
   register,
   login,
-  getProfile
+  getProfile,
+  updateProfile,
+  changePassword,
+  uploadAvatar
 };

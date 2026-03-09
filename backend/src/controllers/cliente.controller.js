@@ -179,8 +179,8 @@ const deleteCliente = async (req, res) => {
       message: 'Cliente eliminado exitosamente'
     });
   } catch (error) {
-    // Error de clave foránea (tiene proyectos asociados)
-    if (error.code === '23503') {
+    // Error de clave foránea o restricción (tiene proyectos asociados)
+    if (error.code === '23503' || error.code === '23001') {
       return res.status(400).json({
         success: false,
         message: 'No se puede eliminar el cliente porque tiene proyectos asociados. Desactívalo en su lugar.'

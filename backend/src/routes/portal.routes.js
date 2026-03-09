@@ -3,6 +3,8 @@ const { body } = require('express-validator');
 const {
   loginCliente,
   getPerfilCliente,
+  updatePerfilCliente,
+  uploadAvatarCliente,
   getMisProyectos,
   cambiarPasswordCliente,
   getMisPresupuestos,
@@ -12,6 +14,7 @@ const {
   descargarMiDocumento,
   getEmpleadosProyecto
 } = require('../controllers/cliente.auth.controller');
+const { uploadAvatares } = require('../config/multer');
 
 const router = express.Router();
 
@@ -52,6 +55,17 @@ router.post('/login', loginValidation, loginCliente);
 // Rutas protegidas (requieren token de cliente)
 // GET /api/portal/perfil - Obtener perfil del cliente autenticado
 router.get('/perfil', authClienteMiddleware, getPerfilCliente);
+
+// PUT /api/portal/perfil - Actualizar perfil del cliente
+router.put('/perfil', authClienteMiddleware, updatePerfilCliente);
+
+// POST /api/portal/perfil/foto - Subir foto de perfil
+router.post('/perfil/foto', authClienteMiddleware, (req, res, next) => {
+  uploadAvatares.single('foto')(req, res, (err) => {
+    if (err) return res.status(400).json({ success: false, message: err.message });
+    next();
+  });
+}, uploadAvatarCliente);
 
 // GET /api/portal/proyectos - Obtener proyectos del cliente autenticado
 router.get('/proyectos', authClienteMiddleware, getMisProyectos);

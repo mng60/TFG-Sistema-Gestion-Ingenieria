@@ -47,77 +47,75 @@ const activarAccesoCliente = async (req, res) => {
   }
 };
 
+const MAX_INTENTOS = 5;
+const LOCK_MINUTOS = 15;
+
 // Login de cliente
 const loginCliente = async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    // Buscar cliente por email (necesitamos la contraseña)
     const { pool } = require('../config/database');
-    const query = 'SELECT * FROM clientes WHERE email = $1';
-    const result = await pool.query(query, [email]);
+    const result = await pool.query('SELECT * FROM clientes WHERE email = $1', [email]);
     const cliente = result.rows[0];
 
     if (!cliente) {
-      return res.status(401).json({
-        success: false,
-        message: 'Credenciales inválidas'
-      });
+      return res.status(401).json({ success: false, message: 'Credenciales inválidas' });
     }
 
-    // Verificar que tiene acceso activado
+    if (!cliente.activo) {
+      return res.status(403).json({ success: false, message: 'Cuenta desactivada. Contacte con la empresa.' });
+    }
+
     if (!cliente.activo_login) {
-      return res.status(403).json({
-        success: false,
-        message: 'Acceso al portal no activado. Contacte con la empresa.'
-      });
+      return res.status(403).json({ success: false, message: 'Acceso al portal no activado. Contacte con la empresa.' });
     }
 
-    // Verificar que tiene contraseña configurada
     if (!cliente.password) {
-      return res.status(403).json({
+      return res.status(403).json({ success: false, message: 'Acceso no configurado. Contacte con la empresa.' });
+    }
+
+    // Comprobar bloqueo
+    if (cliente.locked_until && new Date(cliente.locked_until) > new Date()) {
+      const minutos = Math.ceil((new Date(cliente.locked_until) - new Date()) / 60000);
+      return res.status(429).json({
         success: false,
-        message: 'Acceso no configurado. Contacte con la empresa.'
+        message: `Cuenta bloqueada por demasiados intentos. Inténtalo en ${minutos} min o solicita un reset de contraseña.`,
+        bloqueado: true
       });
     }
 
     // Verificar contraseña
     const isPasswordValid = await bcrypt.compare(password, cliente.password);
     if (!isPasswordValid) {
+      const intentos = (cliente.login_attempts || 0) + 1;
+      const bloqueado = intentos >= MAX_INTENTOS;
+      await pool.query(
+        'UPDATE clientes SET login_attempts = $1, locked_until = $2 WHERE id = $3',
+        [intentos, bloqueado ? new Date(Date.now() + LOCK_MINUTOS * 60000) : null, cliente.id]
+      );
+      const restantes = MAX_INTENTOS - intentos;
       return res.status(401).json({
         success: false,
-        message: 'Credenciales inválidas'
+        message: bloqueado
+          ? `Cuenta bloqueada ${LOCK_MINUTOS} min por demasiados intentos. Solicita un reset de contraseña.`
+          : `Credenciales inválidas. ${restantes} intento${restantes !== 1 ? 's' : ''} restante${restantes !== 1 ? 's' : ''}.`,
+        bloqueado
       });
     }
 
-    // Actualizar último acceso
-    const updateQuery = 'UPDATE clientes SET ultimo_acceso = CURRENT_TIMESTAMP WHERE id = $1';
-    await pool.query(updateQuery, [cliente.id]);
+    // Login correcto — resetear intentos y actualizar último acceso
+    await pool.query(
+      'UPDATE clientes SET login_attempts = 0, locked_until = NULL, ultimo_acceso = CURRENT_TIMESTAMP WHERE id = $1',
+      [cliente.id]
+    );
 
-    // Generar token con tipo "cliente"
-    const token = generateToken({
-      id: cliente.id,
-      email: cliente.email,
-      tipo: 'cliente',
-      nombre_empresa: cliente.nombre_empresa
-    });
+    const token = generateToken({ id: cliente.id, email: cliente.email, tipo: 'cliente', nombre_empresa: cliente.nombre_empresa });
+    const { password: _, login_attempts: __, locked_until: ___, ...clienteData } = cliente;
 
-    // Devolver datos sin contraseña
-    const { password: _, ...clienteData } = cliente;
-
-    res.json({
-      success: true,
-      message: 'Login exitoso',
-      token,
-      cliente: clienteData
-    });
+    res.json({ success: true, message: 'Login exitoso', token, cliente: clienteData });
   } catch (error) {
     console.error('Error en loginCliente:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al iniciar sesión',
-      error: error.message
-    });
+    res.status(500).json({ success: false, message: 'Error al iniciar sesión', error: error.message });
   }
 };
 
@@ -500,10 +498,58 @@ const getEmpleadosProyecto = async (req, res) => {
   }
 };
 
+// Actualizar perfil del cliente (datos no obligatorios)
+const updatePerfilCliente = async (req, res) => {
+  try {
+    const clienteId = req.user.id;
+    const { persona_contacto, telefono, telefono_contacto, email_contacto, direccion, ciudad, codigo_postal, provincia, pais, notas } = req.body;
+    const { pool } = require('../config/database');
+    const result = await pool.query(
+      `UPDATE clientes SET
+        persona_contacto = COALESCE($1, persona_contacto),
+        telefono = COALESCE($2, telefono),
+        telefono_contacto = COALESCE($3, telefono_contacto),
+        email_contacto = COALESCE($4, email_contacto),
+        direccion = COALESCE($5, direccion),
+        ciudad = COALESCE($6, ciudad),
+        codigo_postal = COALESCE($7, codigo_postal),
+        provincia = COALESCE($8, provincia),
+        pais = COALESCE($9, pais),
+        notas = COALESCE($10, notas),
+        updated_at = CURRENT_TIMESTAMP
+       WHERE id = $11 RETURNING *`,
+      [persona_contacto, telefono, telefono_contacto, email_contacto, direccion, ciudad, codigo_postal, provincia, pais, notas, clienteId]
+    );
+    res.json({ success: true, cliente: result.rows[0] });
+  } catch (error) {
+    console.error('Error en updatePerfilCliente:', error);
+    res.status(500).json({ success: false, message: 'Error al actualizar perfil', error: error.message });
+  }
+};
+
+// Subir foto de perfil del cliente
+const uploadAvatarCliente = async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ success: false, message: 'No se subió ningún archivo' });
+    const fotoUrl = `/uploads/avatares/${req.file.filename}`;
+    const { pool } = require('../config/database');
+    const result = await pool.query(
+      'UPDATE clientes SET foto_url = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *',
+      [fotoUrl, req.user.id]
+    );
+    res.json({ success: true, foto_url: fotoUrl, cliente: result.rows[0] });
+  } catch (error) {
+    console.error('Error en uploadAvatarCliente:', error);
+    res.status(500).json({ success: false, message: 'Error al subir foto', error: error.message });
+  }
+};
+
 module.exports = {
   activarAccesoCliente,
   loginCliente,
   getPerfilCliente,
+  updatePerfilCliente,
+  uploadAvatarCliente,
   getMisProyectos,
   cambiarPasswordCliente,
   getMisPresupuestos,

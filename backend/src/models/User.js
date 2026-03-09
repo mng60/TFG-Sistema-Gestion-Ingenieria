@@ -1,5 +1,9 @@
 const { pool } = require('../config/database');
 
+// Añadir columna foto_url si no existe
+pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS foto_url VARCHAR(500)`)
+  .catch(err => console.error('Error añadiendo foto_url a users:', err.message));
+
 class User {
   // Crear un nuevo usuario
   static async create(userData) {
@@ -36,9 +40,36 @@ class User {
   // Buscar usuario por ID
   static async findById(id) {
     try {
-      const query = 'SELECT id, nombre, email, rol, telefono, created_at FROM users WHERE id = $1';
+      const query = 'SELECT id, nombre, email, rol, telefono, foto_url, created_at FROM users WHERE id = $1';
       const result = await pool.query(query, [id]);
-      
+
+      return result.rows[0] || null;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Actualizar foto de perfil
+  static async updateFoto(id, fotoUrl) {
+    try {
+      const result = await pool.query(
+        'UPDATE users SET foto_url = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING id, nombre, email, rol, telefono, foto_url',
+        [fotoUrl, id]
+      );
+      return result.rows[0] || null;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Actualizar perfil propio (nombre, telefono)
+  static async updatePerfil(id, data) {
+    const { nombre, telefono } = data;
+    try {
+      const result = await pool.query(
+        'UPDATE users SET nombre = $1, telefono = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3 RETURNING id, nombre, email, rol, telefono, foto_url',
+        [nombre, telefono, id]
+      );
       return result.rows[0] || null;
     } catch (error) {
       throw error;
@@ -48,7 +79,7 @@ class User {
   // Obtener todos los usuarios
   static async findAll() {
     try {
-      const query = 'SELECT id, nombre, email, rol, telefono, created_at FROM users ORDER BY created_at DESC';
+      const query = 'SELECT id, nombre, email, rol, telefono, foto_url, created_at FROM users ORDER BY created_at DESC';
       const result = await pool.query(query);
       
       return result.rows;

@@ -69,4 +69,5 @@ const activarAccesoValidation = [
 // POST /api/clientes/:id/activar-acceso - Activar acceso al portal (solo admin)
 router.post('/:id/activar-acceso', checkRole('admin'), activarAccesoValidation, activarAccesoCliente);
 
+
 module.exports = router;

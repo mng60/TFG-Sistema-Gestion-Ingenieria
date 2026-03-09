@@ -73,7 +73,8 @@ app.use('/api/proyectos', require('./src/routes/proyecto.routes'));
 app.use('/api/presupuestos', require('./src/routes/presupuesto.routes'));
 app.use('/api/documentos', require('./src/routes/documento.routes'));
 app.use('/api/portal', require('./src/routes/portal.routes'));
-app.use('/api/chat', require('./src/routes/chat.routes')); 
+app.use('/api/chat', require('./src/routes/chat.routes'));
+app.use('/api/tickets', require('./src/routes/ticket.routes'));
 
 // Manejo de errores 404
 app.use((req, res) => {

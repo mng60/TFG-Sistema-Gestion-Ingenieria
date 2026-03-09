@@ -59,8 +59,31 @@ const createMulterConfig = (uploadPath) => {
   });
 };
 
+// Configuración específica para avatares (solo imágenes, 5MB)
+const createAvatarConfig = () => {
+  const uploadsDir = path.join(__dirname, '../../uploads/avatares');
+  if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+
+  const storage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, uploadsDir),
+    filename: (req, file, cb) => {
+      const ext = path.extname(file.originalname).toLowerCase();
+      cb(null, `avatar-${req.user.id}-${Date.now()}${ext}`);
+    }
+  });
+
+  const fileFilter = (req, file, cb) => {
+    const allowed = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+    const ext = path.extname(file.originalname).toLowerCase();
+    allowed.includes(ext) ? cb(null, true) : cb(new Error('Solo se permiten imágenes'));
+  };
+
+  return multer({ storage, fileFilter, limits: { fileSize: 5 * 1024 * 1024 } });
+};
+
 // Exportar configuraciones específicas
 module.exports = {
   uploadDocumentos: createMulterConfig('documentos'),
-  uploadChat: createMulterConfig('chat')
+  uploadChat: createMulterConfig('chat'),
+  uploadAvatares: createAvatarConfig()
 };
