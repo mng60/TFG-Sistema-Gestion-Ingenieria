@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ProyectoCompleto from './pages/ProyectoCompleto';
 import Chat from './pages/Chat';
+import Perfil from './pages/Perfil';
 import ClienteLayout from './components/Layout/ClienteLayout';
 import './styles/App.css';
 
@@ -56,6 +57,12 @@ function App() {
           <Route path="/chat" element={
             <ClienteProtectedRoute>
               <Chat />
+            </ClienteProtectedRoute>
+          } />
+
+          <Route path="/perfil" element={
+            <ClienteProtectedRoute>
+              <Perfil />
             </ClienteProtectedRoute>
           } />
 

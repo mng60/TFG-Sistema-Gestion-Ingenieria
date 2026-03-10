@@ -49,11 +49,18 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const actualizarCliente = (data) => {
+    const updated = { ...(authService.getCurrentCliente() || {}), ...data };
+    localStorage.setItem('cliente', JSON.stringify(updated));
+    setCliente(updated);
+  };
+
   const value = {
     cliente,
     login,
     logout,
     actualizarPerfil,
+    actualizarCliente,
     isAuthenticated: !!cliente
   };
 

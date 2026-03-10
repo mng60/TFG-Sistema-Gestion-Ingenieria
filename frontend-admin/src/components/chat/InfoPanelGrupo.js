@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Paperclip } from 'lucide-react';
+import { Paperclip, CircleMinus } from 'lucide-react';
 import { useEmpleadoAuth } from '../../context/EmpleadoAuthContext';
 import ConfirmModal from '../ConfirmModal';
 import ArchivosPanel from './ArchivosPanel';
 
-function InfoPanelGrupo({ conversacion, currentUser, onClose, onConversacionEliminada, showToast }) {
+function InfoPanelGrupo({ conversacion, currentUser, onClose, onConversacionEliminada, showToast, onOpenDirectChat }) {
   const navigate = useNavigate();
   const { isAdmin } = useEmpleadoAuth();
   const [proyecto, setProyecto] = useState(null);
@@ -96,16 +96,13 @@ function InfoPanelGrupo({ conversacion, currentUser, onClose, onConversacionElim
           <button className="btn-back" onClick={onClose}>
             ← Volver
           </button>
-          <button className="btn-close-panel" onClick={onClose}>
-            ✕
-          </button>
         </div>
 
         <div className="info-panel-content">
           {/* Avatar grande */}
           <div className="info-avatar-large">
             <div className="avatar-circle-large">
-              📁
+              {conversacion.nombre?.charAt(0).toUpperCase() || 'G'}
             </div>
           </div>
 
@@ -133,23 +130,37 @@ function InfoPanelGrupo({ conversacion, currentUser, onClose, onConversacionElim
             <h3>Participantes ({participantes.length})</h3>
             <div className="participantes-list">
               {participantes.map((participante, index) => (
-                <div key={`${participante.user_id}-${participante.tipo_usuario}-${index}`} className="participante-item">
+                <div
+                  key={`${participante.user_id}-${participante.tipo_usuario}-${index}`}
+                  className="participante-item"
+                  onClick={() => {
+                    if (participante.user_id === currentUser.id && participante.tipo_usuario === 'empleado') return;
+                    if (onOpenDirectChat) { onOpenDirectChat(participante); onClose(); }
+                  }}
+                  style={{ cursor: participante.user_id === currentUser.id ? 'default' : 'pointer' }}
+                >
                   <div className="participante-avatar">
-                    {participante.tipo_usuario === 'cliente' ? '🏢' : '👤'}
+                    <div className="avatar-circle" style={{ width: 34, height: 34, fontSize: '0.85rem' }}>
+                      {participante.foto_url
+                        ? <img src={`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'}${participante.foto_url}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                        : participante.nombre?.charAt(0).toUpperCase() || '?'
+                      }
+                    </div>
                   </div>
                   <div className="participante-info">
                     <strong>{participante.nombre}</strong>
-                    <small>{participante.tipo_usuario === 'empleado' ? 'Empleado' : 'Cliente'}</small>
+                    <small>{participante.tipo_usuario === 'empleado' ? (participante.rol === 'admin' ? 'Administrador' : 'Empleado') : 'Cliente'}</small>
                   </div>
-                  {isAdmin() && 
-                   participante.user_id !== currentUser.id && 
+                  {isAdmin() &&
+                   participante.user_id !== currentUser.id &&
                    participante.tipo_usuario === 'empleado' && (
                     <button
                       className="btn-remove-participant"
                       onClick={() => handleEliminarParticipante(participante)}
                       title="Eliminar del grupo"
+                      style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center' }}
                     >
-                      ✕
+                      <CircleMinus size={22} color="#e74c3c" />
                     </button>
                   )}
                 </div>

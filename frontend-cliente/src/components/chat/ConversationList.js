@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Search } from 'lucide-react';
+import { Search, Plus } from 'lucide-react';
 
-function ConversationList({ conversaciones, conversacionActiva, onSelectConversacion, onNewConversacion, currentUser }) {
+function ConversationList({ conversaciones, conversacionActiva, onSelectConversacion, onNewConversacion, currentUser, onlineUsers = new Set() }) {
   const [searchTerm, setSearchTerm] = useState('');
 
   const formatearFecha = (fecha) => {
@@ -81,7 +81,11 @@ function ConversationList({ conversaciones, conversacionActiva, onSelectConversa
               >
                 <div className="conversation-avatar">
                   <div className="avatar-circle">{getAvatarContent(conversacion)}</div>
-                  <div className={`status-indicator ${conversacion.online ? 'online' : ''}`}></div>
+                  {conversacion.tipo !== 'proyecto_grupo' && (() => {
+                    const other = getOtherParticipant(conversacion);
+                    const isOnline = other ? onlineUsers.has(`${other.user_id}_${other.tipo_usuario}`) : false;
+                    return <div className={`status-indicator ${isOnline ? 'online' : ''}`}></div>;
+                  })()}
                 </div>
 
                 <div className="conversation-info">
@@ -115,7 +119,7 @@ function ConversationList({ conversaciones, conversacionActiva, onSelectConversa
       </div>
 
       <button className="btn-new-chat" onClick={onNewConversacion}>
-        ➕ Nuevo chat
+        <Plus size={16} /> Nuevo chat
       </button>
     </div>
   );

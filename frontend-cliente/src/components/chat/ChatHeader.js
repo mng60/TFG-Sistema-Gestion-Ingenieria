@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import InfoPanel from './InfoPanel';
 
-function ChatHeader({ conversacion, currentUser }) {
+function ChatHeader({ conversacion, currentUser, onlineUsers = new Set() }) {
   const [showMenu, setShowMenu] = useState(false);
   const [showInfoPanel, setShowInfoPanel] = useState(false);
 
@@ -24,7 +24,7 @@ function ChatHeader({ conversacion, currentUser }) {
             <div className="avatar-circle">
               {otherParticipant?.nombre?.charAt(0).toUpperCase() || '?'}
             </div>
-            <div className="status-indicator online"></div>
+            <div className={`status-indicator ${otherParticipant && onlineUsers.has(`${otherParticipant.user_id}_${otherParticipant.tipo_usuario}`) ? 'online' : ''}`}></div>
           </div>
           <div className="header-details">
             <h3>{otherParticipant?.nombre || 'Usuario'}</h3>

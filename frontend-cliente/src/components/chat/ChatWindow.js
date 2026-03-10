@@ -3,8 +3,9 @@ import ChatHeader from './ChatHeader';
 import ChatHeaderGrupo from './ChatHeaderGrupo';
 import ChatFooter from './ChatFooter';
 import MessageBubble from './MessageBubble';
+import {MessagesSquare} from 'lucide-react'
 
-function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones, isActive, onBack }) {
+function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones, isActive, onBack, onlineUsers = new Set() }) {
   const [mensajes, setMensajes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
@@ -148,7 +149,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
     return (
       <div className={`chat-window empty${isActive ? ' active' : ''}`}>
         <div className="empty-chat">
-          <div className="empty-icon">💬</div>
+          <div className="empty-icon"><MessagesSquare size={100}/></div>
           <h3>Selecciona una conversación</h3>
           <p>Elige un chat de la izquierda para empezar</p>
         </div>
@@ -166,7 +167,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
       {conversacion.tipo === 'proyecto_grupo' ? (
         <ChatHeaderGrupo conversacion={conversacion} currentUser={currentUser} />
       ) : (
-        <ChatHeader conversacion={conversacion} currentUser={currentUser} />
+        <ChatHeader conversacion={conversacion} currentUser={currentUser} onlineUsers={onlineUsers} />
       )}
 
       {deletionDate && (

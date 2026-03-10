@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import InfoPanelGrupo from './InfoPanelGrupo';
 import ConfirmModal from '../common/ConfirmModal';
+import { ArrowLeft } from 'lucide-react';
 
-function ChatHeaderGrupo({ conversacion, currentUser, onConversacionEliminada, showToast }) {
+function ChatHeaderGrupo({ conversacion, currentUser, onConversacionEliminada, showToast, onBack, onOpenDirectChat }) {
   const [showMenu, setShowMenu] = useState(false);
   const [showInfoPanel, setShowInfoPanel] = useState(false);
   const [confirmModal, setConfirmModal] = useState(null);
@@ -63,11 +64,20 @@ function ChatHeaderGrupo({ conversacion, currentUser, onConversacionEliminada, s
     <>
       <div className="chat-header">
         <div className="chat-header-info">
+          {onBack && (
+            <button onClick={onBack} title="Volver" style={{
+              flexShrink: 0, width: 34, height: 34, borderRadius: '50%',
+              background: '#4DB6A8', border: 'none', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: 'white'
+            }}>
+              <ArrowLeft size={18} />
+            </button>
+          )}
           <div className="header-avatar">
             <div className="avatar-circle">
               {conversacion.nombre?.charAt(0).toUpperCase() || 'G'}
             </div>
-            <div className="status-indicator online"></div>
           </div>
 
           <div className="header-details">
@@ -102,16 +112,16 @@ function ChatHeaderGrupo({ conversacion, currentUser, onConversacionEliminada, s
 
               <div className="chat-menu-dropdown">
                 <button onClick={() => handleMenuAction('info')}>
-                  📋 Ver información del grupo
+                  Ver información del grupo
                 </button>
 
                 <div className="menu-divider"></div>
 
                 <button onClick={() => handleMenuAction('silenciar')}>
-                  🔔 Silenciar notificaciones
+                  Silenciar notificaciones
                 </button>
                 <button onClick={() => handleMenuAction('eliminar')} className="menu-danger">
-                  🗑️ Eliminar grupo
+                  Eliminar grupo
                 </button>
               </div>
             </>
@@ -126,6 +136,7 @@ function ChatHeaderGrupo({ conversacion, currentUser, onConversacionEliminada, s
           onClose={() => setShowInfoPanel(false)}
           onConversacionEliminada={onConversacionEliminada}
           showToast={showToast}
+          onOpenDirectChat={onOpenDirectChat}
         />
       )}
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import presupuestoService from '../services/presupuestoService';
 import PresupuestoModal from './modals/PresupuestoModal';
-import { Plus } from 'lucide-react';
+import { Plus, Pencil, Trash2 } from 'lucide-react';
 
 function ProyectoPresupuestos({ 
   proyectoId, 
@@ -149,7 +149,7 @@ function ProyectoPresupuestos({
                           onClick={() => abrirModalPresupuesto(presupuesto)}
                           title="Editar"
                         >
-                          ✏️
+                          <Pencil size={14} />
                         </button>
                       )}
                       {isAdmin && presupuesto.estado === 'enviado' && !presupuesto.aceptado && (
@@ -176,7 +176,7 @@ function ProyectoPresupuestos({
                           onClick={() => handleEliminar(presupuesto)}
                           title="Eliminar"
                         >
-                          🗑️
+                          <Trash2 size={14} />
                         </button>
                       )}
                     </div>

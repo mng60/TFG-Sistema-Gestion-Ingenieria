@@ -6,7 +6,7 @@ import usuarioService from '../services/usuarioService';
 import Toast from '../components/Toast';
 import ConfirmModal from '../components/ConfirmModal';
 import '../styles/GestionPages.css';
-import { Search, Plus } from 'lucide-react'
+import { Search, Plus, Pencil, Trash2 } from 'lucide-react'
 
 function Usuarios() {
   const { empleado, isAdmin } = useEmpleadoAuth();
@@ -238,20 +238,20 @@ function Usuarios() {
                     </td>
                     <td>
                       <div className="action-buttons">
-                        <button 
+                        <button
                           className="btn-sm btn-edit"
                           onClick={() => abrirModalEditar(usuario)}
                           title="Editar"
                         >
-                          ✏️
+                          <Pencil size={14} />
                         </button>
                         {usuario.id !== empleado.id && (
-                          <button 
+                          <button
                             className="btn-sm btn-danger"
                             onClick={() => handleEliminar(usuario)}
                             title="Eliminar"
                           >
-                            🗑️
+                            <Trash2 size={14} />
                           </button>
                         )}
                       </div>

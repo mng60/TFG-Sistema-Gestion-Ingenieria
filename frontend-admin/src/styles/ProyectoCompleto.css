@@ -79,12 +79,12 @@
 }
 
 .tab-active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #4DB6A8;
   color: white;
 }
 
 .tab-active:hover {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #3da898;
   color: white;
 }
 

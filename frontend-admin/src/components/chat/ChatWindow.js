@@ -3,8 +3,9 @@ import ChatHeader from './ChatHeader';
 import ChatHeaderGrupo from './ChatHeaderGrupo';
 import ChatFooter from './ChatFooter';
 import MessageBubble from './MessageBubble';
+import { MessagesSquare } from 'lucide-react';
 
-function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones, onConversacionEliminada, showToast, isActive, onBack }) {
+function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones, onConversacionEliminada, showToast, isActive, onBack, onlineUsers = new Set(), onOpenDirectChat, onConversacionCreada }) {
   const [mensajes, setMensajes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
@@ -128,7 +129,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
   };
 
   const cargarMensajes = async () => {
-    if (!conversacion) return;
+    if (!conversacion || conversacion.ephemeral) return;
 
     setLoading(true);
     try {
@@ -152,7 +153,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
   };
 
   const marcarComoLeido = async () => {
-    if (!conversacion) return;
+    if (!conversacion || conversacion.ephemeral) return;
 
     try {
       const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
@@ -173,8 +174,31 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
     }
   };
 
-  const handleSendMessage = (mensaje, tipoMensaje = 'texto') => {
+  const handleSendMessage = async (mensaje, tipoMensaje = 'texto') => {
     if (!socket || !conversacion) return;
+
+    if (conversacion.ephemeral) {
+      try {
+        const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+        const token = localStorage.getItem('empleado_token');
+        const participantes = conversacion.participantes.map(p => ({ user_id: p.user_id, tipo_usuario: p.tipo_usuario }));
+        const res = await fetch(`${API_URL}/chat/conversaciones`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tipo: conversacion.tipo, participantes })
+        });
+        const data = await res.json();
+        if (data.success) {
+          const realConv = data.conversacion;
+          if (onConversacionCreada) onConversacionCreada(realConv);
+          socket.emit('join_conversations', [realConv.id]);
+          socket.emit('send_message', { conversacion_id: realConv.id, mensaje, tipo_mensaje: tipoMensaje });
+        }
+      } catch (error) {
+        console.error('Error al crear conversación efímera:', error);
+      }
+      return;
+    }
 
     socket.emit('send_message', {
       conversacion_id: conversacion.id,
@@ -196,7 +220,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
     return (
       <div className={`chat-window empty${isActive ? ' active' : ''}`}>
         <div className="empty-chat">
-          <div className="empty-icon">💬</div>
+          <div className="empty-icon"><MessagesSquare size={100}/></div>
           <h3>Selecciona una conversación</h3>
           <p>Elige un chat de la izquierda para empezar a hablar</p>
         </div>
@@ -223,12 +247,14 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
           currentUser={currentUser}
           onConversacionEliminada={onConversacionEliminada}
           showToast={showToast}
+          onOpenDirectChat={onOpenDirectChat}
         />
       ) : (
         <ChatHeader
           conversacion={conversacion}
           currentUser={currentUser}
           onConversacionEliminada={onConversacionEliminada}
+          onlineUsers={onlineUsers}
         />
       )}
 

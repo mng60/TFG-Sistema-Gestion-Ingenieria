@@ -43,25 +43,28 @@ router.get('/info-participante/:userId/:tipoUsuario', async (req, res) => {
     const pool = require('../config/database').pool;
 
     let infoParticipante = {
+      email: null,
       telefono: null,
       grupos_comunes: []
     };
 
-    // Obtener teléfono según tipo de usuario
+    // Obtener email y teléfono según tipo de usuario
     if (tipoUsuario === 'cliente') {
       const clienteQuery = await pool.query(
-        'SELECT telefono_contacto FROM clientes WHERE id = $1',
+        'SELECT email, telefono_contacto AS telefono FROM clientes WHERE id = $1',
         [userId]
       );
       if (clienteQuery.rows.length > 0) {
-        infoParticipante.telefono = clienteQuery.rows[0].telefono_contacto || clienteQuery.rows[0].telefono;
+        infoParticipante.email = clienteQuery.rows[0].email;
+        infoParticipante.telefono = clienteQuery.rows[0].telefono;
       }
     } else if (tipoUsuario === 'empleado') {
       const empleadoQuery = await pool.query(
-        'SELECT telefono FROM users WHERE id = $1',
+        'SELECT email, telefono FROM users WHERE id = $1',
         [userId]
       );
       if (empleadoQuery.rows.length > 0) {
+        infoParticipante.email = empleadoQuery.rows[0].email;
         infoParticipante.telefono = empleadoQuery.rows[0].telefono;
       }
     }

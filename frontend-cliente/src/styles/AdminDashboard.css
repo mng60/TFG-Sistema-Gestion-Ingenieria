@@ -95,16 +95,20 @@
   padding: 10px;
   background: rgba(231, 76, 60, 0.2);
   border: 1px solid rgba(231, 76, 60, 0.5);
-  color: white;
+  color: #ff8a80;
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
-  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  transition: all 0.25s ease;
 }
 
 .btn-logout:hover {
   background: #e74c3c;
   border-color: #e74c3c;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
 }
 
 /* Main Content */

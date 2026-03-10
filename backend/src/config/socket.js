@@ -35,6 +35,15 @@ const initializeSocket = (io) => {
     const userKey = `${socket.userId}_${socket.tipoUsuario}`;
     connectedUsers.set(userKey, socket.id);
 
+    // Notificar a otros que este usuario está online
+    socket.broadcast.emit('user_online', {
+      userId: socket.userId,
+      tipoUsuario: socket.tipoUsuario
+    });
+
+    // Enviar al recién conectado la lista actual de online
+    socket.emit('online_users', Array.from(connectedUsers.keys()));
+
     // Unirse a las conversaciones del usuario
     socket.on('join_conversations', async (conversacionesIds) => {
       try {

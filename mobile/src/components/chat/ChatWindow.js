@@ -4,7 +4,7 @@ import ChatHeaderGrupo from './ChatHeaderGrupo';
 import ChatFooter from './ChatFooter';
 import MessageBubble from './MessageBubble';
 
-function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones, onConversacionEliminada, showToast, onBack }) {
+function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones, onConversacionEliminada, showToast, onBack, onlineUsers = new Set(), onOpenDirectChat, onConversacionCreada }) {
   const [mensajes, setMensajes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
@@ -126,7 +126,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
   };
 
   const cargarMensajes = async () => {
-    if (!conversacion) return;
+    if (!conversacion || conversacion.ephemeral) return;
 
     setLoading(true);
     try {
@@ -150,7 +150,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
   };
 
   const marcarComoLeido = async () => {
-    if (!conversacion) return;
+    if (!conversacion || conversacion.ephemeral) return;
 
     try {
       const API_URL = process.env.REACT_APP_API_URL || `http://${window.location.hostname}:5000/api`;
@@ -171,8 +171,31 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
     }
   };
 
-  const handleSendMessage = (mensaje, tipoMensaje = 'texto') => {
+  const handleSendMessage = async (mensaje, tipoMensaje = 'texto') => {
     if (!socket || !conversacion) return;
+
+    if (conversacion.ephemeral) {
+      try {
+        const API_URL = process.env.REACT_APP_API_URL || `http://${window.location.hostname}:5000/api`;
+        const token = localStorage.getItem('empleado_token');
+        const participantes = conversacion.participantes.map(p => ({ user_id: p.user_id, tipo_usuario: p.tipo_usuario }));
+        const res = await fetch(`${API_URL}/chat/conversaciones`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tipo: conversacion.tipo, participantes })
+        });
+        const data = await res.json();
+        if (data.success) {
+          const realConv = data.conversacion;
+          if (onConversacionCreada) onConversacionCreada(realConv);
+          socket.emit('join_conversations', [realConv.id]);
+          socket.emit('send_message', { conversacion_id: realConv.id, mensaje, tipo_mensaje: tipoMensaje });
+        }
+      } catch (error) {
+        console.error('Error al crear conversación efímera:', error);
+      }
+      return;
+    }
 
     socket.emit('send_message', {
       conversacion_id: conversacion.id,
@@ -190,17 +213,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
     });
   };
 
-  if (!conversacion) {
-    return (
-      <div className="chat-window empty">
-        <div className="empty-chat">
-          <div className="empty-icon">💬</div>
-          <h3>Selecciona una conversación</h3>
-          <p>Elige un chat de la izquierda para empezar a hablar</p>
-        </div>
-      </div>
-    );
-  }
+  if (!conversacion) return null;
 
   const deletionDate = conversacion.deletion_scheduled_at
     ? new Date(conversacion.deletion_scheduled_at).toLocaleDateString('es-ES', {
@@ -210,33 +223,22 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
 
   return (
     <div className="chat-window">
-      {onBack && (
-        <button
-          onClick={onBack}
-          style={{
-            position: 'absolute', top: 8, left: 8, zIndex: 10,
-            background: 'rgba(255,255,255,0.15)', border: 'none',
-            color: 'white', borderRadius: '50%', width: 34, height: 34,
-            fontSize: '1.1rem', cursor: 'pointer', display: 'flex',
-            alignItems: 'center', justifyContent: 'center'
-          }}
-          title="Volver"
-        >
-          ←
-        </button>
-      )}
       {conversacion.tipo === 'proyecto_grupo' ? (
         <ChatHeaderGrupo
           conversacion={conversacion}
           currentUser={currentUser}
           onConversacionEliminada={onConversacionEliminada}
           showToast={showToast}
+          onBack={onBack}
+          onOpenDirectChat={onOpenDirectChat}
         />
       ) : (
         <ChatHeader
           conversacion={conversacion}
           currentUser={currentUser}
           onConversacionEliminada={onConversacionEliminada}
+          onBack={onBack}
+          onlineUsers={onlineUsers}
         />
       )}
 

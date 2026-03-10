@@ -8,7 +8,7 @@ import Toast from '../components/Toast';
 import ConfirmModal from '../components/ConfirmModal';
 import usuarioService from '../services/usuarioService';
 import '../styles/GestionPages.css';
-import { Search, Plus } from 'lucide-react'
+import { Search, Plus, Pencil, Trash2, UserPlus } from 'lucide-react'
 
 function Proyectos() {
   const { empleado, isAdmin } = useEmpleadoAuth();
@@ -23,6 +23,7 @@ function Proyectos() {
   const [filtroPrioridad, setFiltroPrioridad] = useState('todos');
   const [showModal, setShowModal] = useState(false);
   const [showAsignarModal, setShowAsignarModal] = useState(false);
+  const [empleadosAsignados, setEmpleadosAsignados] = useState([]);
   const [modalMode, setModalMode] = useState('crear');
   const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null);
   const [toast, setToast] = useState(null);
@@ -160,10 +161,17 @@ function Proyectos() {
     setShowModal(true);
   };
 
-  const abrirModalAsignar = (proyecto) => {
+  const abrirModalAsignar = async (proyecto) => {
     setProyectoSeleccionado(proyecto);
     setAsignarForm({ user_id: '', rol_proyecto: '' });
+    setEmpleadosAsignados([]);
     setShowAsignarModal(true);
+    try {
+      const data = await proyectoService.getEmpleados(proyecto.id);
+      setEmpleadosAsignados(data.empleados || []);
+    } catch {
+      // no crítico, simplemente no filtramos si falla
+    }
   };
 
   const handleInputChange = (e) => {
@@ -392,26 +400,26 @@ function Proyectos() {
                       <div className="action-buttons">
                         {isAdmin() && (
                           <>
-                            <button 
+                            <button
                               className="btn-sm btn-edit"
                               onClick={() => abrirModalEditar(proyecto)}
                               title="Editar"
                             >
-                              ✏️
+                              <Pencil size={14} />
                             </button>
-                            <button 
+                            <button
                               className="btn-sm btn-warning"
                               onClick={() => abrirModalAsignar(proyecto)}
                               title="Asignar empleado"
                             >
-                              👤
+                              <UserPlus size={14} />
                             </button>
-                            <button 
+                            <button
                               className="btn-sm btn-danger"
                               onClick={() => handleEliminar(proyecto)}
                               title="Eliminar"
                             >
-                              🗑️
+                              <Trash2 size={14} />
                             </button>
                           </>
                         )}
@@ -602,12 +610,15 @@ function Proyectos() {
                   required
                 >
                   <option value="">Seleccionar empleado...</option>
-                  {usuarios.map(user => (
-                    <option key={user.id} value={user.id}>
-                      {user.nombre} ({user.rol})
-                      {user.id === empleado.id && ' - Tú'}
-                    </option>
-                  ))}
+                  {(() => {
+                    const idsAsignados = new Set(empleadosAsignados.map(e => e.user_id || e.id));
+                    return usuarios.filter(u => !idsAsignados.has(u.id)).map(user => (
+                      <option key={user.id} value={user.id}>
+                        {user.nombre} ({user.rol})
+                        {user.id === empleado.id && ' - Tú'}
+                      </option>
+                    ));
+                  })()}
                 </select>
               </div>
 

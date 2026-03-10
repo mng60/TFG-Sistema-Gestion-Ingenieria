@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import InfoPanelGrupo from './InfoPanelGrupo';
 import ConfirmModal from '../../components/ConfirmModal';
 
-function ChatHeaderGrupo({ conversacion, currentUser, onConversacionEliminada, showToast }) {
+function ChatHeaderGrupo({ conversacion, currentUser, onConversacionEliminada, showToast, onOpenDirectChat }) {
   const [showMenu, setShowMenu] = useState(false);
   const [showInfoPanel, setShowInfoPanel] = useState(false);
   const [confirmModal, setConfirmModal] = useState(null);
@@ -67,7 +67,6 @@ function ChatHeaderGrupo({ conversacion, currentUser, onConversacionEliminada, s
             <div className="avatar-circle">
               {conversacion.nombre?.charAt(0).toUpperCase() || 'G'}
             </div>
-            <div className="status-indicator online"></div>
           </div>
 
           <div className="header-details">
@@ -126,6 +125,7 @@ function ChatHeaderGrupo({ conversacion, currentUser, onConversacionEliminada, s
           onClose={() => setShowInfoPanel(false)}
           onConversacionEliminada={onConversacionEliminada}
           showToast={showToast}
+          onOpenDirectChat={onOpenDirectChat}
         />
       )}
 

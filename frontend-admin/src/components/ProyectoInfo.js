@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import proyectoService from '../services/proyectoService';
 import EditarProyectoModal from './modals/EditarProyectoModal';
 import AsignarEmpleadoModal from './modals/AsignarEmpleadoModal';
-import { Plus } from 'lucide-react';
+import { Plus, Pencil, CircleMinus } from 'lucide-react';
 
 function ProyectoInfo({ 
   proyecto, 
@@ -54,8 +54,8 @@ function ProyectoInfo({
       {/* Botón Editar */}
       {isAdmin && proyecto.estado !== 'completado' && proyecto.estado !== 'cancelado' && (
         <div style={{ marginBottom: '20px', textAlign: 'right' }}>
-          <button className="btn-primary" onClick={abrirModalEditar}>
-            ✏️ Editar Proyecto
+          <button className="btn-primary" onClick={abrirModalEditar} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <Pencil size={15} /> Editar Proyecto
           </button>
         </div>
       )}
@@ -74,7 +74,7 @@ function ProyectoInfo({
           </div>
           {proyecto.ubicacion && (
             <div className="info-item info-item-full">
-              <label>📍 Ubicación:</label>
+              <label>Dirección:</label>
               <span>{proyecto.ubicacion}</span>
             </div>
           )}
@@ -119,7 +119,14 @@ function ProyectoInfo({
           <div className="empleados-grid">
             {empleadosProyecto.map(emp => (
               <div key={emp.id} className="empleado-card">
-                <div className="empleado-avatar">👤</div>
+                <div className="empleado-avatar">
+                  <div className="avatar-circle" style={{ width: 36, height: 36, fontSize: '0.9rem' }}>
+                    {emp.foto_url
+                      ? <img src={`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'}${emp.foto_url}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                      : (emp.empleado_nombre || emp.nombre)?.charAt(0).toUpperCase() || '?'
+                    }
+                  </div>
+                </div>
                 <div className="empleado-info">
                   <strong>{emp.empleado_nombre || emp.nombre}</strong>
                   <span className="empleado-rol">{emp.rol_proyecto}</span>
@@ -129,8 +136,9 @@ function ProyectoInfo({
                     className="btn-desasignar"
                     onClick={() => handleDesasignarEmpleado(emp)}
                     title="Desasignar"
+                    style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center' }}
                   >
-                    ✕
+                    <CircleMinus size={30} color="#e74c3c" />
                   </button>
                 )}
               </div>
@@ -167,6 +175,7 @@ function ProyectoInfo({
         <AsignarEmpleadoModal
           proyectoId={proyecto.id}
           usuarios={usuarios}
+          empleadosProyecto={empleadosProyecto}
           onClose={() => setShowAsignarModal(false)}
           onSuccess={() => {
             showToast('Empleado asignado exitosamente', 'success');

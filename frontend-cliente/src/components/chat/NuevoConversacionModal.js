@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
 
 // Modal para que el cliente inicie un chat 1-1 con un empleado de sus proyectos
-function NuevoConversacionModal({ onClose, onCrear, currentUser, showToast }) {
+function NuevoConversacionModal({ onClose, onCrear, currentUser, showToast, conversaciones = [] }) {
   const [empleados, setEmpleados] = useState([]);
   const [empleadoId, setEmpleadoId] = useState('');
   const [loading, setLoading] = useState(true);
@@ -109,12 +109,18 @@ function NuevoConversacionModal({ onClose, onCrear, currentUser, showToast }) {
                 required
               >
                 <option value="">Seleccionar empleado...</option>
-                {empleados.map(emp => (
-                  <option key={emp.id} value={emp.id}>
-                    {emp.nombre} — {emp.rol_proyecto || emp.rol}
-                    {emp.proyecto_nombre ? ` (${emp.proyecto_nombre})` : ''}
-                  </option>
-                ))}
+                {empleados
+                  .filter(emp => !conversaciones.some(
+                    c => c.tipo === 'empleado_cliente' &&
+                      c.participantes?.some(p => p.user_id === emp.id && p.tipo_usuario === 'empleado')
+                  ))
+                  .map(emp => (
+                    <option key={emp.id} value={emp.id}>
+                      {emp.nombre} — {emp.rol_proyecto || emp.rol}
+                      {emp.proyecto_nombre ? ` (${emp.proyecto_nombre})` : ''}
+                    </option>
+                  ))
+                }
               </select>
             )}
             <small style={{ color: '#7f8c8d', fontSize: '0.85rem', marginTop: '5px', display: 'block' }}>

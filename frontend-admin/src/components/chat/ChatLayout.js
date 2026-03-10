@@ -14,6 +14,7 @@ function ChatLayout() {
   const [showNuevoModal, setShowNuevoModal] = useState(false);
   const [toast, setToast] = useState(null);
   const [activeView, setActiveView] = useState('list');
+  const [onlineUsers, setOnlineUsers] = useState(new Set());
 
   // Conectar Socket.io (solo una vez)
   useEffect(() => {
@@ -32,6 +33,22 @@ function ChatLayout() {
 
     newSocket.on('error', (error) => {
       console.error('❌ Error Socket.io:', error);
+    });
+
+    newSocket.on('online_users', (keys) => {
+      setOnlineUsers(new Set(keys));
+    });
+
+    newSocket.on('user_online', ({ userId, tipoUsuario }) => {
+      setOnlineUsers(prev => new Set([...prev, `${userId}_${tipoUsuario}`]));
+    });
+
+    newSocket.on('user_offline', ({ userId, tipoUsuario }) => {
+      setOnlineUsers(prev => {
+        const next = new Set(prev);
+        next.delete(`${userId}_${tipoUsuario}`);
+        return next;
+      });
     });
 
     setSocket(newSocket);
@@ -106,6 +123,35 @@ const handleConversacionCreada = (nuevaConversacion) => {
   setActiveView('window');
 };
 
+const handleOpenDirectChat = useCallback((participant) => {
+  const tipoConv = participant.tipo_usuario === 'cliente' ? 'empleado_cliente' : 'empleado_empleado';
+  const existing = conversaciones.find(c =>
+    c.tipo === tipoConv &&
+    c.participantes?.some(p => p.user_id === participant.user_id && p.tipo_usuario === participant.tipo_usuario)
+  );
+  if (existing) {
+    setConversacionActiva(existing);
+  } else {
+    setConversacionActiva({
+      id: null,
+      ephemeral: true,
+      tipo: tipoConv,
+      nombre: null,
+      proyecto_id: null,
+      participantes: [
+        { user_id: empleado.id, tipo_usuario: 'empleado', nombre: empleado.nombre, email: empleado.email, rol: empleado.rol, foto_url: empleado.foto_url },
+        { user_id: participant.user_id, tipo_usuario: participant.tipo_usuario, nombre: participant.nombre, email: participant.email, rol: participant.rol, foto_url: participant.foto_url }
+      ]
+    });
+  }
+  setActiveView('window');
+}, [conversaciones, empleado]);
+
+const handleConversacionEfimeraCreada = useCallback((realConv) => {
+  setConversacionActiva(realConv);
+  cargarConversaciones();
+}, []);
+
   return (
     <div className="chat-layout">
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
@@ -115,6 +161,7 @@ const handleConversacionCreada = (nuevaConversacion) => {
         onSelectConversacion={handleSelectConversacion}
         onNewConversacion={handleNewConversacion}
         currentUser={empleado}
+        onlineUsers={onlineUsers}
       />
 
       <ChatWindow
@@ -126,6 +173,9 @@ const handleConversacionCreada = (nuevaConversacion) => {
         showToast={showToast}
         isActive={activeView === 'window'}
         onBack={() => setActiveView('list')}
+        onlineUsers={onlineUsers}
+        onOpenDirectChat={handleOpenDirectChat}
+        onConversacionCreada={handleConversacionEfimeraCreada}
       />
 
       {showNuevoModal && (
@@ -134,6 +184,7 @@ const handleConversacionCreada = (nuevaConversacion) => {
         onCrear={handleConversacionCreada}
         currentUser={empleado}
         showToast={showToast}
+        conversaciones={conversaciones}
       />
     )}
     </div>

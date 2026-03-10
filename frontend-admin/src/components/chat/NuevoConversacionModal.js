@@ -4,7 +4,7 @@ import usuarioService from '../../services/usuarioService';
 import proyectoService from '../../services/proyectoService';
 import { Handshake, CircleUserRound } from 'lucide-react';
 
-function NuevoConversacionModal({ onClose, onCrear, currentUser, showToast }) {
+function NuevoConversacionModal({ onClose, onCrear, currentUser, showToast, conversaciones = [] }) {
   const [clientes, setClientes] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
   const [tipo, setTipo] = useState('empleado_cliente');
@@ -166,16 +166,26 @@ function NuevoConversacionModal({ onClose, onCrear, currentUser, showToast }) {
               >
                 <option value="">Seleccionar...</option>
                 {tipo === 'empleado_cliente'
-                  ? clientes.map(cliente => (
-                      <option key={cliente.id} value={cliente.id}>
-                        {cliente.nombre_empresa} - {cliente.nombre_contacto}
-                      </option>
-                    ))
-                  : usuarios.map(user => (
-                      <option key={user.id} value={user.id}>
-                        {user.nombre} ({user.rol})
-                      </option>
-                    ))
+                  ? clientes
+                      .filter(cliente => !conversaciones.some(
+                        c => c.tipo === 'empleado_cliente' &&
+                          c.participantes?.some(p => p.user_id === cliente.id && p.tipo_usuario === 'cliente')
+                      ))
+                      .map(cliente => (
+                        <option key={cliente.id} value={cliente.id}>
+                          {cliente.nombre_empresa} - {cliente.nombre_contacto}
+                        </option>
+                      ))
+                  : usuarios
+                      .filter(user => !conversaciones.some(
+                        c => c.tipo === 'empleado_empleado' &&
+                          c.participantes?.some(p => p.user_id === user.id && p.tipo_usuario === 'empleado')
+                      ))
+                      .map(user => (
+                        <option key={user.id} value={user.id}>
+                          {user.nombre} ({user.rol})
+                        </option>
+                      ))
                 }
               </select>
             </div>

@@ -160,13 +160,13 @@ function ProyectoCompleto() {
       {/* Tabs */}
       <div className="tabs-container">
         <button className={`tab ${activeTab === 'info' ? 'tab-active' : ''}`} onClick={() => setActiveTab('info')}>
-          📋 Información
+          Información
         </button>
         <button className={`tab ${activeTab === 'presupuestos' ? 'tab-active' : ''}`} onClick={() => setActiveTab('presupuestos')}>
-          💰 Presupuestos ({presupuestos.length})
+          Presupuestos ({presupuestos.length})
         </button>
         <button className={`tab ${activeTab === 'documentos' ? 'tab-active' : ''}`} onClick={() => setActiveTab('documentos')}>
-          📄 Documentos ({documentos.length})
+          Documentos ({documentos.length})
         </button>
       </div>
 

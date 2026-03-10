@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Search, Plus } from 'lucide-react';
 
-function ConversationList({ 
-  conversaciones, 
-  conversacionActiva, 
-  onSelectConversacion, 
+function ConversationList({
+  conversaciones,
+  conversacionActiva,
+  onSelectConversacion,
   onNewConversacion,
-  currentUser 
+  currentUser,
+  onlineUsers = new Set()
 }) {
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -60,6 +61,9 @@ function ConversationList({
       return conversacion.nombre?.charAt(0).toUpperCase() || 'G';
     }
     const otherParticipant = getOtherParticipant(conversacion);
+    if (otherParticipant?.foto_url) {
+      return <img src={`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'}${otherParticipant.foto_url}`} alt="av" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />;
+    }
     return otherParticipant?.nombre?.charAt(0).toUpperCase() || '?';
   };
 
@@ -117,7 +121,11 @@ function ConversationList({
                   <div className="avatar-circle">
                     {getAvatarContent(conversacion)}
                   </div>
-                  <div className={`status-indicator ${conversacion.online ? 'online' : ''}`}></div>
+                  {conversacion.tipo !== 'proyecto_grupo' && (() => {
+                    const other = getOtherParticipant(conversacion);
+                    const isOnline = other ? onlineUsers.has(`${other.user_id}_${other.tipo_usuario}`) : false;
+                    return <div className={`status-indicator ${isOnline ? 'online' : ''}`}></div>;
+                  })()}
                 </div>
 
                 {/* Info */}

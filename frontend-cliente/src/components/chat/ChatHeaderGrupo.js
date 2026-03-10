@@ -15,7 +15,6 @@ function ChatHeaderGrupo({ conversacion, currentUser }) {
         <div className="chat-header-info">
           <div className="header-avatar">
             <div className="avatar-circle">📁</div>
-            <div className="status-indicator online"></div>
           </div>
           <div className="header-details">
             <h3>{conversacion.nombre || 'Grupo'}</h3>

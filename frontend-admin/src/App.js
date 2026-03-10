@@ -8,6 +8,8 @@ import Clientes from './pages/Clientes';
 import Usuarios from './pages/Usuarios';
 import Chat from './pages/Chat';
 import ProyectoCompleto from './pages/ProyectoCompleto';
+import Perfil from './pages/Perfil';
+import Tickets from './pages/Tickets';
 import './styles/App.css';
 
 // Rutas protegidas para empleados
@@ -68,6 +70,18 @@ function App() {
           <Route path="/chat" element={
             <EmpleadoProtectedRoute>
               <Chat />
+            </EmpleadoProtectedRoute>
+          } />
+
+          <Route path="/perfil" element={
+            <EmpleadoProtectedRoute>
+              <Perfil />
+            </EmpleadoProtectedRoute>
+          } />
+
+          <Route path="/tickets" element={
+            <EmpleadoProtectedRoute>
+              <Tickets />
             </EmpleadoProtectedRoute>
           } />
 

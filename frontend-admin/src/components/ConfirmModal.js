@@ -27,11 +27,11 @@ function ConfirmModal({
             <button type="button" className="btn-secondary" onClick={onClose}>
               {cancelText}
             </button>
-            <button 
-              type="button" 
+            <button
+              type="button"
               className={`btn-${type}`}
-              onClick={() => {
-                onConfirm();
+              onClick={async () => {
+                await onConfirm();
                 onClose();
               }}
             >

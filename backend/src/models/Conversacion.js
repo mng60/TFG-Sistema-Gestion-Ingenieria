@@ -52,6 +52,10 @@ class Conversacion {
                   WHEN cp.tipo_usuario = 'empleado' THEN u.nombre
                   WHEN cp.tipo_usuario = 'cliente' THEN COALESCE(cl.persona_contacto, cl.nombre_empresa)
                 END,
+                'email', CASE
+                  WHEN cp.tipo_usuario = 'empleado' THEN u.email
+                  WHEN cp.tipo_usuario = 'cliente' THEN cl.email
+                END,
                 'rol', u.rol,
                 'foto_url', CASE
                   WHEN cp.tipo_usuario = 'empleado' THEN u.foto_url

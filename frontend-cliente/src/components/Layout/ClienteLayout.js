@@ -46,9 +46,12 @@ function ClienteLayout({ children }) {
         </nav>
 
         <div className="sidebar-footer">
-          <div className="user-info">
+          <div className="user-info" onClick={() => { navigate('/perfil'); setSidebarOpen(false); }} style={{ cursor: 'pointer' }} title="Ver mi perfil">
             <div className="user-avatar">
-              {(cliente?.nombre_empresa || 'C').charAt(0).toUpperCase()}
+              {cliente?.foto_url
+                ? <img src={`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'}${cliente.foto_url}`} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                : (cliente?.nombre_empresa || 'C').charAt(0).toUpperCase()
+              }
             </div>
             <div className="user-details">
               <span className="user-name">{cliente?.nombre_empresa || 'Cliente'}</span>

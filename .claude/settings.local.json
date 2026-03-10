@@ -3,7 +3,8 @@
     "allow": [
       "Bash(ls -la \"c:\\\\Users\\\\migue\\\\Documents\\\\4o\\\\TFG-Visual\\\\TFG-Sistema-Gestion-Ingenieria\\\\backend\\\\src\\\\controllers\"\" | grep -E \"portal)",
       "Bash(cliente \")",
-      "Bash(node -e:*)"
+      "Bash(node -e:*)",
+      "Bash(del \"c:\\\\Users\\\\migue\\\\Documents\\\\4o\\\\TFG-Visual\\\\TFG-Sistema-Gestion-Ingenieria\\\\mobile\\\\src\\\\services\\\\clienteService.js\")"
     ]
   }
 }

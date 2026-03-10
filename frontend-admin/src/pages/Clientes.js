@@ -7,7 +7,7 @@ import Toast from '../components/Toast';
 import ConfirmModal from '../components/ConfirmModal';
 import ActivarAccesoModal from '../components/ActivarAccesoModal';
 import '../styles/GestionPages.css';
-import { Search, Plus } from 'lucide-react';
+import { Search, Plus, Pencil, Trash2, KeyRound, Lock } from 'lucide-react';
 
 function Clientes() {
   const { isAdmin } = useEmpleadoAuth();
@@ -26,12 +26,13 @@ function Clientes() {
   const [formData, setFormData] = useState({
     nombre_empresa: '',
     cif: '',
-    nombre_contacto: '',
+    persona_contacto: '',
     email: '',
     telefono: '',
     direccion: '',
     ciudad: '',
     codigo_postal: '',
+    notas: '',
     activo: true
   });
 
@@ -63,7 +64,7 @@ function Clientes() {
     return (
       cliente.nombre_empresa?.toLowerCase().includes(searchLower) ||
       cliente.cif?.toLowerCase().includes(searchLower) ||
-      cliente.nombre_contacto?.toLowerCase().includes(searchLower) ||
+      cliente.persona_contacto?.toLowerCase().includes(searchLower) ||
       cliente.email?.toLowerCase().includes(searchLower)
     );
   });
@@ -77,12 +78,13 @@ function Clientes() {
     setFormData({
       nombre_empresa: '',
       cif: '',
-      nombre_contacto: '',
+      persona_contacto: '',
       email: '',
       telefono: '',
       direccion: '',
       ciudad: '',
       codigo_postal: '',
+      notas: '',
       activo: true
     });
     setShowModal(true);
@@ -94,12 +96,13 @@ function Clientes() {
     setFormData({
       nombre_empresa: cliente.nombre_empresa || '',
       cif: cliente.cif || '',
-      nombre_contacto: cliente.nombre_contacto || '',
+      persona_contacto: cliente.persona_contacto || '',
       email: cliente.email || '',
       telefono: cliente.telefono || '',
       direccion: cliente.direccion || '',
       ciudad: cliente.ciudad || '',
       codigo_postal: cliente.codigo_postal || '',
+      notas: cliente.notas || '',
       activo: cliente.activo
     });
     setShowModal(true);
@@ -108,6 +111,24 @@ function Clientes() {
   const abrirModalActivar = (cliente) => {
     setClienteSeleccionado(cliente);
     setShowActivarModal(true);
+  };
+
+  const handleDesactivarAcceso = (cliente) => {
+    setConfirmModal({
+      title: 'Desactivar acceso al portal',
+      message: `¿Seguro que quieres desactivar el acceso al portal de "${cliente.nombre_empresa}"? El cliente no podrá iniciar sesión hasta que lo reactives.`,
+      type: 'warning',
+      confirmText: 'Sí, desactivar',
+      onConfirm: async () => {
+        try {
+          await clienteService.desactivarAcceso(cliente.id);
+          showToast('Acceso al portal desactivado', 'success');
+          cargarClientes();
+        } catch {
+          showToast('Error al desactivar acceso', 'error');
+        }
+      }
+    });
   };
 
   const handleInputChange = (e) => {
@@ -227,7 +248,7 @@ function Clientes() {
                   <tr key={cliente.id}>
                     <td><strong>{cliente.nombre_empresa}</strong></td>
                     <td>{cliente.cif}</td>
-                    <td>{cliente.nombre_contacto}</td>
+                    <td>{cliente.persona_contacto}</td>
                     <td>{cliente.email}</td>
                     <td>{cliente.telefono || '-'}</td>
                     <td>
@@ -237,28 +258,38 @@ function Clientes() {
                     </td>
                     <td>
                       <div className="action-buttons">
-                        <button 
+                        <button
                           className="btn-sm btn-edit"
                           onClick={() => abrirModalEditar(cliente)}
                           title="Editar"
                         >
-                          ✏️
+                          <Pencil size={14} />
                         </button>
                         {isAdmin() && (
                           <>
-                            <button 
-                              className="btn-sm btn-access"
-                              onClick={() => abrirModalActivar(cliente)}
-                              title="Activar acceso portal"
-                            >
-                              🔑
-                            </button>
-                            <button 
+                            {cliente.activo_login ? (
+                              <button
+                                className="btn-sm btn-warning"
+                                onClick={() => handleDesactivarAcceso(cliente)}
+                                title="Desactivar acceso portal"
+                              >
+                                <Lock size={14} />
+                              </button>
+                            ) : (
+                              <button
+                                className="btn-sm btn-access"
+                                onClick={() => abrirModalActivar(cliente)}
+                                title="Activar acceso portal"
+                              >
+                                <KeyRound size={14} />
+                              </button>
+                            )}
+                            <button
                               className="btn-sm btn-danger"
                               onClick={() => handleEliminar(cliente)}
                               title="Eliminar"
                             >
-                              🗑️
+                              <Trash2 size={14} />
                             </button>
                           </>
                         )}
@@ -308,8 +339,8 @@ function Clientes() {
                   <label>Nombre Contacto *</label>
                   <input
                     type="text"
-                    name="nombre_contacto"
-                    value={formData.nombre_contacto}
+                    name="persona_contacto"
+                    value={formData.persona_contacto}
                     onChange={handleInputChange}
                     required
                   />
@@ -367,6 +398,17 @@ function Clientes() {
                 </div>
 
                 <div className="form-group form-group-full">
+                  <label>Notas internas</label>
+                  <textarea
+                    name="notas"
+                    value={formData.notas}
+                    onChange={handleInputChange}
+                    rows="3"
+                    placeholder="Observaciones internas sobre el cliente..."
+                  />
+                </div>
+
+                <div className="form-group form-group-full">
                   <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <input
                       type="checkbox"
@@ -396,12 +438,16 @@ function Clientes() {
         <ActivarAccesoModal
           cliente={clienteSeleccionado}
           onClose={() => setShowActivarModal(false)}
-          onSuccess={() => {
-            showToast('Acceso al portal activado', 'success');
-            setShowActivarModal(false);
-            cargarClientes();
+          onConfirm={async (password) => {
+            try {
+              await clienteService.activarAcceso(clienteSeleccionado.id, password);
+              showToast('Acceso al portal activado', 'success');
+              setShowActivarModal(false);
+              cargarClientes();
+            } catch (err) {
+              showToast(err.response?.data?.message || 'Error al activar acceso', 'error');
+            }
           }}
-          onError={(error) => showToast(error, 'error')}
         />
       )}
 

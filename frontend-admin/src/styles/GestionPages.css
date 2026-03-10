@@ -189,48 +189,57 @@
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 0.85rem;
   transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-weight: 500;
 }
 
+/* Editar — azul claro informativo */
 .btn-edit {
   background: #3498db;
   color: white;
 }
-
 .btn-edit:hover {
   background: #2980b9;
-  transform: scale(1.1);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(52,152,219,0.35);
 }
 
+/* Activar acceso — verde (acción positiva) */
 .btn-access {
-  background: #9b59b6;
+  background: #27ae60;
   color: white;
 }
-
 .btn-access:hover {
-  background: #8e44ad;
-  transform: scale(1.1);
+  background: #219a52;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(39,174,96,0.35);
 }
 
+/* Asignar empleado — naranja cálido */
 .btn-warning {
-  background: #f39c12;
+  background: #e67e22;
   color: white;
 }
-
 .btn-warning:hover {
-  background: #e67e22;
-  transform: scale(1.1);
+  background: #ca6f1e;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(230,126,34,0.35);
 }
 
+/* Eliminar — rojo */
 .btn-danger {
   background: #e74c3c;
   color: white;
 }
-
 .btn-danger:hover {
   background: #c0392b;
-  transform: scale(1.1);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(231,76,60,0.35);
 }
 
 .form-grid {
@@ -384,15 +393,15 @@
   font-size: 1.5rem;
 }
 
-/* Botón success */
+/* Aceptar — teal corporativo */
 .btn-success {
-  background: #28a745;
+  background: #4DB6A8;
   color: white;
 }
-
 .btn-success:hover {
-  background: #218838;
-  transform: scale(1.1);
+  background: #3A9089;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(77,182,168,0.35);
 }
 
 /* Badges específicos de documentos */

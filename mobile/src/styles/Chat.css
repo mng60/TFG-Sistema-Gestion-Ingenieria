@@ -192,18 +192,25 @@
 .btn-new-chat {
   margin: 15px;
   padding: 12px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #4DB6A8 0%, #3A9089 100%);
   color: white;
   border: none;
   border-radius: 8px;
   font-weight: 600;
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: calc(100% - 30px);
 }
 
 .btn-new-chat:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 12px rgba(77, 182, 168, 0.4);
+  background: linear-gradient(135deg, #5bc8ba 0%, #4DB6A8 100%);
 }
 
 /* ==================== CHAT WINDOW ==================== */
@@ -796,6 +803,21 @@
 .btn-back:hover,
 .btn-close-panel:hover {
   background: #e9ecef;
+}
+
+/* Botón volver en InfoPanel y ArchivosPanel con estilo visible */
+.info-panel-header .btn-back,
+.archivos-panel-header .btn-back {
+  background: #e9ecef;
+  color: #2c3e50;
+  font-weight: 600;
+  padding: 7px 16px;
+  border-radius: 8px;
+}
+
+.info-panel-header .btn-back:hover,
+.archivos-panel-header .btn-back:hover {
+  background: #dee2e6;
 }
 
 .info-panel-content {

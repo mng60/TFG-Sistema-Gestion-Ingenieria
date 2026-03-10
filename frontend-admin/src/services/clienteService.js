@@ -57,6 +57,11 @@ const clienteService = {
   activarAcceso: async (id, password) => {
     const response = await empleadoApi.post(`/clientes/${id}/activar-acceso`, { password });
     return response.data;
+  },
+
+  desactivarAcceso: async (id) => {
+    const response = await empleadoApi.patch(`/clientes/${id}/deactivate`);
+    return response.data;
   }
 };
 

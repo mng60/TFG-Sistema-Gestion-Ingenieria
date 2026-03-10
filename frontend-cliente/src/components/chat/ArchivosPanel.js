@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import ImageViewer from './ImageViewer';
+import { FileText, Archive, Music, Image, FolderOpen } from 'lucide-react';
 
 function ArchivosPanel({ conversacionId, onClose }) {
   const [archivos, setArchivos] = useState({ imagenes: [], documentos: [], audios: [] });
   const [loading, setLoading] = useState(true);
   const [tipoActivo, setTipoActivo] = useState('imagenes');
+  const [imagenSeleccionada, setImagenSeleccionada] = useState(null);
 
   useEffect(() => {
     cargarArchivos();
@@ -39,13 +42,13 @@ function ArchivosPanel({ conversacionId, onClose }) {
     new Date(fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
 
   const getIconoArchivo = (archivoTipo) => {
-    if (!archivoTipo) return '📄';
-    if (archivoTipo.includes('pdf')) return '📕';
-    if (archivoTipo.includes('word') || archivoTipo.includes('document')) return '📘';
-    if (archivoTipo.includes('excel') || archivoTipo.includes('spreadsheet')) return '📗';
-    if (archivoTipo.includes('powerpoint') || archivoTipo.includes('presentation')) return '📙';
-    if (archivoTipo.includes('zip') || archivoTipo.includes('rar')) return '🗜️';
-    return '📄';
+    if (!archivoTipo) return <FileText size={26} color="#7f8c8d" />;
+    if (archivoTipo.includes('pdf')) return <FileText size={26} color="#e74c3c" />;
+    if (archivoTipo.includes('word') || archivoTipo.includes('document')) return <FileText size={26} color="#2980b9" />;
+    if (archivoTipo.includes('excel') || archivoTipo.includes('spreadsheet')) return <FileText size={26} color="#27ae60" />;
+    if (archivoTipo.includes('powerpoint') || archivoTipo.includes('presentation')) return <FileText size={26} color="#e67e22" />;
+    if (archivoTipo.includes('zip') || archivoTipo.includes('rar')) return <Archive size={26} color="#f39c12" />;
+    return <FileText size={26} color="#7f8c8d" />;
   };
 
   const handleDescargar = (archivo) => {
@@ -62,6 +65,7 @@ function ArchivosPanel({ conversacionId, onClose }) {
   const totalArchivos = archivos.imagenes.length + archivos.documentos.length + archivos.audios.length;
 
   return (
+    <>
     <div className="archivos-panel-overlay" onClick={onClose}>
       <div className="archivos-panel" onClick={(e) => e.stopPropagation()}>
         <div className="archivos-panel-header">
@@ -102,7 +106,7 @@ function ArchivosPanel({ conversacionId, onClose }) {
               {tipoActivo === 'imagenes' && (
                 archivos.imagenes.length === 0 ? (
                   <div className="archivos-empty">
-                    <span className="empty-icon">📸</span>
+                    <Image size={40} color="#bdc3c7" />
                     <p>No hay imágenes compartidas</p>
                   </div>
                 ) : (
@@ -111,7 +115,7 @@ function ArchivosPanel({ conversacionId, onClose }) {
                       <div
                         key={archivo.id}
                         className="archivo-imagen-item"
-                        onClick={() => window.open(getFullUrl(archivo.archivo_url), '_blank')}
+                        onClick={() => setImagenSeleccionada(archivo)}
                       >
                         <img
                           src={getFullUrl(archivo.archivo_url)}
@@ -133,7 +137,7 @@ function ArchivosPanel({ conversacionId, onClose }) {
               {tipoActivo === 'documentos' && (
                 archivos.documentos.length === 0 ? (
                   <div className="archivos-empty">
-                    <span className="empty-icon">📂</span>
+                    <FolderOpen size={40} color="#bdc3c7" />
                     <p>No hay documentos compartidos</p>
                   </div>
                 ) : (
@@ -157,14 +161,14 @@ function ArchivosPanel({ conversacionId, onClose }) {
               {tipoActivo === 'audios' && (
                 archivos.audios.length === 0 ? (
                   <div className="archivos-empty">
-                    <span className="empty-icon">🎵</span>
+                    <Music size={40} color="#bdc3c7" />
                     <p>No hay audios compartidos</p>
                   </div>
                 ) : (
                   <div className="archivos-lista">
                     {archivos.audios.map(archivo => (
                       <div key={archivo.id} className="archivo-audio-item">
-                        <div className="archivo-icono">🎵</div>
+                        <div className="archivo-icono"><Music size={26} color="#8e44ad" /></div>
                         <div className="archivo-info">
                           <strong>Audio de {archivo.usuario_nombre}</strong>
                           <small>{formatearFecha(archivo.created_at)}</small>
@@ -182,6 +186,15 @@ function ArchivosPanel({ conversacionId, onClose }) {
         </div>
       </div>
     </div>
+
+    {imagenSeleccionada && (
+      <ImageViewer
+        imageUrl={getFullUrl(imagenSeleccionada.archivo_url)}
+        imageName={imagenSeleccionada.archivo_nombre}
+        onClose={() => setImagenSeleccionada(null)}
+      />
+    )}
+    </>
   );
 }
 

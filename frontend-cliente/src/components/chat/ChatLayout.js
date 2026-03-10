@@ -13,6 +13,7 @@ function ChatLayout() {
   const [showNuevoModal, setShowNuevoModal] = useState(false);
   const [toast, setToast] = useState(null);
   const [activeView, setActiveView] = useState('list');
+  const [onlineUsers, setOnlineUsers] = useState(new Set());
 
   // Conectar Socket.io con el token del cliente
   useEffect(() => {
@@ -27,6 +28,22 @@ function ChatLayout() {
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionAttempts: 5
+    });
+
+    newSocket.on('online_users', (keys) => {
+      setOnlineUsers(new Set(keys));
+    });
+
+    newSocket.on('user_online', ({ userId, tipoUsuario }) => {
+      setOnlineUsers(prev => new Set([...prev, `${userId}_${tipoUsuario}`]));
+    });
+
+    newSocket.on('user_offline', ({ userId, tipoUsuario }) => {
+      setOnlineUsers(prev => {
+        const next = new Set(prev);
+        next.delete(`${userId}_${tipoUsuario}`);
+        return next;
+      });
     });
 
     setSocket(newSocket);
@@ -98,6 +115,7 @@ function ChatLayout() {
         onSelectConversacion={handleSelectConversacion}
         onNewConversacion={() => setShowNuevoModal(true)}
         currentUser={currentUser}
+        onlineUsers={onlineUsers}
       />
 
       <ChatWindow
@@ -107,6 +125,7 @@ function ChatLayout() {
         onReloadConversaciones={cargarConversaciones}
         isActive={activeView === 'window'}
         onBack={() => setActiveView('list')}
+        onlineUsers={onlineUsers}
       />
 
       {showNuevoModal && (
@@ -115,6 +134,7 @@ function ChatLayout() {
           onCrear={handleConversacionCreada}
           currentUser={currentUser}
           showToast={showToast}
+          conversaciones={conversaciones}
         />
       )}
     </div>

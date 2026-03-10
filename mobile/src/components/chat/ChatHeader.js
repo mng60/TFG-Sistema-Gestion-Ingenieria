@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import InfoPanel from './InfoPanel';
 import { useNavigate } from 'react-router-dom';
 import ConfirmModal from '../common/ConfirmModal';
+import { ArrowLeft } from 'lucide-react';
 
-function ChatHeader({ conversacion, currentUser, onConversacionEliminada }) {
+function ChatHeader({ conversacion, currentUser, onConversacionEliminada, onBack, onlineUsers = new Set() }) {
   const [showMenu, setShowMenu] = useState(false);
   const [showInfoPanel, setShowInfoPanel] = useState(false);
   const [confirmModal, setConfirmModal] = useState(null);
@@ -77,12 +78,26 @@ function ChatHeader({ conversacion, currentUser, onConversacionEliminada }) {
     <>
       <div className="chat-header">
         <div className="chat-header-info">
+          {/* Botón volver */}
+          {onBack && (
+            <button onClick={onBack} title="Volver" style={{
+              flexShrink: 0, width: 34, height: 34, borderRadius: '50%',
+              background: '#4DB6A8', border: 'none', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: 'white'
+            }}>
+              <ArrowLeft size={18} />
+            </button>
+          )}
           {/* Avatar */}
           <div className="header-avatar">
             <div className="avatar-circle">
-              {otherParticipant?.nombre?.charAt(0).toUpperCase() || '?'}
+              {otherParticipant?.foto_url
+                ? <img src={`${process.env.REACT_APP_BACKEND_URL || `http://${window.location.hostname}:5000`}${otherParticipant.foto_url}`} alt="av" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                : otherParticipant?.nombre?.charAt(0).toUpperCase() || '?'
+              }
             </div>
-            <div className="status-indicator online"></div>
+            <div className={`status-indicator ${otherParticipant && onlineUsers.has(`${otherParticipant.user_id}_${otherParticipant.tipo_usuario}`) ? 'online' : ''}`}></div>
           </div>
 
           {/* Nombre y tipo */}

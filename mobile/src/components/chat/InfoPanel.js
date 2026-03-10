@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Paperclip } from 'lucide-react';
+import { Paperclip, Mail, Phone } from 'lucide-react';
 import ArchivosPanel from './ArchivosPanel';
 
 function InfoPanel({ participant, conversacion, currentUser, onClose }) {
@@ -58,7 +58,10 @@ function InfoPanel({ participant, conversacion, currentUser, onClose }) {
           {/* Nombre y tipo */}
           <h2 className="info-name">{participant.nombre}</h2>
           <p className="info-type">
-            {participant.tipo_usuario === 'empleado' ? '👤 Empleado' : '🏢 Cliente'}
+            {participant.tipo_usuario === 'cliente'
+              ? 'Cliente'
+              : participant.rol === 'admin' ? 'Administrador' : 'Empleado'
+            }
           </p>
 
           {/* Información de contacto */}
@@ -66,15 +69,20 @@ function InfoPanel({ participant, conversacion, currentUser, onClose }) {
             <h3>Información de contacto</h3>
             
             <div className="info-item">
-              <span className="info-label">📧 Email:</span>
-              <span className="info-value">{participant.email || 'No disponible'}</span>
+              <span className="info-label"><Mail size={14} /> Email:</span>
+              <span className="info-value">
+                {loading
+                  ? 'Cargando...'
+                  : (participant.email || infoAdicional?.email || 'No disponible')
+                }
+              </span>
             </div>
 
             <div className="info-item">
-              <span className="info-label">📞 Teléfono:</span>
+              <span className="info-label"><Phone size={14} /> Teléfono:</span>
               <span className="info-value">
-                {loading 
-                  ? 'Cargando...' 
+                {loading
+                  ? 'Cargando...'
                   : (infoAdicional?.telefono || 'No disponible')
                 }
               </span>
@@ -87,7 +95,11 @@ function InfoPanel({ participant, conversacion, currentUser, onClose }) {
               <h3>Grupos en común ({infoAdicional.grupos_comunes.length})</h3>
               {infoAdicional.grupos_comunes.map(grupo => (
                 <div key={grupo.id} className="grupo-item">
-                  <div className="grupo-icon">📁</div>
+                  <div className="grupo-icon">
+                    <div className="avatar-circle" style={{ width: 32, height: 32, fontSize: '0.8rem' }}>
+                      {grupo.nombre?.charAt(0).toUpperCase() || 'G'}
+                    </div>
+                  </div>
                   <div className="grupo-info">
                     <strong>{grupo.nombre || `Grupo ${grupo.id}`}</strong>
                     <small>{grupo.participantes_count} participantes</small>

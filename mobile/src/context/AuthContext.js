@@ -37,11 +37,18 @@ export const AuthProvider = ({ children }) => {
 
   const isAdmin = () => empleado?.rol === 'admin';
 
+  const actualizarEmpleado = (data) => {
+    const updated = { ...(authService.getCurrentEmpleado() || {}), ...data };
+    localStorage.setItem('empleado', JSON.stringify(updated));
+    setEmpleado(updated);
+  };
+
   const value = {
     empleado,
     login,
     logout,
     isAdmin,
+    actualizarEmpleado,
     isAuthenticated: !!empleado
   };
 

@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import proyectoService from '../../services/proyectoService';
 import '../../styles/Modal.css';
 
-function AsignarEmpleadoModal({ proyectoId, usuarios, onClose, onSuccess, onError }) {
+function AsignarEmpleadoModal({ proyectoId, usuarios, empleadosProyecto = [], onClose, onSuccess, onError }) {
+  const idsAsignados = new Set(empleadosProyecto.map(e => e.user_id || e.id));
   const [formData, setFormData] = useState({
     user_id: '',
     rol_proyecto: ''
@@ -36,7 +37,7 @@ function AsignarEmpleadoModal({ proyectoId, usuarios, onClose, onSuccess, onErro
             <label>Empleado *</label>
             <select name="user_id" value={formData.user_id} onChange={handleChange} required>
               <option value="">Seleccionar...</option>
-              {usuarios.map(u => (
+              {usuarios.filter(u => !idsAsignados.has(u.id)).map(u => (
                 <option key={u.id} value={u.id}>
                   {u.nombre} ({u.rol})
                 </option>

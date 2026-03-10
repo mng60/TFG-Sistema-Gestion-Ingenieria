@@ -47,16 +47,17 @@ function InfoPanelGrupo({ conversacion, currentUser, onClose }) {
       <div className="info-panel" onClick={(e) => e.stopPropagation()}>
         <div className="info-panel-header">
           <button className="btn-back" onClick={onClose}>← Volver</button>
-          <button className="btn-close-panel" onClick={onClose}>✕</button>
         </div>
 
         <div className="info-panel-content">
           <div className="info-avatar-large">
-            <div className="avatar-circle-large">📁</div>
+            <div className="avatar-circle-large">
+              {conversacion.nombre?.charAt(0).toUpperCase() || 'G'}
+            </div>
           </div>
 
           <h2 className="info-name">{conversacion.nombre || 'Grupo'}</h2>
-          <p className="info-type">📁 Grupo de Proyecto</p>
+          <p className="info-type">Grupo de Proyecto</p>
 
           {loading ? (
             <p style={{ textAlign: 'center', color: '#95a5a6' }}>Cargando...</p>
@@ -81,11 +82,16 @@ function InfoPanelGrupo({ conversacion, currentUser, onClose }) {
                   className="participante-item"
                 >
                   <div className="participante-avatar">
-                    {participante.tipo_usuario === 'cliente' ? '🏢' : '👤'}
+                    <div className="avatar-circle" style={{ width: 34, height: 34, fontSize: '0.85rem' }}>
+                      {participante.foto_url
+                        ? <img src={`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'}${participante.foto_url}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                        : participante.nombre?.charAt(0).toUpperCase() || '?'
+                      }
+                    </div>
                   </div>
                   <div className="participante-info">
                     <strong>{participante.nombre}</strong>
-                    <small>{participante.tipo_usuario === 'empleado' ? 'Empleado' : 'Cliente'}</small>
+                    <small>{participante.tipo_usuario === 'empleado' ? (participante.rol === 'admin' ? 'Administrador' : 'Empleado') : 'Cliente'}</small>
                   </div>
                 </div>
               ))}

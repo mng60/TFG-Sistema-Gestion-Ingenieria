@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import { FolderOpen, MessagesSquare, CircleUserRound } from 'lucide-react';
+
+const BACKEND = process.env.REACT_APP_BACKEND_URL || `http://${window.location.hostname}:5000`;
 
 function BottomNav() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { empleado } = useAuth();
   const [mensajesNoLeidos, setMensajesNoLeidos] = useState(0);
 
   useEffect(() => {
@@ -71,7 +75,12 @@ function BottomNav() {
         className={`bottom-nav-item ${isActive('/perfil') ? 'active' : ''}`}
         onClick={() => navigate('/perfil')}
       >
-        <span className="bottom-nav-icon"><CircleUserRound size={22}/></span>
+        <span className="bottom-nav-icon">
+          {empleado?.foto_url
+            ? <img src={`${BACKEND}${empleado.foto_url}`} alt="av" style={{ width: 22, height: 22, borderRadius: '50%', objectFit: 'cover' }} />
+            : <CircleUserRound size={22} />
+          }
+        </span>
         Perfil
       </button>
     </nav>
