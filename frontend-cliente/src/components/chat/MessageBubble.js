@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { FileText } from 'lucide-react';
 import ImageViewer from './ImageViewer';
 
 function MessageBubble({ mensaje, isOwn, conversacion }) {
@@ -67,7 +68,9 @@ function MessageBubble({ mensaje, isOwn, conversacion }) {
             }}
             style={{ cursor: 'pointer' }}
           >
-            <div className="file-icon">📄</div>
+            <div className="file-icon">
+              <FileText size={18} />
+            </div>
             <div className="file-info">
               <span className="file-name">{mensaje.archivo_nombre}</span>
             </div>

@@ -4,16 +4,37 @@ import LandingNav from '../components/LandingNav';
 import '../styles/Landing.css';
 import '../styles/Contacto.css';
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+
 function Contacto() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ nombre: '', empresa: '', email: '', telefono: '', mensaje: '' });
   const [formSent, setFormSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [formError, setFormError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setFormSent(true);
-    setFormData({ nombre: '', empresa: '', email: '', telefono: '', mensaje: '' });
-    setTimeout(() => setFormSent(false), 5000);
+    if (!formData.telefono) {
+      setFormError('El teléfono es obligatorio.');
+      return;
+    }
+    setSending(true);
+    setFormError('');
+    try {
+      const res = await fetch(`${API_URL}/tickets/contacto`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Error al enviar');
+      setFormSent(true);
+    } catch (err) {
+      setFormError(err.message || 'Error al enviar el mensaje. Inténtalo de nuevo.');
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -73,6 +94,11 @@ function Contacto() {
             </div>
           ) : (
             <form className="contacto-form" onSubmit={handleSubmit}>
+              {formError && (
+                <div style={{ padding: '10px 14px', background: '#fee', color: '#c33', borderRadius: 4, fontSize: '0.88rem', borderLeft: '3px solid #c33' }}>
+                  {formError}
+                </div>
+              )}
               <div className="form-row">
                 <div className="form-group">
                   <label>Nombre *</label>
@@ -95,8 +121,8 @@ function Contacto() {
                     onChange={e => setFormData({ ...formData, email: e.target.value })} />
                 </div>
                 <div className="form-group">
-                  <label>Teléfono</label>
-                  <input type="tel" placeholder="+34 600 000 000"
+                  <label>Teléfono *</label>
+                  <input type="tel" required placeholder="+34 600 000 000"
                     value={formData.telefono}
                     onChange={e => setFormData({ ...formData, telefono: e.target.value })} />
                 </div>
@@ -107,11 +133,13 @@ function Contacto() {
                   value={formData.mensaje}
                   onChange={e => setFormData({ ...formData, mensaje: e.target.value })} />
               </div>
-              <button type="submit" className="btn-submit-form">
-                Enviar mensaje
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path d="M5 12h14m0 0l-6-6m6 6l-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                </svg>
+              <button type="submit" className="btn-submit-form" disabled={sending}>
+                {sending ? 'Enviando...' : 'Enviar mensaje'}
+                {!sending && (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M5 12h14m0 0l-6-6m6 6l-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                )}
               </button>
             </form>
           )}
@@ -120,7 +148,7 @@ function Contacto() {
 
       <footer className="landing-footer">
         <div className="footer-inner">
-          <img src="/logo2.png" alt="BlueArc Energy" className="footer-logo" />
+          <img src="/logo.png" alt="BlueArc Energy" className="footer-logo" />
           <p>© 2025 BlueArc Energy. Todos los derechos reservados.</p>
           <button className="footer-area-cliente" onClick={() => navigate('/login')}>
             Área Cliente →

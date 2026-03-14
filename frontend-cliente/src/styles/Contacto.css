@@ -13,7 +13,7 @@
   display: flex; flex-direction: column; gap: 32px;
 }
 .contacto-info h2 {
-  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: clamp(32px, 4vw, 52px);
   font-weight: 800; text-transform: uppercase; color: var(--white); line-height: 1.05;
 }
@@ -22,7 +22,7 @@
 .contacto-datos { display: flex; flex-direction: column; gap: 24px; }
 .dato-bloque { display: flex; flex-direction: column; gap: 4px; }
 .dato-label {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase;
   color: var(--teal);
 }
@@ -33,7 +33,7 @@
 }
 .contacto-area-link p { font-size: 13px; color: rgba(255,255,255,0.4); margin-bottom: 12px; }
 .btn-portal {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 13px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
   color: var(--teal); border: 1.5px solid rgba(77,182,168,0.35); padding: 10px 22px; border-radius: 2px;
   transition: background 0.2s, border-color 0.2s;
@@ -52,14 +52,14 @@
 
 .form-group { display: flex; flex-direction: column; gap: 8px; }
 .form-group label {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
   color: rgba(15,15,15,0.5);
 }
 .form-group input,
 .form-group textarea {
   background: var(--white); border: 1.5px solid var(--gray-light);
-  color: var(--black); font-family: 'Barlow', 'Segoe UI', sans-serif; font-size: 14px;
+  color: var(--black); font-family: 'Inter', 'Segoe UI', sans-serif; font-size: 14px;
   padding: 12px 16px; border-radius: 2px; outline: none; resize: none;
   transition: border-color 0.2s;
 }
@@ -68,15 +68,18 @@
 .form-group input:focus,
 .form-group textarea:focus { border-color: var(--teal); }
 
-.btn-submit-form {
+.landing .btn-submit-form {
   display: inline-flex; align-items: center; gap: 12px;
-  background: var(--dark); color: var(--white);
-  font-family: 'Barlow Condensed', sans-serif;
+  background: #4DB6A8; color: #ffffff;
+  border: none;
+  font-family: 'Montserrat', sans-serif;
   font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
   padding: 14px 32px; border-radius: 2px; align-self: flex-start;
   transition: background 0.22s, gap 0.2s;
+  cursor: pointer;
 }
-.btn-submit-form:hover { background: var(--teal); gap: 18px; }
+.landing .btn-submit-form:hover:not(:disabled) { background: #3A9089; gap: 18px; }
+.landing .btn-submit-form:disabled { opacity: 0.7; cursor: not-allowed; }
 
 /* Success */
 .form-success {
@@ -90,7 +93,7 @@
   color: var(--white); display: flex; align-items: center; justify-content: center; font-size: 24px;
 }
 .form-success h3 {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 24px; font-weight: 700; text-transform: uppercase; color: var(--black);
 }
 .form-success p { font-size: 14px; color: var(--gray); }

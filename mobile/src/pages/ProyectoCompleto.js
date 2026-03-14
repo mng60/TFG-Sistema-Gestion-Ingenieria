@@ -1,53 +1,67 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import MobileLayout from '../components/layout/MobileLayout';
 import ProyectoInfo from '../components/proyecto/ProyectoInfo';
 import DocumentosList from '../components/proyecto/DocumentosList';
 import EmpleadosList from '../components/proyecto/EmpleadosList';
+import ActualizacionesMobile from '../components/proyecto/ActualizacionesMobile';
 import Toast from '../components/common/Toast';
 import proyectoService from '../services/proyectoService';
 import documentoService from '../services/documentoService';
 import '../styles/ProyectoCompleto.css';
 
-const TABS = [
-  { id: 'info', label: '📋 Info' },
-  { id: 'documentos', label: '📄 Docs' },
-  { id: 'empleados', label: '👥 Equipo' }
-];
-
 function ProyectoCompleto() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isAdmin } = useAuth();
+  const { isAdmin, empleado } = useAuth();
 
   const [proyecto, setProyecto] = useState(null);
   const [empleados, setEmpleados] = useState([]);
   const [documentos, setDocumentos] = useState([]);
+  const [actualizaciones, setActualizaciones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('info');
   const [toast, setToast] = useState(null);
 
-  useEffect(() => { cargar(); }, [id]);
+  const tabs = useMemo(() => ([
+    { id: 'info', label: 'Info' },
+    { id: 'documentos', label: `Docs (${documentos.length})` },
+    { id: 'empleados', label: `Equipo (${empleados.length})` },
+    { id: 'avance', label: `Avance (${actualizaciones.length})` }
+  ]), [documentos.length, empleados.length, actualizaciones.length]);
 
-  const cargar = async () => {
-    setLoading(true);
-    try {
-      const [pData, eData, dData] = await Promise.all([
-        proyectoService.getById(id),
-        proyectoService.getEmpleados(id),
-        documentoService.getByProyecto(id)
-      ]);
-      if (!pData.success) { navigate('/proyectos'); return; }
-      setProyecto(pData.proyecto);
-      setEmpleados(eData.empleados || []);
-      setDocumentos(dData.documentos || []);
-    } catch {
-      navigate('/proyectos');
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    const cargar = async () => {
+      setLoading(true);
+
+      try {
+        const [pData, eData, dData, aData] = await Promise.all([
+          proyectoService.getById(id),
+          proyectoService.getEmpleados(id),
+          documentoService.getByProyecto(id),
+          proyectoService.getActualizaciones(id)
+        ]);
+
+        if (!pData.success) {
+          navigate('/proyectos');
+          return;
+        }
+
+        setProyecto(pData.proyecto);
+        setEmpleados(eData.empleados || []);
+        setDocumentos(dData.documentos || []);
+        setActualizaciones(aData.actualizaciones || []);
+      } catch {
+        navigate('/proyectos');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    cargar();
+  }, [id, navigate]);
 
   const cargarEmpleados = async () => {
     const eData = await proyectoService.getEmpleados(id);
@@ -59,7 +73,14 @@ function ProyectoCompleto() {
     setDocumentos(dData.documentos || []);
   };
 
-  const showToast = (message, type = 'success') => setToast({ message, type });
+  const cargarActualizaciones = async () => {
+    const aData = await proyectoService.getActualizaciones(id);
+    setActualizaciones(aData.actualizaciones || []);
+  };
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+  };
 
   if (loading) {
     return (
@@ -79,29 +100,33 @@ function ProyectoCompleto() {
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
       <div className="proyecto-detail">
-        <div className="proyecto-detail-header">
-          <button className="btn-back" onClick={() => navigate('/proyectos')}>←</button>
-          <div className="proyecto-detail-title">
-            <h1>{proyecto.nombre}</h1>
-            <div className="proyecto-detail-badges">
-              <span className={`badge badge-${proyecto.estado}`}>
-                {proyecto.estado?.replace('_', ' ')}
-              </span>
-              <span className={`badge badge-${proyecto.prioridad}`}>{proyecto.prioridad}</span>
+        <section className="project-hero">
+          <div className="proyecto-detail-header">
+            <button
+              className="btn-back btn-back-chip"
+              onClick={() => navigate('/proyectos')}
+              aria-label="Volver a proyectos"
+            >
+              <ArrowLeft size={18} />
+            </button>
+
+            <div className="proyecto-detail-title">
+              <p className="project-kicker">Proyecto</p>
+              <h1>{proyecto.nombre}</h1>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div className="tabs-bar">
-          {TABS.map((t) => (
+        <div className="tabs-bar" role="tablist" aria-label="Secciones del proyecto">
+          {tabs.map(({ id: tabId, label }) => (
             <button
-              key={t.id}
-              className={`tab-btn ${activeTab === t.id ? 'active' : ''}`}
-              onClick={() => setActiveTab(t.id)}
+              key={tabId}
+              className={`tab-btn ${activeTab === tabId ? 'active' : ''}`}
+              onClick={() => setActiveTab(tabId)}
+              role="tab"
+              aria-selected={activeTab === tabId}
             >
-              {t.label}
-              {t.id === 'documentos' && ` (${documentos.length})`}
-              {t.id === 'empleados' && ` (${empleados.length})`}
+              <span>{label}</span>
             </button>
           ))}
         </div>
@@ -126,6 +151,17 @@ function ProyectoCompleto() {
               empleados={empleados}
               isAdmin={isAdmin()}
               onReload={cargarEmpleados}
+              showToast={showToast}
+            />
+          )}
+
+          {activeTab === 'avance' && (
+            <ActualizacionesMobile
+              proyectoId={id}
+              actualizaciones={actualizaciones}
+              isAdmin={isAdmin()}
+              empleadoId={empleado?.id}
+              onReload={cargarActualizaciones}
               showToast={showToast}
             />
           )}

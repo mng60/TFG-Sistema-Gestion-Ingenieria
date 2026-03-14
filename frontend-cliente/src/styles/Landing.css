@@ -17,7 +17,7 @@
 }
 
 .landing * { box-sizing: border-box; margin: 0; padding: 0; }
-.landing { font-family: 'Barlow', 'Segoe UI', sans-serif; color: var(--black); overflow-x: hidden; }
+.landing { font-family: 'Inter', 'Segoe UI', sans-serif; color: var(--black); overflow-x: hidden; }
 .landing button { cursor: pointer; border: none; background: none; font-family: inherit; }
 
 /* ════════════════════
@@ -50,7 +50,7 @@
 .nav-actions { display: flex; align-items: center; gap: 16px; }
 
 .btn-area-cliente {
-  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 13px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
   color: var(--white); border: 1.5px solid rgba(255,255,255,0.55);
   padding: 8px 20px; border-radius: 2px;
@@ -108,7 +108,7 @@
 .nav-menu-list { list-style: none; margin-top: 88px; }
 .nav-menu-list li {
   display: flex; align-items: baseline; gap: 18px;
-  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: clamp(22px, 3vw, 40px);
   font-weight: 800; text-transform: uppercase; color: var(--white);
   padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.08);
@@ -171,12 +171,12 @@
 .hero-content { position: relative; z-index: 2; }
 
 .hero-tagline {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 12px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase;
   color: rgba(255,255,255,0.7); margin-bottom: 18px;
 }
 .hero-title {
-  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: clamp(64px, 8.5vw, 112px);
   font-weight: 800; line-height: 0.9; text-transform: uppercase;
   color: var(--white); letter-spacing: -0.01em; margin-bottom: 26px;
@@ -191,7 +191,7 @@
 
 .btn-hero-cta {
   display: inline-flex; align-items: center; gap: 10px;
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 13px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
   color: var(--white); border-bottom: 2px solid rgba(255,255,255,0.5); padding-bottom: 3px;
   transition: border-color 0.2s, gap 0.2s;
@@ -199,7 +199,7 @@
 .btn-hero-cta:hover { border-color: var(--white); gap: 16px; }
 
 .btn-hero-outline {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 13px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
   color: rgba(255,255,255,0.65);
   border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 3px;
@@ -231,7 +231,7 @@
   display: flex; flex-direction: column; gap: 3px;
 }
 .hero-right-label span {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
   color: rgba(255,255,255,0.5);
 }
@@ -244,24 +244,40 @@
   background: var(--teal-dark);
   display: flex; align-items: center;
   min-height: 100vh; padding: 80px 64px; gap: 40px;
+  position: relative; overflow: hidden;
 }
+
+.como-particles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+.como-particle {
+  position: absolute; bottom: -8px; border-radius: 50%;
+  background: rgba(255,255,255,0.22);
+  animation: float-particle linear infinite;
+}
+
+.como-circuit {
+  position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0;
+  animation: circuit-pulse 5s ease-in-out infinite alternate;
+}
+
+.como-left,
+.como-right { position: relative; z-index: 1; }
 
 .como-left { flex: 0 0 34%; display: flex; flex-direction: column; gap: 20px; }
 
 .section-tag-white {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 12px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase;
   color: rgba(255,255,255,0.55);
 }
 .como-left h2 {
-  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: clamp(44px, 5.5vw, 72px);
   font-weight: 800; text-transform: uppercase; color: var(--white); line-height: 0.95;
 }
 .como-left p { font-size: 14.5px; line-height: 1.7; color: rgba(255,255,255,0.7); max-width: 320px; }
 
 .btn-ver-mas {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 12px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
   color: var(--white); border: 1.5px solid rgba(255,255,255,0.4);
   padding: 10px 22px; border-radius: 2px; align-self: flex-start;
@@ -286,16 +302,18 @@
   width: 52px; height: 52px; border-radius: 50%;
   background: rgba(255,255,255,0.1); border: 1.5px solid rgba(255,255,255,0.2);
   display: flex; align-items: center; justify-content: center; font-size: 20px;
-  transition: background 0.25s, border-color 0.25s, transform 0.25s; z-index: 2;
+  color: rgba(255,255,255,0.8);
+  transition: background 0.25s, border-color 0.25s, transform 0.25s, color 0.25s; z-index: 2;
 }
 .circle-node:hover {
   background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.5);
   transform: translate(-50%, -50%) scale(1.12);
 }
 .circle-node.active {
-  background: var(--white); border-color: var(--white);
+  background: var(--teal); border-color: var(--teal);
+  color: white;
   transform: translate(-50%, -50%) scale(1.18);
-  box-shadow: 0 0 24px rgba(255,255,255,0.3);
+  box-shadow: 0 0 24px rgba(77,182,168,0.4);
 }
 
 .circle-center {
@@ -306,19 +324,19 @@
   z-index: 1;
 }
 .paso-label {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase;
   color: rgba(255,255,255,0.45);
 }
 .circle-center h3 {
-  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: clamp(14px, 2vw, 18px); font-weight: 700; text-transform: uppercase;
   color: var(--white); line-height: 1.1;
 }
 .circle-center p { font-size: clamp(11px, 1.1vw, 12.5px); line-height: 1.5; color: rgba(255,255,255,0.65); }
 
 .btn-ver-mas-sm {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 10px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
   color: rgba(255,255,255,0.65); border: 1px solid rgba(255,255,255,0.25);
   padding: 5px 12px; border-radius: 2px; transition: all 0.2s; margin-top: 4px;
@@ -345,14 +363,14 @@
 
 .section-tag {
   display: block;
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 12px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase;
   color: var(--teal-dark); margin-bottom: 14px;
 }
 .section-tag.light { color: rgba(255,255,255,0.55); }
 
 .valores-header h2 {
-  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: clamp(42px, 5.5vw, 72px);
   font-weight: 800; text-transform: uppercase; color: var(--black); line-height: 1;
 }
@@ -365,11 +383,11 @@
 }
 .valor-item:hover { border-top-color: var(--teal); transform: translateY(-4px); }
 .valor-num {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 13px; font-weight: 700; letter-spacing: 0.1em; color: var(--teal); margin-bottom: 14px;
 }
 .valor-item h3 {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 20px; font-weight: 700; text-transform: uppercase;
   letter-spacing: 0.04em; color: var(--black); margin-bottom: 10px;
 }
@@ -384,7 +402,7 @@
 .vstat:first-child { padding-left: 0; }
 .vstat:last-child  { border-right: none; }
 .vstat-n {
-  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 48px; font-weight: 800; color: var(--teal-dark); line-height: 1;
 }
 .vstat-l { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray); }
@@ -397,14 +415,14 @@
   text-align: center; display: flex; flex-direction: column; align-items: center; gap: 20px;
 }
 .section-cta h2 {
-  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: clamp(40px, 5.5vw, 72px);
   font-weight: 800; text-transform: uppercase; color: var(--white); line-height: 1;
 }
 .section-cta p { font-size: 15px; color: rgba(255,255,255,0.5); max-width: 360px; }
 .btn-cta-main {
   background: var(--teal); color: var(--white);
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 14px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
   padding: 16px 40px; border-radius: 2px; margin-top: 8px;
   transition: background 0.22s;
@@ -417,12 +435,11 @@
 .landing-footer { background: var(--black); border-top: 1px solid rgba(255,255,255,0.06); padding: 26px 80px; }
 .footer-inner { display: flex; align-items: center; justify-content: space-between; }
 .footer-logo {
-  height: 36px; width: auto; object-fit: contain;
-  background: rgba(255,255,255,0.1); border-radius: 3px; padding: 2px 6px;
+  height: 52px; width: auto; object-fit: contain;
 }
 .landing-footer p { font-size: 12px; color: rgba(255,255,255,0.3); }
 .footer-area-cliente {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 13px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
   color: var(--teal); transition: color 0.2s;
 }
@@ -445,7 +462,7 @@
 }
 .page-hero-inner { position: relative; z-index: 1; }
 .page-hero-inner h1 {
-  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: clamp(52px, 7vw, 96px);
   font-weight: 800; text-transform: uppercase; color: var(--white); line-height: 0.92; margin-top: 14px;
 }

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@700;800;900&display=swap');
+
 :root {
   --color-primary: #4DB6A8;
   --color-primary-dark: #3A9089;
@@ -26,7 +28,7 @@ html {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: var(--color-bg);
   color: var(--color-text);
   line-height: 1.5;
@@ -63,11 +65,14 @@ a {
   text-transform: capitalize;
 }
 
+.badge-planificacion { background: #f3e8ff; color: #7c3aed; }
 .badge-pendiente { background: #ffeaa7; color: #d68910; }
 .badge-en_progreso { background: #dbeafe; color: #1d4ed8; }
+.badge-pausado { background: #fef3c7; color: #d97706; }
 .badge-completado { background: #dcfce7; color: #16a34a; }
 .badge-cancelado { background: #fee2e2; color: #dc2626; }
 .badge-alta { background: #fee2e2; color: #dc2626; }
+.badge-urgente { background: #fce7f3; color: #be185d; font-weight: 700; }
 .badge-media { background: #fef9c3; color: #ca8a04; }
 .badge-baja { background: #dcfce7; color: #16a34a; }
 .badge-publico { background: #dbeafe; color: #1d4ed8; }

@@ -14,12 +14,14 @@ function ChatHeaderGrupo({ conversacion, currentUser }) {
       <div className="chat-header">
         <div className="chat-header-info">
           <div className="header-avatar">
-            <div className="avatar-circle">📁</div>
+            <div className="avatar-circle">
+              {conversacion.nombre?.charAt(0).toUpperCase() || 'G'}
+            </div>
           </div>
           <div className="header-details">
             <h3>{conversacion.nombre || 'Grupo'}</h3>
             <span className="header-subtitle">
-              📁 {cantidadParticipantes} participante{cantidadParticipantes !== 1 ? 's' : ''}
+              {cantidadParticipantes} participante{cantidadParticipantes !== 1 ? 's' : ''}
             </span>
           </div>
         </div>
@@ -37,7 +39,7 @@ function ChatHeaderGrupo({ conversacion, currentUser }) {
               />
               <div className="chat-menu-dropdown">
                 <button onClick={() => { setShowMenu(false); setShowInfoPanel(true); }}>
-                  📋 Ver información del grupo
+                  Ver información del grupo
                 </button>
               </div>
             </>

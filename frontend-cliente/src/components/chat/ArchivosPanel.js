@@ -1,16 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import ImageViewer from './ImageViewer';
-import { FileText, Archive, Music, Image, FolderOpen } from 'lucide-react';
+import { FileText, Archive, Music, Image, FolderOpen, Download } from 'lucide-react';
 
 function ArchivosPanel({ conversacionId, onClose }) {
   const [archivos, setArchivos] = useState({ imagenes: [], documentos: [], audios: [] });
   const [loading, setLoading] = useState(true);
   const [tipoActivo, setTipoActivo] = useState('imagenes');
   const [imagenSeleccionada, setImagenSeleccionada] = useState(null);
-
-  useEffect(() => {
-    cargarArchivos();
-  }, [conversacionId]);
 
   const getFullUrl = (url) => {
     if (!url) return '';
@@ -19,24 +15,28 @@ function ArchivosPanel({ conversacionId, onClose }) {
     return `${API_BASE}${url}`;
   };
 
-  const cargarArchivos = async () => {
-    try {
-      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-      const token = localStorage.getItem('token');
+  useEffect(() => {
+    const cargarArchivos = async () => {
+      try {
+        const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+        const token = localStorage.getItem('token');
 
-      const response = await fetch(
-        `${API_URL}/chat/conversaciones/${conversacionId}/archivos`,
-        { headers: { 'Authorization': `Bearer ${token}` } }
-      );
+        const response = await fetch(
+          `${API_URL}/chat/conversaciones/${conversacionId}/archivos`,
+          { headers: { 'Authorization': `Bearer ${token}` } }
+        );
 
-      const data = await response.json();
-      if (data.success) setArchivos(data.archivos);
-    } catch (error) {
-      console.error('Error al cargar archivos:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+        const data = await response.json();
+        if (data.success) setArchivos(data.archivos);
+      } catch (error) {
+        console.error('Error al cargar archivos:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    cargarArchivos();
+  }, [conversacionId]);
 
   const formatearFecha = (fecha) =>
     new Date(fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -79,19 +79,19 @@ function ArchivosPanel({ conversacionId, onClose }) {
             className={`archivos-tab ${tipoActivo === 'imagenes' ? 'active' : ''}`}
             onClick={() => setTipoActivo('imagenes')}
           >
-            📸 Fotos ({archivos.imagenes.length})
+            Fotos ({archivos.imagenes.length})
           </button>
           <button
             className={`archivos-tab ${tipoActivo === 'documentos' ? 'active' : ''}`}
             onClick={() => setTipoActivo('documentos')}
           >
-            📂 Documentos ({archivos.documentos.length})
+            Documentos ({archivos.documentos.length})
           </button>
           <button
             className={`archivos-tab ${tipoActivo === 'audios' ? 'active' : ''}`}
             onClick={() => setTipoActivo('audios')}
           >
-            🎵 Audios ({archivos.audios.length})
+            Audios ({archivos.audios.length})
           </button>
         </div>
 
@@ -150,7 +150,7 @@ function ArchivosPanel({ conversacionId, onClose }) {
                           <small>{archivo.usuario_nombre} • {formatearFecha(archivo.created_at)}</small>
                         </div>
                         <button className="btn-descargar" onClick={() => handleDescargar(archivo)}>
-                          ⬇️
+                          <Download size={16} />
                         </button>
                       </div>
                     ))}

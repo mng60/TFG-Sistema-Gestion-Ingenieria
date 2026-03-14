@@ -102,8 +102,11 @@
 .empty-message {
   text-align: center;
   color: #999;
-  padding: 60px 20px;
-  font-size: 1.1rem;
+  padding: 24px 0;
+  font-size: 0.95rem;
+  font-style: italic;
+  line-height: 1.55;
+  letter-spacing: 0.01em;
 }
 
 /* Cards Grid */

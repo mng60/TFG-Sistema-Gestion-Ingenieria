@@ -1,4 +1,5 @@
 import React from 'react';
+import { MapPin } from 'lucide-react';
 
 const fmt = (fecha) => fecha ? new Date(fecha).toLocaleDateString('es-ES') : '-';
 
@@ -33,7 +34,7 @@ function ProyectoInfo({ proyecto }) {
           {proyecto.ubicacion && (
             <div className="info-item full">
               <label>Ubicación</label>
-              <span>📍 {proyecto.ubicacion}</span>
+              <span><MapPin size={14} style={{ verticalAlign: 'middle', marginRight: 4 }} />{proyecto.ubicacion}</span>
             </div>
           )}
         </div>

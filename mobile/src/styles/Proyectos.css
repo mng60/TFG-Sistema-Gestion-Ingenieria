@@ -1,5 +1,51 @@
 .proyectos-page {}
 
+/* Filter banner (cuando se filtra desde chat) */
+.filter-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #e8f5f3;
+  border: 1.5px solid #4DB6A8;
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  font-size: 0.85rem;
+  color: #2c7a6e;
+}
+
+.filter-banner-close {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #2c7a6e;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+}
+
+/* Search input with icon */
+.search-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input-wrap .search-icon {
+  position: absolute;
+  left: 14px;
+  color: var(--color-muted);
+  pointer-events: none;
+}
+
+.search-input-wrap .search-input {
+  padding-left: 38px;
+}
+
+/* Border colors for planificacion/pausado */
+.proyecto-card.estado-planificacion { border-left-color: #9b59b6; }
+.proyecto-card.estado-pausado       { border-left-color: #f39c12; }
+
 .proyectos-search {
   position: sticky;
   top: 0;

@@ -8,13 +8,21 @@ pool.query(`
     tipo_usuario VARCHAR(20) NOT NULL,
     email VARCHAR(255) NOT NULL,
     nombre VARCHAR(200),
+    empresa VARCHAR(255),
+    telefono VARCHAR(50),
     mensaje TEXT,
+    proyecto_id INTEGER REFERENCES proyectos(id) ON DELETE SET NULL,
     estado VARCHAR(20) DEFAULT 'pendiente',
     resuelto_por INTEGER REFERENCES users(id) ON DELETE SET NULL,
     resuelto_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )
 `).catch(err => console.error('Error creando tabla tickets:', err.message));
+
+// Añadir columnas nuevas si la tabla ya existía
+pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS empresa VARCHAR(255)`).catch(() => {});
+pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS telefono VARCHAR(50)`).catch(() => {});
+pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS proyecto_id INTEGER REFERENCES proyectos(id) ON DELETE SET NULL`).catch(() => {});
 
 // Añadir columnas de intentos de login a users y clientes
 pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS login_attempts INTEGER DEFAULT 0`)
@@ -27,11 +35,11 @@ pool.query(`ALTER TABLE clientes ADD COLUMN IF NOT EXISTS locked_until TIMESTAMP
   .catch(err => console.error(err.message));
 
 class Ticket {
-  static async create({ tipo_usuario, email, nombre, mensaje, tipo = 'olvido_password' }) {
+  static async create({ tipo_usuario, email, nombre, empresa, telefono, mensaje, proyecto_id, tipo = 'olvido_password' }) {
     const result = await pool.query(
-      `INSERT INTO tickets (tipo, tipo_usuario, email, nombre, mensaje)
-       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [tipo, tipo_usuario, email, nombre, mensaje]
+      `INSERT INTO tickets (tipo, tipo_usuario, email, nombre, empresa, telefono, mensaje, proyecto_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+      [tipo, tipo_usuario, email, nombre, empresa || null, telefono || null, mensaje, proyecto_id || null]
     );
     return result.rows[0];
   }

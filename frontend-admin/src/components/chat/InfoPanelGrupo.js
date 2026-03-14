@@ -118,9 +118,6 @@ function InfoPanelGrupo({ conversacion, currentUser, onClose, onConversacionElim
               <h3>Proyecto</h3>
               <div className="proyecto-info-card">
                 <strong>{proyecto.nombre}</strong>
-                <span className={`badge badge-${proyecto.estado}`}>
-                  {proyecto.estado.replace('_', ' ')}
-                </span>
               </div>
             </div>
           ) : null}

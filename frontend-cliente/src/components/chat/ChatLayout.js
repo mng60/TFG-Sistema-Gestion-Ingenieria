@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import ConversationList from './ConversationList';
 import NuevoConversacionModal from './NuevoConversacionModal';
@@ -7,6 +8,8 @@ import { useAuth } from '../../context/AuthContext';
 
 function ChatLayout() {
   const { cliente } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [socket, setSocket] = useState(null);
   const [conversaciones, setConversaciones] = useState([]);
   const [conversacionActiva, setConversacionActiva] = useState(null);
@@ -69,6 +72,24 @@ function ChatLayout() {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
   }, []);
+
+  useEffect(() => {
+    const proyectoId = location.state?.proyectoId;
+    if (!proyectoId || conversaciones.length === 0) return;
+
+    const conversacionProyecto = conversaciones.find(
+      (conv) => conv.tipo === 'proyecto_grupo' && String(conv.proyecto_id) === String(proyectoId)
+    );
+
+    if (conversacionProyecto) {
+      setConversacionActiva(conversacionProyecto);
+      setActiveView('window');
+    } else {
+      showToast('No se encontró el chat de este proyecto', 'warning');
+    }
+
+    navigate(location.pathname, { replace: true, state: {} });
+  }, [conversaciones, location.pathname, location.state, navigate, showToast]);
 
   const cargarConversaciones = async () => {
     try {

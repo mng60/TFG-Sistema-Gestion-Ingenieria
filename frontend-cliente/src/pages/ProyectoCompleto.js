@@ -1,19 +1,17 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Award, CalendarDays, ClipboardList, Download, FileText, Image, MapPin, Ruler, Scroll, BarChart2 } from 'lucide-react';
 import api from '../services/api';
 import '../styles/ProyectoCompleto.css';
 
-const ESTADO_LABELS = {
-  planificacion: 'Planificación',
-  en_progreso: 'En progreso',
-  pausado: 'Pausado',
-  completado: 'Completado',
-  cancelado: 'Cancelado'
-};
-
 const TIPO_DOC_ICONS = {
-  esquema: '📐', plano: '📋', contrato: '📜',
-  informe: '📊', foto: '🖼️', certificado: '🏅', otro: '📄'
+  esquema: <Ruler size={14} style={{ verticalAlign: 'middle', marginRight: 4 }} />,
+  plano: <ClipboardList size={14} style={{ verticalAlign: 'middle', marginRight: 4 }} />,
+  contrato: <Scroll size={14} style={{ verticalAlign: 'middle', marginRight: 4 }} />,
+  informe: <BarChart2 size={14} style={{ verticalAlign: 'middle', marginRight: 4 }} />,
+  foto: <Image size={14} style={{ verticalAlign: 'middle', marginRight: 4 }} />,
+  certificado: <Award size={14} style={{ verticalAlign: 'middle', marginRight: 4 }} />,
+  otro: <FileText size={14} style={{ verticalAlign: 'middle', marginRight: 4 }} />
 };
 
 function ProyectoCompleto() {
@@ -24,34 +22,44 @@ function ProyectoCompleto() {
   const [empleados, setEmpleados] = useState([]);
   const [presupuestos, setPresupuestos] = useState([]);
   const [documentos, setDocumentos] = useState([]);
+  const [actualizaciones, setActualizaciones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('info');
   const [toast, setToast] = useState(null);
 
-  useEffect(() => { cargarDatos(); }, [id]);
+  useEffect(() => {
+    const cargarDatos = async () => {
+      setLoading(true);
+      try {
+        const [proyectoRes, empleadosRes, presupuestosRes, documentosRes, actualizacionesRes] = await Promise.all([
+          api.get('/portal/proyectos'),
+          api.get(`/portal/proyectos/${id}/empleados`),
+          api.get(`/portal/presupuestos?proyecto_id=${id}`),
+          api.get(`/portal/documentos?proyecto_id=${id}`),
+          api.get(`/portal/proyectos/${id}/actualizaciones`)
+        ]);
 
-  const cargarDatos = async () => {
-    setLoading(true);
-    try {
-      const [proyectoRes, empleadosRes, presupuestosRes, documentosRes] = await Promise.all([
-        api.get('/portal/proyectos'),
-        api.get(`/portal/proyectos/${id}/empleados`),
-        api.get(`/portal/presupuestos?proyecto_id=${id}`),
-        api.get(`/portal/documentos?proyecto_id=${id}`)
-      ]);
-      const proyectoEncontrado = (proyectoRes.data.proyectos || []).find(p => String(p.id) === String(id));
-      if (!proyectoEncontrado) { navigate('/dashboard'); return; }
-      setProyecto(proyectoEncontrado);
-      setEmpleados(empleadosRes.data.empleados || []);
-      setPresupuestos(presupuestosRes.data.presupuestos || []);
-      setDocumentos(documentosRes.data.documentos || []);
-    } catch (error) {
-      console.error('Error al cargar proyecto:', error);
-      navigate('/dashboard');
-    } finally {
-      setLoading(false);
-    }
-  };
+        const proyectoEncontrado = (proyectoRes.data.proyectos || []).find((p) => String(p.id) === String(id));
+        if (!proyectoEncontrado) {
+          navigate('/dashboard');
+          return;
+        }
+
+        setProyecto(proyectoEncontrado);
+        setEmpleados(empleadosRes.data.empleados || []);
+        setPresupuestos(presupuestosRes.data.presupuestos || []);
+        setDocumentos(documentosRes.data.documentos || []);
+        setActualizaciones(actualizacionesRes.data.actualizaciones || []);
+      } catch (error) {
+        console.error('Error al cargar proyecto:', error);
+        navigate('/dashboard');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    cargarDatos();
+  }, [id, navigate]);
 
   const showToast = (msg, tipo = 'success') => {
     setToast({ msg, tipo });
@@ -70,6 +78,18 @@ function ProyectoCompleto() {
     }
   };
 
+  const rechazarPresupuesto = async (presupuestoId) => {
+    if (!window.confirm('¿Confirmas que deseas rechazar este presupuesto?')) return;
+    try {
+      await api.patch(`/portal/presupuestos/${presupuestoId}/rechazar`);
+      showToast('Presupuesto rechazado');
+      const res = await api.get(`/portal/presupuestos?proyecto_id=${id}`);
+      setPresupuestos(res.data.presupuestos || []);
+    } catch (error) {
+      showToast(error.response?.data?.message || 'Error al rechazar presupuesto', 'error');
+    }
+  };
+
   const descargarDocumento = async (docId, nombre) => {
     try {
       const response = await api.get(`/portal/documentos/${docId}/download`, { responseType: 'blob' });
@@ -80,15 +100,22 @@ function ProyectoCompleto() {
       document.body.appendChild(link);
       link.click();
       link.remove();
-    } catch (error) {
+    } catch {
       showToast('Error al descargar el documento', 'error');
     }
   };
 
-  const formatearFecha = (f) => f ? new Date(f).toLocaleDateString('es-ES') : '-';
-  const formatearMoneda = (v) => v
-    ? new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(v)
-    : '0,00 €';
+  const irAlChatProyecto = () => {
+    navigate('/chat', { state: { proyectoId: proyecto.id } });
+  };
+
+  const formatearFecha = (fecha) => fecha ? new Date(fecha).toLocaleDateString('es-ES') : '-';
+  const formatearMoneda = (valor) => (
+    valor
+      ? new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(valor)
+      : '0,00 €'
+  );
+
   const formatearTamano = (bytes) => {
     if (!bytes) return '-';
     return bytes > 1048576
@@ -99,7 +126,7 @@ function ProyectoCompleto() {
   if (loading) {
     return (
       <div className="loading-container">
-        <div className="spinner"></div>
+        <div className="spinner" />
         <p>Cargando proyecto...</p>
       </div>
     );
@@ -109,50 +136,46 @@ function ProyectoCompleto() {
 
   return (
     <div className="proyecto-completo">
-      {/* Toast */}
       {toast && <div className={`toast toast-${toast.tipo}`}>{toast.msg}</div>}
 
-      {/* Cabecera */}
       <header className="proyecto-header">
         <button className="btn-back" onClick={() => navigate('/dashboard')}>← Volver</button>
         <div className="proyecto-header-info">
           <h1>{proyecto.nombre}</h1>
-          <div className="proyecto-badges">
-            <span className={`badge badge-${proyecto.estado}`}>
-              {ESTADO_LABELS[proyecto.estado] || proyecto.estado}
-            </span>
-          </div>
         </div>
-        <button className="chat-proyecto-btn" onClick={() => navigate('/chat')}>
-          💬 Ir al chat
+        <button className="chat-proyecto-btn" onClick={irAlChatProyecto}>
+          Ir al chat del proyecto
         </button>
       </header>
 
-      {/* Tabs */}
       <div className="tabs-container">
         <button
           className={`tab ${activeTab === 'info' ? 'tab-active' : ''}`}
           onClick={() => setActiveTab('info')}
         >
-          📋 Información
+          Información
         </button>
         <button
           className={`tab ${activeTab === 'presupuestos' ? 'tab-active' : ''}`}
           onClick={() => setActiveTab('presupuestos')}
         >
-          💰 Presupuestos ({presupuestos.length})
+          Presupuestos ({presupuestos.length})
         </button>
         <button
           className={`tab ${activeTab === 'documentos' ? 'tab-active' : ''}`}
           onClick={() => setActiveTab('documentos')}
         >
-          📄 Documentos ({documentos.length})
+          Documentos ({documentos.length})
+        </button>
+        <button
+          className={`tab ${activeTab === 'avance' ? 'tab-active' : ''}`}
+          onClick={() => setActiveTab('avance')}
+        >
+          Avance ({actualizaciones.length})
         </button>
       </div>
 
       <div className="tab-content">
-
-        {/* ── TAB INFORMACIÓN ── */}
         {activeTab === 'info' && (
           <div className="tab-panel">
             <section className="info-section">
@@ -160,7 +183,7 @@ function ProyectoCompleto() {
               <div className="info-grid">
                 {proyecto.ubicacion && (
                   <div className="info-item info-item-full">
-                    <label>📍 Ubicación:</label>
+                    <label><MapPin size={13} style={{ verticalAlign: 'middle', marginRight: 3 }} />Ubicación:</label>
                     <span>{proyecto.ubicacion}</span>
                   </div>
                 )}
@@ -200,7 +223,7 @@ function ProyectoCompleto() {
               <section className="info-section">
                 <h2>Equipo Asignado</h2>
                 <div className="empleados-grid">
-                  {empleados.map(emp => (
+                  {empleados.map((emp) => (
                     <div key={emp.id} className="empleado-card">
                       <div className="empleado-avatar">
                         {emp.nombre.charAt(0).toUpperCase()}
@@ -217,7 +240,6 @@ function ProyectoCompleto() {
           </div>
         )}
 
-        {/* ── TAB PRESUPUESTOS ── */}
         {activeTab === 'presupuestos' && (
           <div className="tab-panel">
             {presupuestos.length === 0 ? (
@@ -237,23 +259,28 @@ function ProyectoCompleto() {
                     </tr>
                   </thead>
                   <tbody>
-                    {presupuestos.map(p => (
-                      <tr key={p.id}>
-                        <td><strong>{p.numero_presupuesto}</strong></td>
-                        <td>{formatearFecha(p.fecha_emision)}</td>
-                        <td>{formatearMoneda(p.subtotal)}</td>
-                        <td>{p.iva}%</td>
-                        <td><strong>{formatearMoneda(p.total)}</strong></td>
+                    {presupuestos.map((presupuesto) => (
+                      <tr key={presupuesto.id}>
+                        <td><strong>{presupuesto.numero_presupuesto}</strong></td>
+                        <td>{formatearFecha(presupuesto.fecha_emision)}</td>
+                        <td>{formatearMoneda(presupuesto.subtotal)}</td>
+                        <td>{presupuesto.iva}%</td>
+                        <td><strong>{formatearMoneda(presupuesto.total)}</strong></td>
                         <td>
-                          <span className={`badge badge-${p.aceptado ? 'aceptado' : p.estado}`}>
-                            {p.aceptado ? 'Aceptado' : (p.estado || 'Pendiente')}
+                          <span className={`badge badge-${presupuesto.aceptado ? 'aceptado' : presupuesto.estado}`}>
+                            {presupuesto.aceptado ? 'Aceptado' : (presupuesto.estado || 'Pendiente')}
                           </span>
                         </td>
                         <td>
-                          {!p.aceptado && p.estado === 'enviado' && (
-                            <button className="btn-accept" onClick={() => aceptarPresupuesto(p.id)}>
-                              Aceptar
-                            </button>
+                          {!presupuesto.aceptado && presupuesto.estado === 'enviado' && presupuesto.estado !== 'rechazado' && (
+                            <div style={{ display: 'flex', gap: 6 }}>
+                              <button className="btn-accept" onClick={() => aceptarPresupuesto(presupuesto.id)}>
+                                Aceptar
+                              </button>
+                              <button className="btn-reject" onClick={() => rechazarPresupuesto(presupuesto.id)}>
+                                Rechazar
+                              </button>
+                            </div>
                           )}
                         </td>
                       </tr>
@@ -265,7 +292,6 @@ function ProyectoCompleto() {
           </div>
         )}
 
-        {/* ── TAB DOCUMENTOS ── */}
         {activeTab === 'documentos' && (
           <div className="tab-panel">
             {documentos.length === 0 ? (
@@ -283,26 +309,68 @@ function ProyectoCompleto() {
                     </tr>
                   </thead>
                   <tbody>
-                    {documentos.map(doc => (
+                    {documentos.map((doc) => (
                       <tr key={doc.id}>
                         <td>
-                          <span>{TIPO_DOC_ICONS[doc.tipo_documento] || '📄'} {doc.nombre}</span>
+                          <span>{TIPO_DOC_ICONS[doc.tipo_documento] || TIPO_DOC_ICONS.otro} {doc.nombre}</span>
                         </td>
                         <td><span className="badge badge-tipo">{doc.tipo_documento}</span></td>
                         <td>{formatearFecha(doc.created_at)}</td>
                         <td>{formatearTamano(doc.tamano_bytes)}</td>
                         <td>
-                          <button
-                            className="btn-download"
-                            onClick={() => descargarDocumento(doc.id, doc.nombre)}
-                          >
-                            ⬇️ Descargar
+                          <button className="btn-download" onClick={() => descargarDocumento(doc.id, doc.nombre)}>
+                            <Download size={13} style={{ verticalAlign: 'middle', marginRight: 4 }} />Descargar
                           </button>
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'avance' && (
+          <div className="tab-panel">
+            {actualizaciones.length === 0 ? (
+              <p className="empty-message-small">No hay actualizaciones registradas todavía.</p>
+            ) : (
+              <div className="act-list-cliente">
+                {actualizaciones.map((act) => (
+                  <div key={act.id} className="act-item-cliente">
+                    <div className="act-avatar-cliente">
+                      {act.autor_foto
+                        ? <img src={`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'}${act.autor_foto}`} alt="" />
+                        : (act.autor_nombre || 'E').charAt(0).toUpperCase()
+                      }
+                    </div>
+                    <div className="act-body-cliente">
+                      <div className="act-meta-cliente">
+                        <strong>{act.autor_nombre || 'Empleado'}</strong>
+                        <span>{formatearFecha(act.created_at)}</span>
+                        {act.sugiere_cambio_fecha && act.fecha_sugerida && (
+                          <span className="act-badge-fecha-cliente">
+                            <CalendarDays size={13} style={{ verticalAlign: 'middle', marginRight: 4 }} />
+                            Sugiere fin: {formatearFecha(act.fecha_sugerida)}
+                          </span>
+                        )}
+                      </div>
+                      {act.realizado && (
+                        <div className="act-bloque-cliente act-bloque-realizado">
+                          <span className="act-bloque-label-cliente">Realizado</span>
+                          <p>{act.realizado}</p>
+                        </div>
+                      )}
+                      {act.pendiente && (
+                        <div className="act-bloque-cliente act-bloque-pendiente">
+                          <span className="act-bloque-label-cliente">Pendiente</span>
+                          <p>{act.pendiente}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>

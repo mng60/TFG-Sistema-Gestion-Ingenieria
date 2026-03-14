@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Paperclip, CircleMinus } from 'lucide-react';
+import { Paperclip, CircleMinus, FolderOpen } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import ConfirmModal from '../common/ConfirmModal';
 import ArchivosPanel from './ArchivosPanel';
@@ -52,7 +52,7 @@ function InfoPanelGrupo({ conversacion, currentUser, onClose, onConversacionElim
     }
 
     setConfirmModal({
-      title: '⚠️ Eliminar Participante',
+      title: 'Eliminar Participante',
       message: `¿Eliminar a "${participante.nombre}" del grupo?`,
       type: 'warning',
       confirmText: 'Sí, Eliminar',
@@ -118,9 +118,6 @@ function InfoPanelGrupo({ conversacion, currentUser, onClose, onConversacionElim
               <h3>Proyecto</h3>
               <div className="proyecto-info-card">
                 <strong>{proyecto.nombre}</strong>
-                <span className={`badge badge-${proyecto.estado}`}>
-                  {proyecto.estado.replace('_', ' ')}
-                </span>
               </div>
             </div>
           ) : null}
@@ -187,7 +184,7 @@ function InfoPanelGrupo({ conversacion, currentUser, onClose, onConversacionElim
                   onClose();
                 }}
               >
-                📁 Ver proyecto completo
+                <FolderOpen size={14} /> Ver proyecto completo
               </button>
             </div>
           )}

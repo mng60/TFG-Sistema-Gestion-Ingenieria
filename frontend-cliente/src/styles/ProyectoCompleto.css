@@ -75,7 +75,7 @@
 }
 
 .chat-proyecto-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1B3A4B 0%, #254f63 100%);
   color: white;
   border: none;
   padding: 10px 18px;
@@ -117,17 +117,17 @@
 }
 
 .tab:hover {
-  background: #f8f9fa;
-  color: #495057;
+  background: rgba(27, 58, 75, 0.08);
+  color: #1B3A4B;
 }
 
 .tab-active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1B3A4B 0%, #254f63 100%);
   color: white;
 }
 
 .tab-active:hover {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1B3A4B 0%, #254f63 100%);
   color: white;
 }
 
@@ -203,7 +203,7 @@
   background: #f8f9fa;
   padding: 16px;
   border-radius: 8px;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid #1B3A4B;
   margin: 0;
 }
 
@@ -232,7 +232,7 @@
 .empleado-avatar {
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1B3A4B 0%, #254f63 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -302,6 +302,19 @@
 }
 .btn-accept:hover { background: #218838; }
 
+.btn-reject {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-reject:hover { background: #c0392b; }
+
 .btn-download {
   background: #3498db;
   color: white;
@@ -322,6 +335,8 @@
   padding: 20px 0;
   text-align: center;
   font-size: 0.95rem;
+  line-height: 1.55;
+  letter-spacing: 0.01em;
 }
 
 /* ==================== LOADING ==================== */
@@ -339,7 +354,7 @@
   width: 36px;
   height: 36px;
   border: 3px solid #e0e0e0;
-  border-top-color: #667eea;
+  border-top-color: #1B3A4B;
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
@@ -366,6 +381,110 @@
 .badge-borrador      { background: #e9ecef; color: #495057; }
 .badge-rechazado     { background: #f8d7da; color: #721c24; }
 .badge-tipo          { background: #e9ecef; color: #495057; text-transform: capitalize; }
+
+/* ==================== AVANCE (read-only) ==================== */
+.act-list-cliente {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.act-item-cliente {
+  display: flex;
+  gap: 14px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 16px;
+  border-left: 3px solid #1B3A4B;
+}
+
+.act-avatar-cliente {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #1B3A4B;
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.act-avatar-cliente img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.act-body-cliente {
+  flex: 1;
+  min-width: 0;
+}
+
+.act-meta-cliente {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  font-size: 0.85rem;
+  color: #7f8c8d;
+}
+
+.act-meta-cliente strong {
+  color: #2c3e50;
+  font-size: 0.9rem;
+}
+
+.act-badge-fecha-cliente {
+  background: rgba(27, 58, 75, 0.08);
+  color: #1B3A4B;
+  border: 1px solid rgba(27, 58, 75, 0.2);
+  border-radius: 12px;
+  padding: 2px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.act-bloque-cliente {
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-top: 8px;
+}
+
+.act-bloque-realizado {
+  background: rgba(39, 174, 96, 0.07);
+  border-left: 3px solid #27ae60;
+}
+
+.act-bloque-pendiente {
+  background: rgba(231, 76, 60, 0.07);
+  border-left: 3px solid #e74c3c;
+}
+
+.act-bloque-label-cliente {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  color: #7f8c8d;
+}
+
+.act-bloque-realizado .act-bloque-label-cliente { color: #27ae60; }
+.act-bloque-pendiente .act-bloque-label-cliente { color: #e74c3c; }
+
+.act-bloque-cliente p {
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: #2c3e50;
+  margin: 0;
+  white-space: pre-wrap;
+}
 
 /* ==================== RESPONSIVE ==================== */
 @media (max-width: 768px) {

@@ -33,7 +33,7 @@ function LandingNav() {
     <>
       <nav className={`landing-nav ${scrolled ? 'scrolled' : ''}`}>
         <div className="nav-logo" onClick={() => goTo('/')}>
-          <img src="/logo2.png" alt="BlueArc Energy" />
+          <img src="/logo.png" alt="BlueArc Energy" />
         </div>
         <div className="nav-actions">
           <button className="btn-area-cliente" onClick={handleAreaCliente}>

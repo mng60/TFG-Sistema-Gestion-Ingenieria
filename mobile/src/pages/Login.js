@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import '../styles/Login.css';
 
@@ -10,6 +11,8 @@ function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPwd, setShowPwd] = useState(false);
+  const [capsLock, setCapsLock] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showOlvide, setShowOlvide] = useState(false);
@@ -17,10 +20,21 @@ function Login() {
   const [olvideMsg, setOlvideMsg] = useState('');
   const [olvideLoading, setOlvideLoading] = useState(false);
 
+  const particlesRef = useRef(
+    Array.from({ length: 10 }, (_, i) => ({
+      id: i,
+      left: (i * 10 + 5) % 95,
+      delay: (i * 0.7) % 6,
+      duration: 5 + (i % 4),
+      size: 2 + (i % 3)
+    }))
+  );
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
+
     try {
       await login(email, password);
       navigate('/proyectos');
@@ -34,113 +48,154 @@ function Login() {
   const handleOlvide = async (e) => {
     e.preventDefault();
     setOlvideLoading(true);
+
     try {
       await fetch(`${API_URL}/tickets`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tipo_usuario: 'empleado', email: olvideEmail, mensaje: 'Solicitud de recuperación de contraseña desde la app móvil.' })
+        body: JSON.stringify({
+          tipo_usuario: 'empleado',
+          email: olvideEmail,
+          mensaje: 'Solicitud de recuperacion de contrasena desde la app movil.'
+        })
       });
-      setOlvideMsg('Solicitud enviada. Un administrador restablecerá tu contraseña en breve.');
+      setOlvideMsg('Solicitud enviada. Un administrador restablecera tu contrasena en breve.');
     } catch {
-      setOlvideMsg('Error al enviar la solicitud. Inténtalo de nuevo.');
+      setOlvideMsg('Error al enviar la solicitud. Intentalo de nuevo.');
     } finally {
       setOlvideLoading(false);
     }
   };
 
   return (
-    <div className="login-container">
-      <div className="login-box">
-        <div className="login-header">
-          <h1>Panel Interno</h1>
-          <p>Sistema de Gestión - Empleados</p>
+    <div className="mobile-login">
+      <div className="mobile-login-visual">
+        <div className="mobile-login-particles">
+          {particlesRef.current.map((p) => (
+            <span
+              key={p.id}
+              className="mobile-login-particle"
+              style={{
+                left: `${p.left}%`,
+                width: `${p.size}px`,
+                height: `${p.size}px`,
+                animationDelay: `${p.delay}s`,
+                animationDuration: `${p.duration}s`
+              }}
+            />
+          ))}
         </div>
 
-        {!showOlvide ? (
-          <>
-            <form onSubmit={handleSubmit} className="login-form">
-              {error && <div className="error-message">{error}</div>}
+        <div className="mobile-login-brand">
+          <img src="/logo.png" alt="BlueArc Energy" className="mobile-login-logo" />
+          <h2 className="mobile-login-brand-name">BlueArc</h2>
+          <p className="mobile-login-brand-sub">Sistema de Gestion de Ingenieria</p>
+        </div>
+      </div>
 
-              <div className="form-group">
-                <label htmlFor="email">Email</label>
-                <input
-                  type="email"
-                  id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="empleado@empresa.com"
-                  required
-                  autoComplete="email"
-                  disabled={loading}
-                />
-              </div>
+      <div className="mobile-login-form-panel">
+        <div className="mobile-login-form-inner">
+          {!showOlvide ? (
+            <>
+              <h1 className="mobile-login-title">INICIO DE SESION</h1>
+              <p className="mobile-login-subtitle">Accede con tus credenciales</p>
 
-              <div className="form-group">
-                <label htmlFor="password">Contraseña</label>
-                <input
-                  type="password"
-                  id="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  autoComplete="current-password"
-                  disabled={loading}
-                />
-              </div>
+              <form onSubmit={handleSubmit} className="mobile-login-fields">
+                {error && <div className="mobile-login-error">{error}</div>}
 
-              <button type="submit" className="login-button" disabled={loading}>
-                {loading ? 'Iniciando sesión...' : 'Acceder al Sistema'}
-              </button>
-            </form>
-
-            <div className="login-footer">
-              <p><small>Panel de gestión interna</small></p>
-              <button
-                onClick={() => setShowOlvide(true)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4DB6A8', fontSize: '0.85rem', marginTop: 8 }}
-              >
-                ¿Olvidaste tu contraseña?
-              </button>
-            </div>
-          </>
-        ) : (
-          <div className="login-form">
-            <h3 style={{ margin: '0 0 12px', fontSize: '1rem', color: '#2c3e50' }}>Recuperar contraseña</h3>
-            <p style={{ fontSize: '0.85rem', color: '#7f8c8d', marginBottom: 16 }}>
-              Un administrador recibirá la solicitud y restablecerá tu contraseña.
-            </p>
-            {olvideMsg ? (
-              <div style={{ padding: '12px 16px', borderRadius: 8, background: '#d4edda', color: '#155724', fontSize: '0.9rem', marginBottom: 12 }}>
-                {olvideMsg}
-              </div>
-            ) : (
-              <form onSubmit={handleOlvide}>
-                <div className="form-group">
+                <div className="mobile-login-group">
                   <label>Email</label>
                   <input
                     type="email"
-                    value={olvideEmail}
-                    onChange={e => setOlvideEmail(e.target.value)}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     placeholder="empleado@empresa.com"
                     required
                     autoComplete="email"
-                    disabled={olvideLoading}
+                    disabled={loading}
                   />
                 </div>
-                <button type="submit" className="login-button" disabled={olvideLoading}>
-                  {olvideLoading ? 'Enviando...' : 'Enviar solicitud'}
+
+                <div className="mobile-login-group">
+                  <label>
+                    Contrasena
+                    {capsLock && <span className="caps-warning">↑ Mayusculas activas</span>}
+                  </label>
+                  <div className="mobile-pwd-wrap">
+                    <input
+                      type={showPwd ? 'text' : 'password'}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      onKeyDown={(e) => setCapsLock(e.getModifierState('CapsLock'))}
+                      onKeyUp={(e) => setCapsLock(e.getModifierState('CapsLock'))}
+                      placeholder="••••••••"
+                      required
+                      autoComplete="current-password"
+                      disabled={loading}
+                    />
+                    <button
+                      type="button"
+                      className="mobile-pwd-eye"
+                      onClick={() => setShowPwd((v) => !v)}
+                      tabIndex={-1}
+                      aria-label={showPwd ? 'Ocultar contrasena' : 'Mostrar contrasena'}
+                    >
+                      {showPwd ? <EyeOff size={22} /> : <Eye size={22} />}
+                    </button>
+                  </div>
+                </div>
+
+                <button type="submit" className="mobile-login-btn" disabled={loading}>
+                  {loading ? 'Iniciando sesion...' : 'ACCEDER AL SISTEMA'}
                 </button>
               </form>
-            )}
-            <button
-              onClick={() => { setShowOlvide(false); setOlvideMsg(''); setOlvideEmail(''); }}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4DB6A8', fontSize: '0.85rem', marginTop: 12 }}
-            >
-              ← Volver al login
-            </button>
-          </div>
-        )}
+
+              <button onClick={() => setShowOlvide(true)} className="mobile-login-link">
+                ¿Olvidaste tu contrasena?
+              </button>
+            </>
+          ) : (
+            <>
+              <h1 className="mobile-login-title">RECUPERAR ACCESO</h1>
+              <p className="mobile-login-subtitle">
+                Un administrador recibira la solicitud y restablecera tu contrasena.
+              </p>
+
+              {olvideMsg ? (
+                <div className="mobile-login-success">{olvideMsg}</div>
+              ) : (
+                <form onSubmit={handleOlvide} className="mobile-login-fields">
+                  <div className="mobile-login-group">
+                    <label>Email</label>
+                    <input
+                      type="email"
+                      value={olvideEmail}
+                      onChange={(e) => setOlvideEmail(e.target.value)}
+                      placeholder="empleado@empresa.com"
+                      required
+                      autoComplete="email"
+                      disabled={olvideLoading}
+                    />
+                  </div>
+                  <button type="submit" className="mobile-login-btn" disabled={olvideLoading}>
+                    {olvideLoading ? 'Enviando...' : 'Enviar solicitud'}
+                  </button>
+                </form>
+              )}
+
+              <button
+                onClick={() => {
+                  setShowOlvide(false);
+                  setOlvideMsg('');
+                  setOlvideEmail('');
+                }}
+                className="mobile-login-link"
+              >
+                ← Volver al login
+              </button>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

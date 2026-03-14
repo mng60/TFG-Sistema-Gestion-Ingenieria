@@ -10,9 +10,11 @@ const {
   getMisPresupuestos,
   getPresupuestoDetalle,
   aceptarMiPresupuesto,
+  rechazarMiPresupuesto,
   getMisDocumentos,
   descargarMiDocumento,
-  getEmpleadosProyecto
+  getEmpleadosProyecto,
+  getActualizacionesProyecto
 } = require('../controllers/cliente.auth.controller');
 const { uploadAvatares } = require('../config/multer');
 
@@ -78,6 +80,7 @@ router.get('/presupuestos', authClienteMiddleware, getMisPresupuestos);
 
 // GET /api/portal/presupuestos/:id/aceptar - Aceptar presupuesto (ANTES de presupuestos/:id)
 router.patch('/presupuestos/:id/aceptar', authClienteMiddleware, aceptarMiPresupuesto);
+router.patch('/presupuestos/:id/rechazar', authClienteMiddleware, rechazarMiPresupuesto);
 
 // GET /api/portal/presupuestos/:id - Obtener detalle de un presupuesto
 router.get('/presupuestos/:id', authClienteMiddleware, getPresupuestoDetalle);
@@ -90,5 +93,8 @@ router.get('/documentos', authClienteMiddleware, getMisDocumentos);
 
 // GET /api/portal/proyectos/:id/empleados - Empleados asignados al proyecto (para iniciar chat)
 router.get('/proyectos/:id/empleados', authClienteMiddleware, getEmpleadosProyecto);
+
+// GET /api/portal/proyectos/:proyectoId/actualizaciones - Actualizaciones del proyecto (read-only)
+router.get('/proyectos/:proyectoId/actualizaciones', authClienteMiddleware, getActualizacionesProyecto);
 
 module.exports = router;

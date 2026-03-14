@@ -364,6 +364,38 @@ const aceptarMiPresupuesto = async (req, res) => {
   }
 };
 
+// Rechazar un presupuesto
+const rechazarMiPresupuesto = async (req, res) => {
+  try {
+    const clienteId = req.user.id;
+    const { id } = req.params;
+    const { pool } = require('../config/database');
+
+    const checkResult = await pool.query(`
+      SELECT p.id, p.aceptado, p.estado
+      FROM presupuestos p
+      JOIN proyectos pr ON p.proyecto_id = pr.id
+      WHERE p.id = $1 AND pr.cliente_id = $2
+    `, [id, clienteId]);
+
+    if (checkResult.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Presupuesto no encontrado o no autorizado' });
+    }
+    if (checkResult.rows[0].aceptado || checkResult.rows[0].estado === 'rechazado') {
+      return res.status(400).json({ success: false, message: 'El presupuesto ya ha sido procesado' });
+    }
+
+    const result = await pool.query(`
+      UPDATE presupuestos SET estado = 'rechazado', updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *
+    `, [id]);
+
+    res.json({ success: true, message: 'Presupuesto rechazado', presupuesto: result.rows[0] });
+  } catch (error) {
+    console.error('Error en rechazarMiPresupuesto:', error);
+    res.status(500).json({ success: false, message: 'Error al rechazar presupuesto', error: error.message });
+  }
+};
+
 // Obtener documentos públicos de los proyectos del cliente
 const getMisDocumentos = async (req, res) => {
   try {
@@ -544,6 +576,38 @@ const uploadAvatarCliente = async (req, res) => {
   }
 };
 
+// Obtener actualizaciones de un proyecto (solo si el cliente es propietario)
+const getActualizacionesProyecto = async (req, res) => {
+  try {
+    const clienteId = req.user.id;
+    const { proyectoId } = req.params;
+    const { pool } = require('../config/database');
+
+    // Verificar que el proyecto pertenece al cliente
+    const checkRes = await pool.query(
+      'SELECT id FROM proyectos WHERE id = $1 AND cliente_id = $2',
+      [proyectoId, clienteId]
+    );
+    if (checkRes.rows.length === 0) {
+      return res.status(403).json({ success: false, message: 'Acceso no autorizado' });
+    }
+
+    const result = await pool.query(
+      `SELECT a.*, u.nombre as autor_nombre, u.foto_url as autor_foto
+       FROM proyecto_actualizaciones a
+       LEFT JOIN users u ON u.id = a.empleado_id
+       WHERE a.proyecto_id = $1
+       ORDER BY a.created_at DESC`,
+      [proyectoId]
+    );
+
+    res.json({ success: true, actualizaciones: result.rows });
+  } catch (error) {
+    console.error('Error en getActualizacionesProyecto:', error);
+    res.status(500).json({ success: false, message: 'Error al obtener actualizaciones', error: error.message });
+  }
+};
+
 module.exports = {
   activarAccesoCliente,
   loginCliente,
@@ -555,7 +619,9 @@ module.exports = {
   getMisPresupuestos,
   getPresupuestoDetalle,
   aceptarMiPresupuesto,
+  rechazarMiPresupuesto,
   getMisDocumentos,
   descargarMiDocumento,
-  getEmpleadosProyecto
+  getEmpleadosProyecto,
+  getActualizacionesProyecto
 };

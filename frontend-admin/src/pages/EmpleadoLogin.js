@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
 import { useEmpleadoAuth } from '../context/EmpleadoAuthContext';
-import '../styles/Login.css';
+import '../styles/LoginSplit.css';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 function EmpleadoLogin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPwd, setShowPwd] = useState(false);
+  const [capsLock, setCapsLock] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showOlvide, setShowOlvide] = useState(false);
@@ -18,8 +21,18 @@ function EmpleadoLogin() {
   const { login } = useEmpleadoAuth();
   const navigate = useNavigate();
 
+  const particlesRef = useRef(
+    Array.from({ length: 14 }, (_, i) => ({
+      id: i,
+      left: (i * 7 + 5) % 95,
+      delay: (i * 0.6) % 7,
+      duration: 5 + (i % 5),
+      size: 2 + (i % 3)
+    }))
+  );
+
   React.useEffect(() => {
-    document.title = 'Panel Interno - Login';
+    document.title = 'Portal Empleados - Login';
   }, []);
 
   const handleSubmit = async (e) => {
@@ -43,7 +56,11 @@ function EmpleadoLogin() {
       await fetch(`${API_URL}/tickets`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tipo_usuario: 'empleado', email: olvideEmail, mensaje: 'Solicitud de recuperación de contraseña desde el login.' })
+        body: JSON.stringify({
+          tipo_usuario: 'empleado',
+          email: olvideEmail,
+          mensaje: 'Solicitud de recuperación de contraseña desde el login.'
+        })
       });
       setOlvideMsg('Solicitud enviada. Un administrador restablecerá tu contraseña en breve.');
     } catch {
@@ -54,95 +71,132 @@ function EmpleadoLogin() {
   };
 
   return (
-    <div className="login-container">
-      <div className="login-box">
-        <div className="login-header">
-          <h1>Panel Interno</h1>
-          <p>Sistema de Gestión - Empleados</p>
-        </div>
+    <div className="login-split">
+      <div className="login-split-form">
+        <div className="login-split-form-inner">
+          <div className="login-brand-inline">BLUEARC<span>ENERGY</span></div>
 
-        {!showOlvide ? (
-          <>
-            <form onSubmit={handleSubmit} className="login-form">
-              {error && <div className="error-message">{error}</div>}
+          <h1 className="login-split-title">INICIO DE SESIÓN</h1>
+          <p className="login-split-subtitle">Sistema de Gestión</p>
 
-              <div className="form-group">
-                <label htmlFor="email">Email</label>
-                <input
-                  type="email"
-                  id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="empleado@empresa.com"
-                  required
-                  disabled={loading}
-                />
-              </div>
+          {!showOlvide ? (
+            <>
+              <form onSubmit={handleSubmit} className="login-split-form-fields">
+                {error && <div className="login-split-error">{error}</div>}
 
-              <div className="form-group">
-                <label htmlFor="password">Contraseña</label>
-                <input
-                  type="password"
-                  id="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  disabled={loading}
-                />
-              </div>
-
-              <button type="submit" className="login-button" disabled={loading}>
-                {loading ? 'Iniciando sesión...' : 'Acceder al Sistema'}
-              </button>
-            </form>
-
-            <div className="login-footer">
-              <p><small>Panel administrativo de gestión interna</small></p>
-              <button
-                onClick={() => setShowOlvide(true)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4DB6A8', fontSize: '0.85rem', marginTop: 8 }}
-              >
-                ¿Olvidaste tu contraseña?
-              </button>
-            </div>
-          </>
-        ) : (
-          <div className="login-form">
-            <h3 style={{ margin: '0 0 12px', fontSize: '1rem', color: '#2c3e50' }}>Recuperar contraseña</h3>
-            <p style={{ fontSize: '0.85rem', color: '#7f8c8d', marginBottom: 16 }}>
-              Introduce tu email y un administrador recibirá la solicitud para restablecer tu contraseña.
-            </p>
-            {olvideMsg ? (
-              <div style={{ padding: '12px 16px', borderRadius: 8, background: '#d4edda', color: '#155724', fontSize: '0.9rem', marginBottom: 12 }}>
-                {olvideMsg}
-              </div>
-            ) : (
-              <form onSubmit={handleOlvide}>
-                <div className="form-group">
-                  <label>Email</label>
+                <div className="login-split-group">
+                  <label>Email corporativo</label>
                   <input
                     type="email"
-                    value={olvideEmail}
-                    onChange={e => setOlvideEmail(e.target.value)}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     placeholder="empleado@empresa.com"
                     required
-                    disabled={olvideLoading}
+                    disabled={loading}
                   />
                 </div>
-                <button type="submit" className="login-button" disabled={olvideLoading}>
-                  {olvideLoading ? 'Enviando...' : 'Enviar solicitud'}
+
+                <div className="login-split-group">
+                  <label>
+                    Contraseña {capsLock && <span className="caps-warning">↑ Mayúsculas activas</span>}
+                  </label>
+                  <div className="login-pwd-wrap">
+                    <input
+                      type={showPwd ? 'text' : 'password'}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      onKeyDown={(e) => setCapsLock(e.getModifierState('CapsLock'))}
+                      onKeyUp={(e) => setCapsLock(e.getModifierState('CapsLock'))}
+                      placeholder="••••••••"
+                      required
+                      disabled={loading}
+                    />
+                    <button type="button" className="login-pwd-eye" onClick={() => setShowPwd((v) => !v)} tabIndex={-1}>
+                      {showPwd ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                  </div>
+                </div>
+
+                <button type="submit" className="login-split-btn" disabled={loading}>
+                  {loading ? 'Accediendo...' : 'ACCEDER AL SISTEMA'}
                 </button>
               </form>
-            )}
-            <button
-              onClick={() => { setShowOlvide(false); setOlvideMsg(''); setOlvideEmail(''); }}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4DB6A8', fontSize: '0.85rem', marginTop: 12 }}
-            >
-              ← Volver al login
-            </button>
-          </div>
-        )}
+
+              <button onClick={() => setShowOlvide(true)} className="login-split-link">
+                ¿Olvidaste tu contraseña?
+              </button>
+            </>
+          ) : (
+            <div className="login-split-form-fields">
+              <h3 style={{ margin: '0 0 8px', fontSize: '1rem', color: '#2c3e50' }}>Recuperar contraseña</h3>
+              <p style={{ fontSize: '0.85rem', color: '#7f8c8d', marginBottom: 16 }}>
+                Introduce tu email y un administrador recibirá la solicitud.
+              </p>
+              {olvideMsg ? (
+                <div className="login-split-success">{olvideMsg}</div>
+              ) : (
+                <form onSubmit={handleOlvide}>
+                  <div className="login-split-group">
+                    <label>Email</label>
+                    <input
+                      type="email"
+                      value={olvideEmail}
+                      onChange={(e) => setOlvideEmail(e.target.value)}
+                      placeholder="empleado@empresa.com"
+                      required
+                      disabled={olvideLoading}
+                    />
+                  </div>
+                  <button type="submit" className="login-split-btn" disabled={olvideLoading} style={{ marginTop: 8 }}>
+                    {olvideLoading ? 'Enviando...' : 'Enviar solicitud'}
+                  </button>
+                </form>
+              )}
+              <button
+                onClick={() => { setShowOlvide(false); setOlvideMsg(''); setOlvideEmail(''); }}
+                className="login-split-link"
+                style={{ marginTop: 12 }}
+              >
+                ← Volver al login
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="login-split-visual login-split-visual--dark">
+        <div className="login-visual-particles">
+          {particlesRef.current.map((p) => (
+            <span
+              key={p.id}
+              className="login-particle"
+              style={{
+                left: `${p.left}%`,
+                width: `${p.size}px`,
+                height: `${p.size}px`,
+                animationDelay: `${p.delay}s`,
+                animationDuration: `${p.duration}s`
+              }}
+            />
+          ))}
+        </div>
+        <svg className="login-visual-circuit" viewBox="0 0 500 600" fill="none">
+          <path d="M0 150 L80 150 L80 80 L250 80" stroke="rgba(77,182,168,0.15)" strokeWidth="1.5" />
+          <path d="M0 300 L120 300 L120 200 L350 200 L350 300 L500 300" stroke="rgba(77,182,168,0.1)" strokeWidth="1.5" />
+          <path d="M180 0 L180 120 L300 120 L300 350" stroke="rgba(77,182,168,0.12)" strokeWidth="1.5" />
+          <path d="M400 450 L400 250 L480 250 L480 600" stroke="rgba(77,182,168,0.08)" strokeWidth="1.5" />
+          <path d="M50 500 L50 400 L200 400 L200 500 L400 500" stroke="rgba(77,182,168,0.07)" strokeWidth="1.5" />
+          <circle cx="80" cy="150" r="4" fill="rgba(77,182,168,0.3)" />
+          <circle cx="250" cy="80" r="4" fill="rgba(77,182,168,0.3)" />
+          <circle cx="120" cy="300" r="4" fill="rgba(77,182,168,0.25)" />
+          <circle cx="350" cy="200" r="4" fill="rgba(77,182,168,0.25)" />
+          <circle cx="300" cy="350" r="6" fill="rgba(77,182,168,0.2)" />
+        </svg>
+        <div className="login-visual-content">
+          <div className="login-visual-badge">BLUEARC ENERGY · PORTAL EMPLEADOS</div>
+          <h2>PORTAL<br /><span>INTERNO</span></h2>
+          <p>Gestión centralizada de proyectos, clientes y equipos de ingeniería</p>
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Paperclip, Mail, Phone } from 'lucide-react';
+import { Paperclip, Mail, Phone, FolderOpen } from 'lucide-react';
 import ArchivosPanel from './ArchivosPanel';
 
 function InfoPanel({ participant, conversacion, currentUser, onClose }) {
@@ -124,14 +124,14 @@ function InfoPanel({ participant, conversacion, currentUser, onClose }) {
               className="info-action-btn"
               onClick={() => {
                 if (participant.tipo_usuario === 'cliente') {
-                  navigate(`/proyectos?cliente_id=${participant.user_id}`);
+                  navigate(`/proyectos?cliente_id=${participant.user_id}&nombre=${encodeURIComponent(participant.nombre)}`);
                 } else {
-                  navigate(`/proyectos?empleado_id=${participant.user_id}`);
+                  navigate(`/proyectos?solo_empleado_id=${participant.user_id}&nombre=${encodeURIComponent(participant.nombre)}`);
                 }
                 onClose();
               }}
             >
-              📁 Ver proyectos
+              <FolderOpen size={14} /> Ver proyectos
             </button>
           </div>
         </div>

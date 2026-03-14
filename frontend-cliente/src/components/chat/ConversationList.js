@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Plus } from 'lucide-react';
+import { Search, Plus, Paperclip } from 'lucide-react';
 
 function ConversationList({ conversaciones, conversacionActiva, onSelectConversacion, onNewConversacion, currentUser, onlineUsers = new Set() }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -102,7 +102,8 @@ function ConversationList({ conversaciones, conversacionActiva, onSelectConversa
                     {conversacion.ultimo_mensaje && (
                       <p className="last-message">
                         {conversacion.ultimo_mensaje.tipo_mensaje === 'archivo'
-                          ? '📎 Archivo'
+                          ? <><Paperclip size={12} style={{ verticalAlign: 'middle', marginRight: 3 }} />Archivo</>
+
                           : conversacion.ultimo_mensaje.mensaje}
                       </p>
                     )}

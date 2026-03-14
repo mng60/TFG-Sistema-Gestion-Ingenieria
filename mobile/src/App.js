@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import SplashScreen from './components/SplashScreen';
 import Login from './pages/Login';
 import Proyectos from './pages/Proyectos';
 import ProyectoCompleto from './pages/ProyectoCompleto';
@@ -19,6 +20,12 @@ function PublicRoute({ children }) {
 }
 
 function App() {
+  const [splashDone, setSplashDone] = useState(false);
+
+  if (!splashDone) {
+    return <SplashScreen onDone={() => setSplashDone(true)} />;
+  }
+
   return (
     <Router>
       <AuthProvider>

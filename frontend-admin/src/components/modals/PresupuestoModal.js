@@ -141,9 +141,7 @@ function PresupuestoModal({ proyectoId, presupuesto, onClose, onSuccess, onError
                 disabled={presupuesto?.aceptado}
               >
                 <option value="borrador">Borrador</option>
-                <option value="enviado">Enviado</option>
-                <option value="aceptado">Aceptado</option>
-                <option value="rechazado">Rechazado</option>
+                <option value="enviado">Enviado al cliente</option>
               </select>
             </div>
 

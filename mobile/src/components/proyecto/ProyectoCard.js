@@ -1,10 +1,19 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Users, Calendar, MapPin } from 'lucide-react';
 import '../../styles/Proyectos.css';
 
 const formatFecha = (fecha) => {
   if (!fecha) return '-';
   return new Date(fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+};
+
+const ESTADO_LABELS = {
+  planificacion: 'Planificación',
+  en_progreso: 'En progreso',
+  pausado: 'Pausado',
+  completado: 'Completado',
+  cancelado: 'Cancelado'
 };
 
 function ProyectoCard({ proyecto }) {
@@ -19,7 +28,7 @@ function ProyectoCard({ proyecto }) {
         <span className="proyecto-card-nombre">{proyecto.nombre}</span>
         <div className="proyecto-card-badges">
           <span className={`badge badge-${proyecto.estado}`}>
-            {proyecto.estado?.replace('_', ' ')}
+            {ESTADO_LABELS[proyecto.estado] || proyecto.estado?.replace('_', ' ')}
           </span>
           <span className={`badge badge-${proyecto.prioridad}`}>
             {proyecto.prioridad}
@@ -28,13 +37,13 @@ function ProyectoCard({ proyecto }) {
       </div>
       <div className="proyecto-card-meta">
         {proyecto.nombre_cliente && (
-          <span>👥 {proyecto.nombre_cliente}</span>
+          <span><Users size={12} style={{ verticalAlign: 'middle', marginRight: 3 }} />{proyecto.nombre_cliente}</span>
         )}
         {proyecto.fecha_fin && (
-          <span>📅 Fin: {formatFecha(proyecto.fecha_fin)}</span>
+          <span><Calendar size={12} style={{ verticalAlign: 'middle', marginRight: 3 }} />Fin: {formatFecha(proyecto.fecha_fin)}</span>
         )}
         {proyecto.ubicacion && (
-          <span>📍 {proyecto.ubicacion}</span>
+          <span><MapPin size={12} style={{ verticalAlign: 'middle', marginRight: 3 }} />{proyecto.ubicacion}</span>
         )}
       </div>
     </div>

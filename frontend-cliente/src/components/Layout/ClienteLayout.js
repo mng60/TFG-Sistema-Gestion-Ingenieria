@@ -1,15 +1,54 @@
-import React, { useState } from 'react';
-import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { ClipboardList, FolderOpen, MessagesSquare } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import '../../styles/ClienteLayout.css';
-import { FolderOpen, MessagesSquare } from 'lucide-react';
 
 function ClienteLayout({ children }) {
   const { cliente, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mensajesNoLeidos, setMensajesNoLeidos] = useState(0);
   const isChat = location.pathname === '/chat';
+  const isProjectsSection = location.pathname === '/dashboard' || location.pathname.startsWith('/proyectos/');
+  const isSolicitudSection = location.pathname === '/solicitar-proyecto';
+
+  useEffect(() => {
+    cargarMensajesNoLeidos();
+    const interval = setInterval(cargarMensajesNoLeidos, 10000);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (isChat) setMensajesNoLeidos(0);
+  }, [isChat]);
+
+  const cargarMensajesNoLeidos = async () => {
+    try {
+      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const response = await fetch(`${API_URL}/chat/conversaciones`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (!response.ok) return;
+
+      const data = await response.json();
+      if (data.success) {
+        const total = data.conversaciones.reduce((sum, conv) => {
+          return sum + (parseInt(conv.mensajes_no_leidos, 10) || 0);
+        }, 0);
+
+        if (location.pathname !== '/chat') setMensajesNoLeidos(total);
+      }
+    } catch {
+      // silencioso
+    }
+  };
 
   const handleLogout = () => {
     logout();
@@ -18,7 +57,6 @@ function ClienteLayout({ children }) {
 
   return (
     <div className="cliente-layout">
-      {/* Sidebar */}
       <aside className={`cliente-sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
           <div className="sidebar-logo">
@@ -30,10 +68,18 @@ function ClienteLayout({ children }) {
         <nav className="sidebar-nav">
           <NavLink
             to="/dashboard"
-            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+            className={() => `nav-item ${isProjectsSection ? 'active' : ''}`}
             onClick={() => setSidebarOpen(false)}
           >
-            <FolderOpen size={18}/> Mis Proyectos
+            <FolderOpen size={18} /> Mis Proyectos
+          </NavLink>
+
+          <NavLink
+            to="/solicitar-proyecto"
+            className={() => `nav-item ${isSolicitudSection ? 'active' : ''}`}
+            onClick={() => setSidebarOpen(false)}
+          >
+            <ClipboardList size={18} /> Solicitar Proyecto
           </NavLink>
 
           <NavLink
@@ -41,12 +87,20 @@ function ClienteLayout({ children }) {
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
             onClick={() => setSidebarOpen(false)}
           >
-            <MessagesSquare size={18}/> Chat
+            <MessagesSquare size={18} /> Chat
+            {mensajesNoLeidos > 0 && (
+              <span className="notification-badge">{mensajesNoLeidos}</span>
+            )}
           </NavLink>
         </nav>
 
         <div className="sidebar-footer">
-          <div className="user-info" onClick={() => { navigate('/perfil'); setSidebarOpen(false); }} style={{ cursor: 'pointer' }} title="Ver mi perfil">
+          <div
+            className="user-info"
+            onClick={() => { navigate('/perfil'); setSidebarOpen(false); }}
+            style={{ cursor: 'pointer' }}
+            title="Ver mi perfil"
+          >
             <div className="user-avatar">
               {cliente?.foto_url
                 ? <img src={`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'}${cliente.foto_url}`} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
@@ -59,22 +113,22 @@ function ClienteLayout({ children }) {
             </div>
           </div>
           <button className="logout-btn" onClick={handleLogout}>
-            Cerrar Sesión
+            Cerrar Sesion
           </button>
         </div>
       </aside>
 
-      {/* Overlay para móvil */}
       {sidebarOpen && (
         <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
       )}
 
-      {/* Contenido principal */}
       <div className="cliente-main">
-        {/* Topbar móvil */}
         <header className="cliente-topbar">
           <button className="topbar-menu-btn" onClick={() => setSidebarOpen(true)}>☰</button>
           <span className="topbar-title">Portal Cliente</span>
+          {mensajesNoLeidos > 0 && (
+            <span className="topbar-badge">{mensajesNoLeidos}</span>
+          )}
         </header>
 
         <main className={`cliente-content${isChat ? ' cliente-content--chat' : ''}`}>

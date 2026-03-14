@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Paperclip } from 'lucide-react';
+import { Paperclip, FolderOpen } from 'lucide-react';
 import ArchivosPanel from './ArchivosPanel';
 
 function InfoPanelGrupo({ conversacion, currentUser, onClose }) {
@@ -61,16 +61,6 @@ function InfoPanelGrupo({ conversacion, currentUser, onClose }) {
 
           {loading ? (
             <p style={{ textAlign: 'center', color: '#95a5a6' }}>Cargando...</p>
-          ) : proyecto ? (
-            <div className="info-section">
-              <h3>Proyecto</h3>
-              <div className="proyecto-info-card">
-                <strong>{proyecto.nombre}</strong>
-                <span className={`badge badge-${proyecto.estado}`}>
-                  {proyecto.estado.replace('_', ' ')}
-                </span>
-              </div>
-            </div>
           ) : null}
 
           <div className="info-section">
@@ -108,7 +98,7 @@ function InfoPanelGrupo({ conversacion, currentUser, onClose }) {
                 className="info-action-btn"
                 onClick={() => { navigate(`/proyectos/${proyecto.id}`); onClose(); }}
               >
-                📁 Ver proyecto completo
+                <FolderOpen size={14} style={{ verticalAlign: 'middle', marginRight: 4 }} />Ver proyecto completo
               </button>
             )}
           </div>

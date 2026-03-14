@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Landing from './pages/Landing';
 import SobreNosotros from './pages/SobreNosotros';
 import Contacto from './pages/Contacto';
+import SolicitarProyecto from './pages/SolicitarProyecto';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ProyectoCompleto from './pages/ProyectoCompleto';
@@ -63,6 +64,12 @@ function App() {
           <Route path="/perfil" element={
             <ClienteProtectedRoute>
               <Perfil />
+            </ClienteProtectedRoute>
+          } />
+
+          <Route path="/solicitar-proyecto" element={
+            <ClienteProtectedRoute>
+              <SolicitarProyecto />
             </ClienteProtectedRoute>
           } />
 

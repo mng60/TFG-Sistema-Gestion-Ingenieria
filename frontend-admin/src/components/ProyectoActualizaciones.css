@@ -1,0 +1,274 @@
+.actualizaciones-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.act-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 4px;
+}
+
+.act-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.act-header-left h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #2c3e50;
+  font-weight: 700;
+}
+
+.act-header-left p {
+  margin: 0;
+  font-size: 0.92rem;
+  color: #7f8c8d;
+}
+
+.act-header-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.act-action-btn {
+  min-height: 44px;
+  padding: 12px 20px;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.act-empty-message {
+  padding: 56px 20px;
+  color: #95a5a6;
+  font-size: 0.98rem;
+}
+
+/* Form */
+.act-form {
+  background: #f8f9fa;
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.act-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 700px) {
+  .act-form-grid { grid-template-columns: 1fr; }
+}
+
+.act-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.act-form .form-group label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #555;
+}
+
+.act-form .form-group textarea,
+.act-form .form-group input[type="date"] {
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  resize: vertical;
+  background: white;
+  transition: border-color 0.2s;
+}
+
+.act-form .form-group textarea:focus,
+.act-form .form-group input[type="date"]:focus {
+  outline: none;
+  border-color: #4DB6A8;
+}
+
+.act-solicitud-textarea {
+  width: 100%;
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  resize: vertical;
+  background: white;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.act-solicitud-textarea:focus {
+  outline: none;
+  border-color: #4DB6A8;
+  box-shadow: 0 0 0 3px rgba(77, 182, 168, 0.15);
+}
+
+.act-form-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.act-check-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  color: #2c3e50;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.act-check-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #4DB6A8;
+}
+
+/* List */
+.act-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.act-item {
+  display: flex;
+  gap: 12px;
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 14px 16px;
+  position: relative;
+}
+
+.act-item-avatar {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #4DB6A8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.act-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.act-avatar-initial {
+  color: white;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.act-item-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.act-item-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.act-autor {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #2c3e50;
+}
+
+.act-fecha {
+  font-size: 0.8rem;
+  color: #95a5a6;
+}
+
+.act-badge-fecha {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #fff3cd;
+  color: #856404;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  border: 1px solid #ffc107;
+}
+
+.act-bloque {
+  margin-bottom: 8px;
+}
+
+.act-bloque-label {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-bottom: 4px;
+}
+
+.act-bloque-label.realizado {
+  background: #d4edda;
+  color: #155724;
+}
+
+.act-bloque-label.pendiente {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.act-bloque p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #4a4a4a;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.act-delete-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  align-self: flex-start;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.act-delete-btn:hover {
+  background: #fdecea;
+}

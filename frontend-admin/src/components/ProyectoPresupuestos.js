@@ -37,42 +37,6 @@ function ProyectoPresupuestos({
     setShowPresupuestoModal(true);
   };
 
-  const handleAceptar = (presupuesto) => {
-    setConfirmModal({
-      title: 'Aceptar Presupuesto',
-      message: `¿Marcar el presupuesto ${presupuesto.numero_presupuesto} como aceptado?`,
-      type: 'info',
-      confirmText: 'Aceptar',
-      onConfirm: async () => {
-        try {
-          await presupuestoService.aceptar(presupuesto.id);
-          showToast('Presupuesto aceptado', 'success');
-          onReload();
-        } catch (error) {
-          showToast('Error al aceptar presupuesto', 'error');
-        }
-      }
-    });
-  };
-
-  const handleRechazar = (presupuesto) => {
-    setConfirmModal({
-      title: 'Rechazar Presupuesto',
-      message: `¿Marcar el presupuesto ${presupuesto.numero_presupuesto} como rechazado?`,
-      type: 'warning',
-      confirmText: 'Rechazar',
-      onConfirm: async () => {
-        try {
-          await presupuestoService.rechazar(presupuesto.id);
-          showToast('Presupuesto rechazado', 'success');
-          onReload();
-        } catch (error) {
-          showToast('Error al rechazar presupuesto', 'error');
-        }
-      }
-    });
-  };
-
   const handleEliminar = (presupuesto) => {
     if (presupuesto.aceptado) {
       showToast('No se pueden eliminar presupuestos aceptados', 'error');
@@ -151,24 +115,6 @@ function ProyectoPresupuestos({
                         >
                           <Pencil size={14} />
                         </button>
-                      )}
-                      {isAdmin && presupuesto.estado === 'enviado' && !presupuesto.aceptado && (
-                        <>
-                          <button
-                            className="btn-sm btn-success"
-                            onClick={() => handleAceptar(presupuesto)}
-                            title="Aceptar"
-                          >
-                            ✓
-                          </button>
-                          <button
-                            className="btn-sm btn-warning"
-                            onClick={() => handleRechazar(presupuesto)}
-                            title="Rechazar"
-                          >
-                            ✕
-                          </button>
-                        </>
                       )}
                       {isAdmin && !presupuesto.aceptado && proyecto.estado !== 'completado' && (
                         <button

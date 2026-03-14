@@ -1,15 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { MapPin, Calendar, Flag } from 'lucide-react';
 import api from '../services/api';
 import '../styles/Dashboard.css';
-
-const ESTADO_LABELS = {
-  planificacion: 'Planificación',
-  en_progreso: 'En progreso',
-  pausado: 'Pausado',
-  completado: 'Completado',
-  cancelado: 'Cancelado'
-};
 
 function Dashboard() {
   const [proyectos, setProyectos] = useState([]);
@@ -18,8 +11,8 @@ function Dashboard() {
   useEffect(() => {
     document.title = 'Mis Proyectos - Portal Cliente';
     api.get('/portal/proyectos')
-      .then(res => setProyectos(res.data.proyectos || []))
-      .catch(err => console.error('Error al cargar proyectos:', err))
+      .then((res) => setProyectos(res.data.proyectos || []))
+      .catch((err) => console.error('Error al cargar proyectos:', err))
       .finally(() => setLoading(false));
   }, []);
 
@@ -48,7 +41,7 @@ function Dashboard() {
         <div className="empty-state">
           <div className="empty-icon"></div>
           <h3>No tienes proyectos asignados</h3>
-          <p>Cuando se te asigne un proyecto aparecerá aquí.</p>
+          <p>Cuando se te asigne un proyecto aparecera aqui.</p>
         </div>
       ) : (
         <div className="proyectos-grid">
@@ -56,24 +49,22 @@ function Dashboard() {
             <Link key={proyecto.id} to={`/proyectos/${proyecto.id}`} className="proyecto-card">
               <div className="proyecto-card-header">
                 <h3>{proyecto.nombre}</h3>
-                <span className={`badge badge-${proyecto.estado}`}>
-                  {ESTADO_LABELS[proyecto.estado] || proyecto.estado}
-                </span>
               </div>
+
               <div className="proyecto-card-body">
-                {proyecto.descripcion && (
-                  <p className="proyecto-desc">{proyecto.descripcion}</p>
-                )}
+                {proyecto.descripcion && <p className="proyecto-desc">{proyecto.descripcion}</p>}
+
                 <div className="proyecto-meta">
                   {proyecto.ubicacion && (
-                    <span><strong>📍</strong> {proyecto.ubicacion}</span>
+                    <span><MapPin size={14} style={{ verticalAlign: 'middle', marginRight: 3 }} />{proyecto.ubicacion}</span>
                   )}
-                  <span><strong>📅</strong> Inicio: {formatearFecha(proyecto.fecha_inicio)}</span>
+                  <span><Calendar size={14} style={{ verticalAlign: 'middle', marginRight: 3 }} />Inicio: {formatearFecha(proyecto.fecha_inicio)}</span>
                   {proyecto.fecha_fin_estimada && (
-                    <span><strong>🏁</strong> Fin est.: {formatearFecha(proyecto.fecha_fin_estimada)}</span>
+                    <span><Flag size={14} style={{ verticalAlign: 'middle', marginRight: 3 }} />Fin est.: {formatearFecha(proyecto.fecha_fin_estimada)}</span>
                   )}
                 </div>
               </div>
+
               <div className="proyecto-card-footer">
                 <span className="ver-detalle">Ver detalles →</span>
               </div>

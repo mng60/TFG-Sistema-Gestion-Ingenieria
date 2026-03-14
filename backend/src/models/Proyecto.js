@@ -314,11 +314,11 @@ class Proyecto {
     }
   }
 
-  // Obtener estadísticas del proyecto
+  // Obtener estadísticas generales (sin filtro de rol)
   static async getEstadisticas() {
     try {
       const queryProyectos = `
-        SELECT 
+        SELECT
           COUNT(*) as total_proyectos,
           COUNT(CASE WHEN estado = 'pendiente' THEN 1 END) as pendiente,
           COUNT(CASE WHEN estado = 'en_progreso' THEN 1 END) as en_progreso,
@@ -329,7 +329,7 @@ class Proyecto {
       `;
 
       const queryPresupuestos = `
-        SELECT 
+        SELECT
           COALESCE(SUM(subtotal), 0) as total_sin_iva,
           COALESCE(SUM(total), 0) as total_con_iva
         FROM presupuestos
@@ -356,6 +356,135 @@ class Proyecto {
         presupuesto_total_estimado: parseFloat(s.total_sin_iva) || 0,
         presupuesto_real_total: parseFloat(s.total_con_iva) || 0
       };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Obtener datos del dashboard filtrados por rol
+  static async getDashboardData(userId, rol) {
+    try {
+      const isAdmin = rol === 'admin';
+
+      const queryProyectos = isAdmin
+        ? `SELECT COUNT(*) as total,
+            COUNT(CASE WHEN estado = 'en_progreso' THEN 1 END) as en_progreso,
+            COUNT(CASE WHEN estado = 'completado' THEN 1 END) as completado,
+            COUNT(CASE WHEN estado = 'pendiente' THEN 1 END) as pendiente
+           FROM proyectos`
+        : `SELECT COUNT(*) as total,
+            COUNT(CASE WHEN p.estado = 'en_progreso' THEN 1 END) as en_progreso,
+            COUNT(CASE WHEN p.estado = 'completado' THEN 1 END) as completado,
+            COUNT(CASE WHEN p.estado = 'pendiente' THEN 1 END) as pendiente
+           FROM proyectos p
+           JOIN proyecto_empleados pe ON pe.proyecto_id = p.id AND pe.user_id = $1 AND pe.activo = true`;
+
+      const queryRecientes = isAdmin
+        ? `SELECT p.id, p.nombre, p.estado, p.prioridad,
+            c.nombre_empresa as cliente_nombre,
+            GREATEST(
+              p.updated_at,
+              COALESCE((SELECT MAX(a.created_at) FROM proyecto_actualizaciones a WHERE a.proyecto_id = p.id), p.updated_at),
+              COALESCE((SELECT MAX(pr.updated_at) FROM presupuestos pr WHERE pr.proyecto_id = p.id), p.updated_at),
+              COALESCE((SELECT MAX(d.created_at) FROM documentos d WHERE d.proyecto_id = p.id), p.updated_at)
+            ) as ultima_actividad
+           FROM proyectos p
+           LEFT JOIN clientes c ON c.id = p.cliente_id
+           ORDER BY ultima_actividad DESC LIMIT 5`
+        : `SELECT p.id, p.nombre, p.estado, p.prioridad,
+            c.nombre_empresa as cliente_nombre,
+            GREATEST(
+              p.updated_at,
+              COALESCE((SELECT MAX(a.created_at) FROM proyecto_actualizaciones a WHERE a.proyecto_id = p.id), p.updated_at),
+              COALESCE((SELECT MAX(pr.updated_at) FROM presupuestos pr WHERE pr.proyecto_id = p.id), p.updated_at),
+              COALESCE((SELECT MAX(d.created_at) FROM documentos d WHERE d.proyecto_id = p.id), p.updated_at)
+            ) as ultima_actividad
+           FROM proyectos p
+           JOIN proyecto_empleados pe ON pe.proyecto_id = p.id AND pe.user_id = $1 AND pe.activo = true
+           LEFT JOIN clientes c ON c.id = p.cliente_id
+           ORDER BY ultima_actividad DESC LIMIT 5`;
+
+      const queryUltimosPresupuestos = `
+        SELECT p.id, p.numero_presupuesto, p.estado, p.total,
+          COALESCE(p.updated_at, p.created_at, p.fecha_emision::timestamp) as fecha_referencia,
+          pr.id as proyecto_id,
+          pr.nombre as proyecto_nombre,
+          c.nombre_empresa as cliente_nombre
+        FROM presupuestos p
+        LEFT JOIN proyectos pr ON pr.id = p.proyecto_id
+        LEFT JOIN clientes c ON c.id = pr.cliente_id
+        ORDER BY fecha_referencia DESC
+        LIMIT 5
+      `;
+
+      const queryUltimosTickets = `
+        SELECT t.id, t.tipo, t.estado, t.email, t.nombre, t.created_at,
+          t.empresa, pr.id as proyecto_id, pr.nombre as proyecto_nombre
+        FROM tickets t
+        LEFT JOIN proyectos pr ON pr.id = t.proyecto_id
+        ORDER BY t.created_at DESC
+        LIMIT 5
+      `;
+
+      const queryMensajes = `
+        SELECT COALESCE(SUM(sub.cnt), 0) as mensajes_no_leidos
+        FROM (
+          SELECT c.id,
+            (SELECT COUNT(*) FROM mensajes m
+             LEFT JOIN conversacion_participantes cp2
+               ON cp2.conversacion_id = m.conversacion_id AND cp2.user_id = $1 AND cp2.tipo_usuario = 'empleado'
+             WHERE m.conversacion_id = c.id
+               AND m.created_at > COALESCE(cp2.last_read, '1970-01-01'::timestamp)
+               AND NOT (m.user_id = $1 AND m.tipo_usuario = 'empleado')
+            ) as cnt
+          FROM conversaciones c
+          INNER JOIN conversacion_participantes cp
+            ON cp.conversacion_id = c.id AND cp.user_id = $1 AND cp.tipo_usuario = 'empleado'
+          WHERE c.deletion_scheduled_at IS NULL OR c.deletion_scheduled_at > CURRENT_TIMESTAMP
+        ) sub
+      `;
+
+      const promises = isAdmin
+        ? [
+            pool.query(queryProyectos),
+            pool.query(queryRecientes),
+            pool.query(`SELECT COALESCE(SUM(subtotal), 0) as sin_iva, COALESCE(SUM(total), 0) as con_iva FROM presupuestos WHERE aceptado = true`),
+            pool.query(`SELECT COUNT(*) as pendientes FROM tickets WHERE estado = 'pendiente'`),
+            pool.query(queryUltimosPresupuestos),
+            pool.query(queryUltimosTickets)
+          ]
+        : [
+            pool.query(queryProyectos, [userId]),
+            pool.query(queryRecientes, [userId]),
+            pool.query(queryMensajes, [userId])
+          ];
+
+      const results = await Promise.all(promises);
+      const [resP, resR] = results;
+
+      const p = resP.rows[0];
+      const result = {
+        total_proyectos: parseInt(p.total) || 0,
+        por_estado: {
+          en_progreso: parseInt(p.en_progreso) || 0,
+          completado: parseInt(p.completado) || 0,
+          pendiente: parseInt(p.pendiente) || 0
+        },
+        proyectos_recientes: resR.rows
+      };
+
+      if (isAdmin) {
+        const s = results[2].rows[0];
+        result.presupuesto_total_estimado = parseFloat(s.sin_iva) || 0;
+        result.presupuesto_real_total = parseFloat(s.con_iva) || 0;
+        result.tickets_pendientes = parseInt(results[3].rows[0].pendientes) || 0;
+        result.ultimos_presupuestos = results[4].rows;
+        result.ultimos_tickets = results[5].rows;
+      } else {
+        result.mensajes_no_leidos = parseInt(results[2].rows[0].mensajes_no_leidos) || 0;
+      }
+
+      return result;
     } catch (error) {
       throw error;
     }

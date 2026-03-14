@@ -4,7 +4,17 @@
       "Bash(ls -la \"c:\\\\Users\\\\migue\\\\Documents\\\\4o\\\\TFG-Visual\\\\TFG-Sistema-Gestion-Ingenieria\\\\backend\\\\src\\\\controllers\"\" | grep -E \"portal)",
       "Bash(cliente \")",
       "Bash(node -e:*)",
-      "Bash(del \"c:\\\\Users\\\\migue\\\\Documents\\\\4o\\\\TFG-Visual\\\\TFG-Sistema-Gestion-Ingenieria\\\\mobile\\\\src\\\\services\\\\clienteService.js\")"
+      "Bash(del \"c:\\\\Users\\\\migue\\\\Documents\\\\4o\\\\TFG-Visual\\\\TFG-Sistema-Gestion-Ingenieria\\\\mobile\\\\src\\\\services\\\\clienteService.js\")",
+      "Bash(ls /c/Users/migue/Documents/4o/TFG-Visual/TFG-Sistema-Gestion-Ingenieria/backend/src/*.js)",
+      "Bash(find /c/Users/migue/Documents/4o/TFG-Visual/TFG-Sistema-Gestion-Ingenieria/frontend-cliente/src -path *landing* -o -path *sections*)",
+      "Bash(head -5 grep -n \"pwd-wrap\\\\|pwd-eye\\\\|eye\" \"c:/Users/migue/Documents/4o/TFG-Visual/TFG-Sistema-Gestion-Ingenieria/frontend-admin/src/styles/LoginSplit.css\")",
+      "Bash(PWD_STYLES=':*)",
+      "Bash(__NEW_LINE_c799d5d6d5c976b7__ echo:*)",
+      "Bash(\"c:/Users/migue/Documents/4o/TFG-Visual/TFG-Sistema-Gestion-Ingenieria/frontend-admin/src/styles/LoginSplit.css\")",
+      "Bash(\"c:/Users/migue/Documents/4o/TFG-Visual/TFG-Sistema-Gestion-Ingenieria/frontend-cliente/src/styles/LoginSplit.css\")",
+      "Bash(jq -r \"select\\(.message.role==\"\"user\"\" and \\(.message.content[0].text | test\\(\"\"quitar|eliminar|ocultar|botón|button\"\"; \"\"i\"\"\\)\\)\\) | \"\"\\\\\\(.timestamp\\)\\\\n\\\\\\(.message.content[0].text\\)\\\\n---\"\"\" C:Usersmigue.claudeprojectsc--Users-migue-Documents-4o-TFG-Visual-TFG-Sistema-Gestion-Ingenieria47d61efc-2ffb-4ed7-8290-61fdbf51e6e8.jsonl)",
+      "Bash(python3:*)",
+      "Bash(pwsh -Command \":*)"
     ]
   }
 }

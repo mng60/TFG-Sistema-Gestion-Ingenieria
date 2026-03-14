@@ -189,6 +189,14 @@
   color: #95a5a6;
 }
 
+.empty-conversations p {
+  margin: 0;
+  font-size: 0.95rem;
+  font-style: italic;
+  line-height: 1.55;
+  letter-spacing: 0.01em;
+}
+
 .btn-new-chat {
   margin: 15px;
   padding: 12px;
@@ -248,7 +256,10 @@
 }
 
 .empty-chat p {
-  font-size: 1rem;
+  font-size: 0.95rem;
+  font-style: italic;
+  line-height: 1.55;
+  letter-spacing: 0.01em;
 }
 
 /* ==================== CHAT HEADER ==================== */
@@ -1267,7 +1278,11 @@
 }
 
 .archivos-empty p {
-  font-size: 1rem;
+  font-size: 0.95rem;
+  font-style: italic;
+  line-height: 1.55;
+  letter-spacing: 0.01em;
+  margin: 0;
 }
 
 /* Loading */

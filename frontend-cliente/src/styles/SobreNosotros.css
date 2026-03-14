@@ -12,7 +12,7 @@
 }
 .sn-intro-text { display: flex; flex-direction: column; gap: 20px; }
 .sn-intro-text h2 {
-  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: clamp(36px, 4.5vw, 60px);
   font-weight: 800; text-transform: uppercase; color: var(--black); line-height: 1;
 }
@@ -33,7 +33,7 @@
   border-top: 3px solid var(--teal);
 }
 .sn-stat span {
-  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 36px; font-weight: 800; color: var(--teal-dark); line-height: 1;
 }
 .sn-stat label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gray); }
@@ -42,7 +42,7 @@
 .sn-servicios { background: var(--white); }
 .sn-section-header { margin-bottom: 52px; }
 .sn-section-header h2 {
-  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: clamp(38px, 4.5vw, 60px);
   font-weight: 800; text-transform: uppercase; color: var(--black); line-height: 1;
 }
@@ -58,9 +58,19 @@
 .sn-servicio-card:hover {
   background: var(--teal); border-top-color: var(--teal-dark); transform: translateY(-4px);
 }
-.sn-servicio-icon { font-size: 28px; margin-bottom: 18px; }
+.sn-servicio-icon {
+  width: 52px;
+  height: 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  margin-bottom: 18px;
+  color: var(--teal-dark);
+  background: rgba(77, 182, 168, 0.12);
+}
 .sn-servicio-card h3 {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 19px; font-weight: 700; text-transform: uppercase;
   letter-spacing: 0.04em; color: var(--black); margin-bottom: 10px;
   transition: color 0.25s;
@@ -84,12 +94,12 @@
 .sn-valor-row:first-child { border-top: 1px solid rgba(255,255,255,0.07); }
 
 .sn-valor-n {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: var(--teal);
   padding-top: 4px;
 }
 .sn-valor-row h3 {
-  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 18px; font-weight: 700; text-transform: uppercase; color: var(--white);
 }
 .sn-valor-row p { font-size: 14px; line-height: 1.65; color: rgba(255,255,255,0.5); }

@@ -1,11 +1,21 @@
 .proyecto-detail {}
 
+.project-hero {
+  background:
+    radial-gradient(circle at top right, rgba(77, 182, 168, 0.18), transparent 42%),
+    linear-gradient(145deg, #ffffff, #f4fbfa);
+  border: 1px solid rgba(77, 182, 168, 0.14);
+  border-radius: 20px;
+  padding: 14px;
+  margin-bottom: 16px;
+  box-shadow: 0 10px 24px rgba(25, 52, 66, 0.08);
+}
+
 .proyecto-detail-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
-  margin-bottom: 16px;
-  padding-top: 4px;
+  margin-bottom: 14px;
 }
 
 .btn-back {
@@ -19,48 +29,68 @@
   cursor: pointer;
 }
 
+.btn-back-chip {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #425466;
+  background: #eef1f4;
+  box-shadow: none;
+}
+
 .proyecto-detail-title {
   flex: 1;
   min-width: 0;
 }
 
-.proyecto-detail-title h1 {
-  font-size: 1.1rem;
+.project-kicker {
+  font-size: 0.72rem;
   font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-primary-dark);
+  margin-bottom: 4px;
+}
+
+.proyecto-detail-title h1 {
+  font-size: 1.18rem;
+  font-weight: 800;
   color: var(--color-text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.2;
 }
 
-.proyecto-detail-badges {
-  display: flex;
-  gap: 6px;
-  margin-top: 4px;
-  flex-wrap: wrap;
-}
-
-/* Tabs */
 .tabs-bar {
   display: flex;
-  gap: 2px;
-  background: var(--color-border);
-  border-radius: 12px;
-  padding: 3px;
+  gap: 8px;
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
   margin-bottom: 16px;
   position: sticky;
   top: 0;
   z-index: 10;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tabs-bar::-webkit-scrollbar {
+  display: none;
 }
 
 .tab-btn {
-  flex: 1;
-  padding: 9px 4px;
-  border: none;
-  background: none;
-  border-radius: 10px;
-  font-size: 0.78rem;
-  font-weight: 500;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 12px;
+  border: 1px solid rgba(77, 182, 168, 0.12);
+  background: rgba(255, 255, 255, 0.82);
+  border-radius: 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
   color: var(--color-muted);
   cursor: pointer;
   transition: all 0.2s;
@@ -69,13 +99,17 @@
 }
 
 .tab-btn.active {
-  background: white;
-  color: var(--color-text);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  color: white;
   font-weight: 600;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  border-color: transparent;
+  box-shadow: 0 8px 18px rgba(77, 182, 168, 0.3);
 }
 
-/* Info Tab */
+.tab-content {
+  padding-bottom: 8px;
+}
+
 .info-section {
   background: white;
   border-radius: 14px;
@@ -126,7 +160,6 @@
   line-height: 1.6;
 }
 
-/* Documentos Tab */
 .doc-card {
   background: white;
   border-radius: 12px;
@@ -135,7 +168,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
 .doc-icon {
@@ -189,7 +222,9 @@
   transition: background 0.15s;
 }
 
-.btn-icon:active { background: var(--color-border); }
+.btn-icon:active {
+  background: var(--color-border);
+}
 
 .toggle-publico {
   padding: 5px 10px;
@@ -213,7 +248,6 @@
   color: #6b7280;
 }
 
-/* Empleados Tab */
 .empleado-card-m {
   background: white;
   border-radius: 12px;
@@ -222,7 +256,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
 .empleado-avatar-m {
@@ -268,7 +302,6 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Bottom Sheet Modal para asignar empleado */
 .asignar-modal .modal-overlay {
   align-items: flex-end;
 }
@@ -288,10 +321,19 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.empleado-picker-item:last-child { border-bottom: none; }
-.empleado-picker-item:active { opacity: 0.7; }
+.empleado-picker-item:last-child {
+  border-bottom: none;
+}
 
-.empleado-picker-item.selected { background: #edf8f7; border-radius: 8px; padding: 12px 8px; }
+.empleado-picker-item:active {
+  opacity: 0.7;
+}
+
+.empleado-picker-item.selected {
+  background: #edf8f7;
+  border-radius: 8px;
+  padding: 12px 8px;
+}
 
 .tab-section-header {
   display: flex;

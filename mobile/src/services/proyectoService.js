@@ -25,6 +25,21 @@ const proyectoService = {
   desasignarEmpleado: async (proyectoId, userId) => {
     const response = await api.delete(`/proyectos/${proyectoId}/empleados/${userId}`);
     return response.data;
+  },
+
+  getActualizaciones: async (id) => {
+    const response = await api.get(`/proyectos/${id}/actualizaciones`);
+    return response.data;
+  },
+
+  createActualizacion: async (id, data) => {
+    const response = await api.post(`/proyectos/${id}/actualizaciones`, data);
+    return response.data;
+  },
+
+  deleteActualizacion: async (proyectoId, actId) => {
+    const response = await api.delete(`/proyectos/${proyectoId}/actualizaciones/${actId}`);
+    return response.data;
   }
 };
 

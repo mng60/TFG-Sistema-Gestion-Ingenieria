@@ -12,6 +12,7 @@ import ConfirmModal from '../components/ConfirmModal';
 import ProyectoInfo from '../components/ProyectoInfo';
 import ProyectoPresupuestos from '../components/ProyectoPresupuestos';
 import ProyectoDocumentos from '../components/ProyectoDocumentos';
+import ProyectoActualizaciones from '../components/ProyectoActualizaciones';
 import '../styles/ProyectoCompleto.css';
 
 function ProyectoCompleto() {
@@ -24,6 +25,7 @@ function ProyectoCompleto() {
   const [empleadosProyecto, setEmpleadosProyecto] = useState([]);
   const [presupuestos, setPresupuestos] = useState([]);
   const [documentos, setDocumentos] = useState([]);
+  const [actualizaciones, setActualizaciones] = useState([]);
   const [clientes, setClientes] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -70,7 +72,8 @@ function ProyectoCompleto() {
       await Promise.all([
         cargarEmpleados(),
         cargarPresupuestos(),
-        cargarDocumentos()
+        cargarDocumentos(),
+        cargarActualizaciones()
       ]);
     } catch (error) {
       console.error('Error al cargar proyecto:', error);
@@ -111,6 +114,19 @@ function ProyectoCompleto() {
       setDocumentos(response.data.documentos || []);
     } catch (error) {
       console.error('Error al cargar documentos:', error);
+    }
+  };
+
+  const cargarActualizaciones = async () => {
+    try {
+      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+      const token = localStorage.getItem('empleado_token');
+      const response = await axios.get(`${API_URL}/proyectos/${id}/actualizaciones`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      setActualizaciones(response.data.actualizaciones || []);
+    } catch (error) {
+      console.error('Error al cargar actualizaciones:', error);
     }
   };
 
@@ -162,11 +178,16 @@ function ProyectoCompleto() {
         <button className={`tab ${activeTab === 'info' ? 'tab-active' : ''}`} onClick={() => setActiveTab('info')}>
           Información
         </button>
-        <button className={`tab ${activeTab === 'presupuestos' ? 'tab-active' : ''}`} onClick={() => setActiveTab('presupuestos')}>
-          Presupuestos ({presupuestos.length})
-        </button>
+        {isAdmin() && (
+          <button className={`tab ${activeTab === 'presupuestos' ? 'tab-active' : ''}`} onClick={() => setActiveTab('presupuestos')}>
+            Presupuestos ({presupuestos.length})
+          </button>
+        )}
         <button className={`tab ${activeTab === 'documentos' ? 'tab-active' : ''}`} onClick={() => setActiveTab('documentos')}>
           Documentos ({documentos.length})
+        </button>
+        <button className={`tab ${activeTab === 'avance' ? 'tab-active' : ''}`} onClick={() => setActiveTab('avance')}>
+          Avance ({actualizaciones.length})
         </button>
       </div>
 
@@ -207,6 +228,16 @@ function ProyectoCompleto() {
             onReload={cargarDocumentos}
             showToast={showToast}
             setConfirmModal={setConfirmModal}
+          />
+        )}
+
+        {activeTab === 'avance' && (
+          <ProyectoActualizaciones
+            proyectoId={id}
+            actualizaciones={actualizaciones}
+            isAdmin={isAdmin()}
+            onReload={cargarActualizaciones}
+            showToast={showToast}
           />
         )}
       </div>

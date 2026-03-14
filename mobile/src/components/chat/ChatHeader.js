@@ -30,11 +30,11 @@ function ChatHeader({ conversacion, currentUser, onConversacionEliminada, onBack
       case 'proyectos':
         // Si es cliente, filtrar por sus proyectos
         if (otherParticipant?.tipo_usuario === 'cliente') {
-          navigate(`/proyectos?cliente_id=${otherParticipant.user_id}`);
+          navigate(`/proyectos?cliente_id=${otherParticipant.user_id}&nombre=${encodeURIComponent(otherParticipant.nombre)}`);
         } 
         // Si es empleado, filtrar por proyectos compartidos
         else if (otherParticipant?.tipo_usuario === 'empleado') {
-          navigate(`/proyectos?empleado_id=${otherParticipant.user_id}`);
+          navigate(`/proyectos?empleado_id=${otherParticipant.user_id}&nombre=${encodeURIComponent(otherParticipant.nombre)}`);
         }
         break;
       case 'silenciar':
@@ -131,7 +131,7 @@ function ChatHeader({ conversacion, currentUser, onConversacionEliminada, onBack
               
               {otherParticipant?.tipo_usuario === 'cliente' && (
                   <button onClick={() => handleMenuAction('proyectos')}>
-                    📁 Ver proyectos
+                   Ver proyectos
                   </button>
               )}
 

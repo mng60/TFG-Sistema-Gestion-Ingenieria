@@ -96,4 +96,49 @@ const resetPasswordTicket = async (req, res) => {
   }
 };
 
-module.exports = { crearTicket, getTickets, resolverTicket, resetPasswordTicket, MAX_INTENTOS, LOCK_MINUTOS };
+// Crear ticket desde formulario de contacto web (público)
+const crearTicketContacto = async (req, res) => {
+  try {
+    const { nombre, empresa, email, telefono, mensaje, tipo } = req.body;
+    if (!nombre || !email || !telefono || !mensaje) {
+      return res.status(400).json({ success: false, message: 'Nombre, email, teléfono y mensaje son obligatorios' });
+    }
+    await Ticket.create({
+      tipo: tipo === 'solicitud_nuevo_proyecto' ? 'solicitud_nuevo_proyecto' : 'contacto_web',
+      tipo_usuario: 'externo',
+      email,
+      nombre,
+      empresa,
+      telefono,
+      mensaje
+    });
+    res.json({ success: true, message: 'Mensaje recibido. Nos pondremos en contacto contigo en breve.' });
+  } catch (error) {
+    console.error('Error en crearTicketContacto:', error);
+    res.status(500).json({ success: false, message: 'Error al enviar mensaje', error: error.message });
+  }
+};
+
+// Crear ticket de solicitud de presupuesto (empleados autenticados)
+const crearTicketSolicitud = async (req, res) => {
+  try {
+    const { proyecto_id, mensaje } = req.body;
+    if (!proyecto_id) {
+      return res.status(400).json({ success: false, message: 'proyecto_id es obligatorio' });
+    }
+    const ticket = await Ticket.create({
+      tipo: 'solicitud_presupuesto',
+      tipo_usuario: 'empleado',
+      email: req.user.email,
+      nombre: req.user.nombre,
+      mensaje: mensaje || 'Solicitud de nuevo presupuesto',
+      proyecto_id
+    });
+    res.json({ success: true, ticket });
+  } catch (error) {
+    console.error('Error en crearTicketSolicitud:', error);
+    res.status(500).json({ success: false, message: 'Error al crear solicitud', error: error.message });
+  }
+};
+
+module.exports = { crearTicket, getTickets, resolverTicket, resetPasswordTicket, crearTicketContacto, crearTicketSolicitud, MAX_INTENTOS, LOCK_MINUTOS };
