@@ -28,6 +28,7 @@ function Clientes() {
     cif: '',
     persona_contacto: '',
     email: '',
+    email_personal: '',
     telefono: '',
     direccion: '',
     ciudad: '',
@@ -80,6 +81,7 @@ function Clientes() {
       cif: '',
       persona_contacto: '',
       email: '',
+      email_personal: '',
       telefono: '',
       direccion: '',
       ciudad: '',
@@ -98,6 +100,7 @@ function Clientes() {
       cif: cliente.cif || '',
       persona_contacto: cliente.persona_contacto || '',
       email: cliente.email || '',
+      email_personal: cliente.email_personal || '',
       telefono: cliente.telefono || '',
       direccion: cliente.direccion || '',
       ciudad: cliente.ciudad || '',
@@ -347,13 +350,25 @@ function Clientes() {
                 </div>
 
                 <div className="form-group">
-                  <label>Email *</label>
+                  <label>Email de acceso (login) *</label>
                   <input
                     type="email"
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
                     required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Email personal (notificaciones) *</label>
+                  <input
+                    type="email"
+                    name="email_personal"
+                    value={formData.email_personal}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="contacto@gmail.com"
                   />
                 </div>
 

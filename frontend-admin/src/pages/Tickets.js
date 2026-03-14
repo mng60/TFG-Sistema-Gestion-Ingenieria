@@ -256,15 +256,16 @@ function TicketDetailModal({ ticket, onClose, onResolve, onResetPassword }) {
             <button type="button" className="btn-secondary" onClick={onClose}>
               Cerrar
             </button>
-            {ticket.estado === 'pendiente' && tipoNormalizado === 'olvido_password' && (
-              <button type="button" className="btn-primary" onClick={onResetPassword}>
-                <KeyRound size={15} /> Reactivar acceso
-              </button>
-            )}
             {ticket.estado === 'pendiente' && (
-              <button type="button" className="btn-primary" onClick={onResolve}>
-                <CheckCheck size={15} /> Marcar resuelto
-              </button>
+              tipoNormalizado === 'olvido_password' ? (
+                <button type="button" className="btn-primary" onClick={onResetPassword}>
+                  <KeyRound size={15} /> Reactivar y resolver
+                </button>
+              ) : (
+                <button type="button" className="btn-primary" onClick={onResolve}>
+                  <CheckCheck size={15} /> Marcar resuelto
+                </button>
+              )
             )}
           </div>
         </div>
@@ -498,23 +499,24 @@ function Tickets() {
                         <td onClick={(e) => e.stopPropagation()}>
                           {ticket.estado === 'pendiente' && (
                             <div className="action-buttons">
-                              {getTicketTipoNormalizado(ticket) === 'olvido_password' && (
+                              {getTicketTipoNormalizado(ticket) === 'olvido_password' ? (
                                 <button
-                                  className="btn-sm btn-primary"
+                                  className="btn-sm btn-edit"
                                   onClick={() => setResetModal(ticket)}
                                   style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
-                                  title="Reactivar acceso"
+                                  title="Reactivar acceso y resolver"
                                 >
-                                  <KeyRound size={13} /> Reactivar
+                                  <KeyRound size={13} /> Resolver
+                                </button>
+                              ) : (
+                                <button
+                                  className="btn-sm btn-edit"
+                                  onClick={() => handleResolver(ticket)}
+                                  title="Marcar como resuelto"
+                                >
+                                  ✓ Resolver
                                 </button>
                               )}
-                              <button
-                                className="btn-sm btn-edit"
-                                onClick={() => handleResolver(ticket)}
-                                title="Marcar como resuelto"
-                              >
-                                ✓ Resolver
-                              </button>
                             </div>
                           )}
                         </td>

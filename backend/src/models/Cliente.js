@@ -1,8 +1,10 @@
 const { pool } = require('../config/database');
 
-// Añadir columna foto_url si no existe
+// Añadir columnas si no existen
 pool.query(`ALTER TABLE clientes ADD COLUMN IF NOT EXISTS foto_url VARCHAR(500)`)
   .catch(err => console.error('Error añadiendo foto_url a clientes:', err.message));
+pool.query(`ALTER TABLE clientes ADD COLUMN IF NOT EXISTS email_personal VARCHAR(255)`)
+  .catch(err => console.error('Error añadiendo email_personal a clientes:', err.message));
 
 class Cliente {
   // Crear un nuevo cliente
@@ -20,21 +22,22 @@ class Cliente {
       persona_contacto,
       telefono_contacto,
       email_contacto,
-      notas
+      notas,
+      email_personal
     } = clienteData;
-    
+
     try {
       const query = `
         INSERT INTO clientes (
           nombre_empresa, cif, email, telefono, direccion, ciudad,
           codigo_postal, provincia, pais, persona_contacto,
-          telefono_contacto, email_contacto, notas
+          telefono_contacto, email_contacto, notas, email_personal
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
         RETURNING id, nombre_empresa, cif, email, telefono, ciudad,
-                  persona_contacto, activo, created_at
+                  persona_contacto, activo, email_personal, created_at
       `;
-      
+
       const values = [
         nombre_empresa,
         cif,
@@ -48,7 +51,8 @@ class Cliente {
         persona_contacto,
         telefono_contacto,
         email_contacto,
-        notas
+        notas,
+        email_personal || null
       ];
       
       const result = await pool.query(query, values);
@@ -128,21 +132,22 @@ class Cliente {
       telefono_contacto,
       email_contacto,
       notas,
-      activo
+      activo,
+      email_personal
     } = clienteData;
-    
+
     try {
       const query = `
-        UPDATE clientes 
+        UPDATE clientes
         SET nombre_empresa = $1, cif = $2, email = $3, telefono = $4,
             direccion = $5, ciudad = $6, codigo_postal = $7, provincia = $8,
             pais = $9, persona_contacto = $10, telefono_contacto = $11,
             email_contacto = $12, notas = $13, activo = $14,
-            updated_at = CURRENT_TIMESTAMP
-        WHERE id = $15
+            email_personal = $15, updated_at = CURRENT_TIMESTAMP
+        WHERE id = $16
         RETURNING *
       `;
-      
+
       const values = [
         nombre_empresa,
         cif,
@@ -158,6 +163,7 @@ class Cliente {
         email_contacto,
         notas,
         activo !== undefined ? activo : true,
+        email_personal || null,
         id
       ];
       

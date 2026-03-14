@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const Ticket = require('../models/Ticket');
 const { pool } = require('../config/database');
+const { sendPasswordReset } = require('../utils/emailService');
 
 const MAX_INTENTOS = 5;
 const LOCK_MINUTOS = 15;
@@ -76,19 +77,28 @@ const resetPasswordTicket = async (req, res) => {
 
     const hashed = await bcrypt.hash(newPassword, await bcrypt.genSalt(10));
 
+    let emailPersonal = null;
+    let nombre = ticket.nombre;
+
     if (ticket.tipo_usuario === 'empleado') {
-      await pool.query(
-        'UPDATE users SET password = $1, login_attempts = 0, locked_until = NULL, updated_at = CURRENT_TIMESTAMP WHERE email = $2',
+      const r = await pool.query(
+        'UPDATE users SET password = $1, login_attempts = 0, locked_until = NULL, updated_at = CURRENT_TIMESTAMP WHERE email = $2 RETURNING nombre, email_personal',
         [hashed, ticket.email]
       );
+      if (r.rows[0]) { emailPersonal = r.rows[0].email_personal; nombre = r.rows[0].nombre; }
     } else if (ticket.tipo_usuario === 'cliente') {
-      await pool.query(
-        'UPDATE clientes SET password = $1, login_attempts = 0, locked_until = NULL, updated_at = CURRENT_TIMESTAMP WHERE email = $2',
+      const r = await pool.query(
+        'UPDATE clientes SET password = $1, login_attempts = 0, locked_until = NULL, updated_at = CURRENT_TIMESTAMP WHERE email = $2 RETURNING nombre_empresa, email_personal',
         [hashed, ticket.email]
       );
+      if (r.rows[0]) { emailPersonal = r.rows[0].email_personal; nombre = r.rows[0].nombre_empresa; }
     }
 
     await Ticket.resolver(id, req.user.id);
+
+    // Enviar nueva contraseña al email personal si está configurado
+    sendPasswordReset({ to: emailPersonal, nombre, newPassword, tipoUsuario: ticket.tipo_usuario }).catch(() => {});
+
     res.json({ success: true, message: 'Contraseña reseteada y ticket resuelto' });
   } catch (error) {
     console.error('Error en resetPasswordTicket:', error);

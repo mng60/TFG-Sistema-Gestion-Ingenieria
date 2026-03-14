@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LandingNav from '../components/LandingNav';
-import { MessageCircle, FileText, CheckSquare, Zap, ClipboardList, Wrench } from 'lucide-react';
+import { MessageCircle, FileText, CheckSquare, Zap, ClipboardList, Wrench, ChevronLeft, ChevronRight } from 'lucide-react';
 import '../styles/Landing.css';
 
 const PASO_ICONS = [
@@ -162,48 +162,92 @@ function Landing() {
 
         <div className="como-right">
           <div className="circle-container">
-            {/* Anillo SVG con rotación acumulada */}
-            <svg
-              className="circle-ring"
-              viewBox="0 0 400 400"
-              style={{ transform: `rotate(${rotationAngle}deg)`, transition: 'transform 0.5s cubic-bezier(0.4,0,0.2,1)' }}
+
+            {/* Rueda completa — anillo + nodos giran juntos */}
+            <div
+              className="circle-wheel"
+              style={{ transform: `rotate(${rotationAngle}deg)`, transition: 'transform 0.6s cubic-bezier(0.4,0,0.2,1)' }}
             >
-              <circle cx="200" cy="200" r="155" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-              {pasos.map((_, i) => {
+              <svg className="circle-ring" viewBox="0 0 400 400" fill="none"
+                style={{ filter: 'drop-shadow(0 0 10px rgba(77,182,168,0.18))' }}>
+                <defs>
+                  <linearGradient id="arcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="rgba(77,182,168,0.15)" />
+                    <stop offset="50%" stopColor="rgba(255,255,255,0.55)" />
+                    <stop offset="100%" stopColor="rgba(77,182,168,0.15)" />
+                  </linearGradient>
+                </defs>
+                {/* Anillo exterior decorativo */}
+                <circle cx="200" cy="200" r="163" stroke="rgba(77,182,168,0.12)" strokeWidth="1" strokeDasharray="2 12" />
+                {/* Anillo principal suave */}
+                <circle cx="200" cy="200" r="155" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                {/* Capa glow de arcos (teal, gruesa, blur via filter) */}
+                {pasos.map((_, i) => {
+                  const n = pasos.length;
+                  const gapRad = (19 * Math.PI) / 180;
+                  const a1 = (i / n) * 2 * Math.PI - Math.PI / 2 + gapRad;
+                  const a2 = ((i + 1) / n) * 2 * Math.PI - Math.PI / 2 - gapRad;
+                  const R = 155;
+                  const x1 = 200 + R * Math.cos(a1), y1 = 200 + R * Math.sin(a1);
+                  const x2 = 200 + R * Math.cos(a2), y2 = 200 + R * Math.sin(a2);
+                  return (
+                    <path key={`glow-${i}`} d={`M ${x1} ${y1} A ${R} ${R} 0 0 1 ${x2} ${y2}`}
+                      stroke="rgba(77,182,168,0.25)" strokeWidth="5" strokeLinecap="round" />
+                  );
+                })}
+                {/* Arcos principales blancos */}
+                {pasos.map((_, i) => {
+                  const n = pasos.length;
+                  const gapRad = (19 * Math.PI) / 180;
+                  const a1 = (i / n) * 2 * Math.PI - Math.PI / 2 + gapRad;
+                  const a2 = ((i + 1) / n) * 2 * Math.PI - Math.PI / 2 - gapRad;
+                  const R = 155;
+                  const x1 = 200 + R * Math.cos(a1), y1 = 200 + R * Math.sin(a1);
+                  const x2 = 200 + R * Math.cos(a2), y2 = 200 + R * Math.sin(a2);
+                  return (
+                    <path key={`arc-${i}`} d={`M ${x1} ${y1} A ${R} ${R} 0 0 1 ${x2} ${y2}`}
+                      stroke="rgba(255,255,255,0.5)" strokeWidth="1.5" strokeLinecap="round" />
+                  );
+                })}
+                {/* Puntos teal en cada nodo */}
+                {pasos.map((_, i) => {
+                  const angle = (i / pasos.length) * 2 * Math.PI - Math.PI / 2;
+                  const cx = 200 + 155 * Math.cos(angle);
+                  const cy = 200 + 155 * Math.sin(angle);
+                  return (
+                    <g key={`dot-${i}`}>
+                      <circle cx={cx} cy={cy} r="5" fill="rgba(77,182,168,0.25)" />
+                      <circle cx={cx} cy={cy} r="2.5" fill="rgba(255,255,255,0.7)" />
+                    </g>
+                  );
+                })}
+                {/* Anillo interior con dash */}
+                <circle cx="200" cy="200" r="96" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 8" />
+              </svg>
+
+              {/* Nodos — rotan con la rueda, icono contra-rota para quedar derecho */}
+              {pasos.map((paso, i) => {
                 const angle = (i / pasos.length) * 2 * Math.PI - Math.PI / 2;
+                const x = 50 + 38.75 * Math.cos(angle);
+                const y = 50 + 38.75 * Math.sin(angle);
                 return (
-                  <line
+                  <button
                     key={i}
-                    x1={200 + 155 * Math.cos(angle)}
-                    y1={200 + 155 * Math.sin(angle)}
-                    x2={200 + 95 * Math.cos(angle)}
-                    y2={200 + 95 * Math.sin(angle)}
-                    stroke="rgba(255,255,255,0.07)"
-                    strokeWidth="1"
-                  />
+                    className={`circle-node ${activePaso === i ? 'active' : ''}`}
+                    style={{ left: `${x}%`, top: `${y}%` }}
+                    onClick={() => goTo(i)}
+                    title={paso.titulo}
+                  >
+                    <span className="circle-node-icon"
+                      style={{ transform: `rotate(${-rotationAngle}deg)`, transition: 'transform 0.6s cubic-bezier(0.4,0,0.2,1)' }}>
+                      {PASO_ICONS[i]}
+                    </span>
+                  </button>
                 );
               })}
-            </svg>
+            </div>
 
-            {/* Nodos interactivos (posición fija, NO rotan) */}
-            {pasos.map((paso, i) => {
-              const angle = (i / pasos.length) * 2 * Math.PI - Math.PI / 2;
-              const x = 50 + 38.75 * Math.cos(angle);
-              const y = 50 + 38.75 * Math.sin(angle);
-              return (
-                <button
-                  key={i}
-                  className={`circle-node ${activePaso === i ? 'active' : ''}`}
-                  style={{ left: `${x}%`, top: `${y}%` }}
-                  onClick={() => goTo(i)}
-                  title={paso.titulo}
-                >
-                  {PASO_ICONS[i]}
-                </button>
-              );
-            })}
-
-            {/* Centro */}
+            {/* Centro fijo */}
             <div className="circle-center">
               <span className="paso-label">PASO {activePaso + 1}</span>
               <h3>{pasos[activePaso].titulo}</h3>
@@ -211,8 +255,8 @@ function Landing() {
             </div>
 
             {/* Flechas navegación */}
-            <button className="circle-nav circle-prev" onClick={prevPaso}>←</button>
-            <button className="circle-nav circle-next" onClick={nextPaso}>→</button>
+            <button className="circle-nav circle-prev" onClick={prevPaso}><ChevronLeft size={24} strokeWidth={2} /></button>
+            <button className="circle-nav circle-next" onClick={nextPaso}><ChevronRight size={24} strokeWidth={2} /></button>
           </div>
         </div>
       </section>

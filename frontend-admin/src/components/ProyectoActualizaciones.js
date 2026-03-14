@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { CalendarClock, ChevronUp, Plus, Trash2 } from 'lucide-react';
 import { useEmpleadoAuth } from '../context/EmpleadoAuthContext';
-import './ProyectoActualizaciones.css';
+import '../styles/ProyectoActualizaciones.css';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 

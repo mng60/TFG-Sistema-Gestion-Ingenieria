@@ -14,7 +14,8 @@ function Perfil() {
 
   const [form, setForm] = useState({
     nombre: empleado?.nombre || '',
-    telefono: empleado?.telefono || ''
+    telefono: empleado?.telefono || '',
+    email_personal: empleado?.email_personal || ''
   });
   const [passForm, setPassForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
   const [toast, setToast] = useState(null);
@@ -170,12 +171,22 @@ function Perfil() {
                     <input value={form.telefono} onChange={e => setForm({ ...form, telefono: e.target.value })} placeholder="Ej: +34 600 000 000" />
                   </div>
                   <div className="form-group">
-                    <label>Email</label>
+                    <label>Email de acceso</label>
                     <input value={empleado?.email || ''} disabled style={{ background: '#f8f9fa', color: '#7f8c8d' }} />
                   </div>
                   <div className="form-group">
                     <label>Rol</label>
                     <input value={empleado?.rol === 'admin' ? 'Administrador' : 'Empleado'} disabled style={{ background: '#f8f9fa', color: '#7f8c8d' }} />
+                  </div>
+                  <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                    <label>Email personal (notificaciones) *</label>
+                    <input
+                      type="email"
+                      value={form.email_personal}
+                      onChange={e => setForm({ ...form, email_personal: e.target.value })}
+                      required
+                      placeholder="personal@gmail.com"
+                    />
                   </div>
                 </div>
                 <button type="submit" className="btn-primary" disabled={savingInfo} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>

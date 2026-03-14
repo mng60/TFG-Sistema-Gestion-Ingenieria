@@ -42,7 +42,8 @@ function Perfil() {
 
   const [form, setForm] = useState({
     nombre: empleado?.nombre || '',
-    telefono: empleado?.telefono || ''
+    telefono: empleado?.telefono || '',
+    email_personal: empleado?.email_personal || ''
   });
   const [passForm, setPassForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
   const [showPass, setShowPass] = useState(false);
@@ -191,8 +192,17 @@ function Perfil() {
               placeholder="+34 600 000 000"
             />
           </FieldGroup>
-          <FieldGroup label="Email">
+          <FieldGroup label="Email de acceso">
             <input style={inputDisabled} value={empleado?.email || ''} disabled />
+          </FieldGroup>
+          <FieldGroup label="Email personal (notificaciones) *">
+            <input
+              style={inputStyle}
+              type="email"
+              value={form.email_personal}
+              onChange={e => setForm({ ...form, email_personal: e.target.value })}
+              placeholder="personal@gmail.com"
+            />
           </FieldGroup>
           <button
             onClick={handleSaveInfo}

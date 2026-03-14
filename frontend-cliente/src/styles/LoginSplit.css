@@ -6,12 +6,12 @@
 }
 
 .login-split-form {
-  flex: 0 0 48%;
+  flex: 0 0 58%;
   background: #ffffff;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  padding: 48px 52px 48px clamp(78px, 9vw, 132px);
+  justify-content: center;
+  padding: 48px 52px;
 }
 
 .login-split-form--white {
@@ -304,17 +304,18 @@
 .login-pwd-eye {
   position: absolute;
   right: 8px;
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   justify-content: center;
-  background: transparent;
+  background: rgba(255,255,255,0.75);
   border: none;
   border-radius: 10px;
   cursor: pointer;
-  color: #8d9aa3;
+  color: #95a5a6;
   display: flex;
   align-items: center;
   padding: 0;
+  transition: color 0.2s;
 }
 
 .login-pwd-eye:hover {

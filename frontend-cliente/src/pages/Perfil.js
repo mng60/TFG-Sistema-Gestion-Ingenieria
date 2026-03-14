@@ -40,7 +40,7 @@ function Perfil() {
     persona_contacto: cliente?.persona_contacto || '',
     telefono: cliente?.telefono || '',
     telefono_contacto: cliente?.telefono_contacto || '',
-    email_contacto: cliente?.email_contacto || '',
+    email_personal: cliente?.email_personal || '',
     direccion: cliente?.direccion || '',
     ciudad: cliente?.ciudad || '',
     codigo_postal: cliente?.codigo_postal || '',
@@ -202,8 +202,8 @@ function Perfil() {
                 <FG label="Teléfono contacto">
                   <input style={inputSt} value={form.telefono_contacto} onChange={e => setForm({ ...form, telefono_contacto: e.target.value })} placeholder="+34 600 000 000" />
                 </FG>
-                <FG label="Email de contacto">
-                  <input style={inputSt} type="email" value={form.email_contacto} onChange={e => setForm({ ...form, email_contacto: e.target.value })} placeholder="contacto@empresa.com" />
+                <FG label="Email personal (notificaciones) *">
+                  <input style={inputSt} type="email" value={form.email_personal} onChange={e => setForm({ ...form, email_personal: e.target.value })} required placeholder="personal@gmail.com" />
                 </FG>
                 <FG label="Dirección">
                   <input style={inputSt} value={form.direccion} onChange={e => setForm({ ...form, direccion: e.target.value })} placeholder="Calle, número..." />

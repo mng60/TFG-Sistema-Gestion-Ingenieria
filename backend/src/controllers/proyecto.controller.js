@@ -2,6 +2,9 @@ const Proyecto = require('../models/Proyecto');
 const Cliente = require('../models/Cliente');
 const User = require('../models/User');
 const { pool } = require('../config/database');
+const { sendProyectoCompletado } = require('../utils/emailService');
+
+const PORTAL_URL = process.env.PORTAL_URL || 'http://localhost:3001';
 
 // Helpers para gestión automática del grupo de chat del proyecto
 const crearGrupoChat = async (proyectoId, nombreProyecto, clienteId) => {
@@ -226,9 +229,24 @@ const updateProyecto = async (req, res) => {
 
     const proyectoActualizado = await Proyecto.update(id, proyectoData);
 
-    // Si el proyecto se marca como completado, programar borrado del chat
+    // Si el proyecto se marca como completado, programar borrado del chat y notificar al cliente
     if (proyectoData.estado === 'completado' && proyectoExistente.estado !== 'completado') {
       await programarBorradoChat(id);
+      try {
+        const clienteRow = await pool.query(
+          'SELECT nombre_empresa, email_personal FROM clientes WHERE id = $1',
+          [proyectoActualizado.cliente_id]
+        );
+        const c = clienteRow.rows[0];
+        if (c?.email_personal) {
+          sendProyectoCompletado({
+            to: c.email_personal,
+            nombreEmpresa: c.nombre_empresa,
+            nombreProyecto: proyectoActualizado.nombre,
+            portalUrl: PORTAL_URL
+          }).catch(() => {});
+        }
+      } catch (_) {}
     }
 
     res.json({

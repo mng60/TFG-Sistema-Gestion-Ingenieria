@@ -1,6 +1,10 @@
 const bcrypt = require('bcryptjs');
 const Cliente = require('../models/Cliente');
 const { generateToken } = require('../utils/jwt');
+const { sendBienvenidaPortal, sendPresupuestoAceptado, sendPresupuestoRechazado } = require('../utils/emailService');
+
+const PORTAL_URL = process.env.PORTAL_URL || 'http://localhost:3001';
+const formatMoneda = (v) => v ? new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(v) : '0,00 €';
 
 // Registro de cliente (admin crea el acceso)
 const activarAccesoCliente = async (req, res) => {
@@ -32,10 +36,23 @@ const activarAccesoCliente = async (req, res) => {
     const { pool } = require('../config/database');
     const result = await pool.query(query, [hashedPassword, id]);
 
+    const clienteActivado = result.rows[0];
+
+    // Enviar email de bienvenida al email_personal si está configurado
+    if (cliente.email_personal) {
+      sendBienvenidaPortal({
+        to: cliente.email_personal,
+        nombreEmpresa: cliente.nombre_empresa,
+        emailLogin: cliente.email,
+        password,
+        portalUrl: PORTAL_URL
+      }).catch(() => {});
+    }
+
     res.json({
       success: true,
       message: 'Acceso al portal activado exitosamente',
-      cliente: result.rows[0]
+      cliente: clienteActivado
     });
   } catch (error) {
     console.error('Error en activarAccesoCliente:', error);
@@ -348,11 +365,38 @@ const aceptarMiPresupuesto = async (req, res) => {
     `;
 
     const result = await pool.query(updateQuery, [id]);
+    const presupuesto = result.rows[0];
+
+    // Notificar a los admins por email
+    try {
+      const infoRow = await pool.query(
+        `SELECT pr.nombre as proyecto_nombre, c.nombre_empresa,
+                p.numero_presupuesto, p.total
+         FROM presupuestos p
+         JOIN proyectos pr ON pr.id = p.proyecto_id
+         JOIN clientes c ON c.id = pr.cliente_id
+         WHERE p.id = $1`,
+        [id]
+      );
+      const info = infoRow.rows[0];
+      if (info) {
+        const adminsRes = await pool.query('SELECT email_personal FROM users WHERE rol = $1 AND email_personal IS NOT NULL', ['admin']);
+        adminsRes.rows.forEach(({ email_personal }) => {
+          sendPresupuestoAceptado({
+            to: email_personal,
+            nombreEmpresa: info.nombre_empresa,
+            nombreProyecto: info.proyecto_nombre,
+            numeroPresupuesto: info.numero_presupuesto,
+            total: formatMoneda(info.total)
+          }).catch(() => {});
+        });
+      }
+    } catch (_) {}
 
     res.json({
       success: true,
       message: 'Presupuesto aceptado exitosamente',
-      presupuesto: result.rows[0]
+      presupuesto
     });
   } catch (error) {
     console.error('Error en aceptarMiPresupuesto:', error);
@@ -388,8 +432,33 @@ const rechazarMiPresupuesto = async (req, res) => {
     const result = await pool.query(`
       UPDATE presupuestos SET estado = 'rechazado', updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *
     `, [id]);
+    const presupuesto = result.rows[0];
 
-    res.json({ success: true, message: 'Presupuesto rechazado', presupuesto: result.rows[0] });
+    // Notificar a los admins por email
+    try {
+      const infoRow = await pool.query(
+        `SELECT pr.nombre as proyecto_nombre, c.nombre_empresa, p.numero_presupuesto
+         FROM presupuestos p
+         JOIN proyectos pr ON pr.id = p.proyecto_id
+         JOIN clientes c ON c.id = pr.cliente_id
+         WHERE p.id = $1`,
+        [id]
+      );
+      const info = infoRow.rows[0];
+      if (info) {
+        const adminsRes = await pool.query('SELECT email_personal FROM users WHERE rol = $1 AND email_personal IS NOT NULL', ['admin']);
+        adminsRes.rows.forEach(({ email_personal }) => {
+          sendPresupuestoRechazado({
+            to: email_personal,
+            nombreEmpresa: info.nombre_empresa,
+            nombreProyecto: info.proyecto_nombre,
+            numeroPresupuesto: info.numero_presupuesto
+          }).catch(() => {});
+        });
+      }
+    } catch (_) {}
+
+    res.json({ success: true, message: 'Presupuesto rechazado', presupuesto });
   } catch (error) {
     console.error('Error en rechazarMiPresupuesto:', error);
     res.status(500).json({ success: false, message: 'Error al rechazar presupuesto', error: error.message });
@@ -534,7 +603,7 @@ const getEmpleadosProyecto = async (req, res) => {
 const updatePerfilCliente = async (req, res) => {
   try {
     const clienteId = req.user.id;
-    const { persona_contacto, telefono, telefono_contacto, email_contacto, direccion, ciudad, codigo_postal, provincia, pais, notas } = req.body;
+    const { persona_contacto, telefono, telefono_contacto, email_contacto, email_personal, direccion, ciudad, codigo_postal, provincia, pais, notas } = req.body;
     const { pool } = require('../config/database');
     const result = await pool.query(
       `UPDATE clientes SET
@@ -542,15 +611,16 @@ const updatePerfilCliente = async (req, res) => {
         telefono = COALESCE($2, telefono),
         telefono_contacto = COALESCE($3, telefono_contacto),
         email_contacto = COALESCE($4, email_contacto),
-        direccion = COALESCE($5, direccion),
-        ciudad = COALESCE($6, ciudad),
-        codigo_postal = COALESCE($7, codigo_postal),
-        provincia = COALESCE($8, provincia),
-        pais = COALESCE($9, pais),
-        notas = COALESCE($10, notas),
+        email_personal = COALESCE($5, email_personal),
+        direccion = COALESCE($6, direccion),
+        ciudad = COALESCE($7, ciudad),
+        codigo_postal = COALESCE($8, codigo_postal),
+        provincia = COALESCE($9, provincia),
+        pais = COALESCE($10, pais),
+        notas = COALESCE($11, notas),
         updated_at = CURRENT_TIMESTAMP
-       WHERE id = $11 RETURNING *`,
-      [persona_contacto, telefono, telefono_contacto, email_contacto, direccion, ciudad, codigo_postal, provincia, pais, notas, clienteId]
+       WHERE id = $12 RETURNING *`,
+      [persona_contacto, telefono, telefono_contacto, email_contacto, email_personal || null, direccion, ciudad, codigo_postal, provincia, pais, notas, clienteId]
     );
     res.json({ success: true, cliente: result.rows[0] });
   } catch (error) {

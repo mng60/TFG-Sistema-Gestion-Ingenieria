@@ -26,7 +26,8 @@ function Usuarios() {
     email: '',
     password: '',
     rol: 'empleado',
-    telefono: ''
+    telefono: '',
+    email_personal: ''
   });
 
   useEffect(() => {
@@ -77,7 +78,8 @@ function Usuarios() {
       email: '',
       password: '',
       rol: 'empleado',
-      telefono: ''
+      telefono: '',
+      email_personal: ''
     });
     setShowModal(true);
   };
@@ -90,7 +92,8 @@ function Usuarios() {
       email: usuario.email || '',
       password: '',
       rol: usuario.rol || 'empleado',
-      telefono: usuario.telefono || ''
+      telefono: usuario.telefono || '',
+      email_personal: usuario.email_personal || ''
     });
     setShowModal(true);
   };
@@ -334,6 +337,18 @@ function Usuarios() {
                   onChange={handleInputChange}
                   placeholder="612345678"
                   maxLength="9"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Email personal (notificaciones) *</label>
+                <input
+                  type="email"
+                  name="email_personal"
+                  value={formData.email_personal}
+                  onChange={handleInputChange}
+                  required
+                  placeholder="personal@gmail.com"
                 />
               </div>
 

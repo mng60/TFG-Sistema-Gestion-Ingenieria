@@ -1,5 +1,10 @@
 const Presupuesto = require('../models/Presupuesto');
 const Proyecto = require('../models/Proyecto');
+const { pool } = require('../config/database');
+const { sendNuevoPresupuesto } = require('../utils/emailService');
+
+const formatMoneda = (v) => v ? new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(v) : '0,00 €';
+const PORTAL_URL = process.env.PORTAL_URL || 'http://localhost:3001';
 
 // Obtener todos los presupuestos
 const getAllPresupuestos = async (req, res) => {
@@ -171,6 +176,29 @@ const updatePresupuesto = async (req, res) => {
     }
 
     const presupuestoActualizado = await Presupuesto.update(id, presupuestoData);
+
+    // Si se acaba de marcar como 'enviado', notificar al cliente
+    if (presupuestoData.estado === 'enviado' && presupuestoExistente.estado !== 'enviado') {
+      try {
+        const proyRow = await pool.query(
+          `SELECT pr.nombre as proyecto_nombre, c.nombre_empresa, c.email_personal
+           FROM proyectos pr JOIN clientes c ON c.id = pr.cliente_id
+           WHERE pr.id = $1`,
+          [presupuestoActualizado.proyecto_id]
+        );
+        if (proyRow.rows[0]?.email_personal) {
+          const { nombre_empresa, email_personal, proyecto_nombre } = proyRow.rows[0];
+          sendNuevoPresupuesto({
+            to: email_personal,
+            nombreEmpresa: nombre_empresa,
+            nombreProyecto: proyecto_nombre,
+            numeroPresupuesto: presupuestoActualizado.numero_presupuesto,
+            total: formatMoneda(presupuestoActualizado.total),
+            portalUrl: `${PORTAL_URL}/dashboard`
+          }).catch(() => {});
+        }
+      } catch (_) {}
+    }
 
     res.json({
       success: true,

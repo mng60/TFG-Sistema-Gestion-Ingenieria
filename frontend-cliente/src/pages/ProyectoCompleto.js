@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Award, CalendarDays, ClipboardList, Download, FileText, Image, MapPin, Ruler, Scroll, BarChart2 } from 'lucide-react';
+import { Award, ClipboardList, Download, FileText, Image, MapPin, Ruler, Scroll, BarChart2 } from 'lucide-react';
 import api from '../services/api';
 import '../styles/ProyectoCompleto.css';
 
@@ -22,7 +22,6 @@ function ProyectoCompleto() {
   const [empleados, setEmpleados] = useState([]);
   const [presupuestos, setPresupuestos] = useState([]);
   const [documentos, setDocumentos] = useState([]);
-  const [actualizaciones, setActualizaciones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('info');
   const [toast, setToast] = useState(null);
@@ -31,12 +30,11 @@ function ProyectoCompleto() {
     const cargarDatos = async () => {
       setLoading(true);
       try {
-        const [proyectoRes, empleadosRes, presupuestosRes, documentosRes, actualizacionesRes] = await Promise.all([
+        const [proyectoRes, empleadosRes, presupuestosRes, documentosRes] = await Promise.all([
           api.get('/portal/proyectos'),
           api.get(`/portal/proyectos/${id}/empleados`),
           api.get(`/portal/presupuestos?proyecto_id=${id}`),
-          api.get(`/portal/documentos?proyecto_id=${id}`),
-          api.get(`/portal/proyectos/${id}/actualizaciones`)
+          api.get(`/portal/documentos?proyecto_id=${id}`)
         ]);
 
         const proyectoEncontrado = (proyectoRes.data.proyectos || []).find((p) => String(p.id) === String(id));
@@ -49,7 +47,6 @@ function ProyectoCompleto() {
         setEmpleados(empleadosRes.data.empleados || []);
         setPresupuestos(presupuestosRes.data.presupuestos || []);
         setDocumentos(documentosRes.data.documentos || []);
-        setActualizaciones(actualizacionesRes.data.actualizaciones || []);
       } catch (error) {
         console.error('Error al cargar proyecto:', error);
         navigate('/dashboard');
@@ -166,12 +163,6 @@ function ProyectoCompleto() {
           onClick={() => setActiveTab('documentos')}
         >
           Documentos ({documentos.length})
-        </button>
-        <button
-          className={`tab ${activeTab === 'avance' ? 'tab-active' : ''}`}
-          onClick={() => setActiveTab('avance')}
-        >
-          Avance ({actualizaciones.length})
         </button>
       </div>
 
@@ -331,50 +322,6 @@ function ProyectoCompleto() {
           </div>
         )}
 
-        {activeTab === 'avance' && (
-          <div className="tab-panel">
-            {actualizaciones.length === 0 ? (
-              <p className="empty-message-small">No hay actualizaciones registradas todavía.</p>
-            ) : (
-              <div className="act-list-cliente">
-                {actualizaciones.map((act) => (
-                  <div key={act.id} className="act-item-cliente">
-                    <div className="act-avatar-cliente">
-                      {act.autor_foto
-                        ? <img src={`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'}${act.autor_foto}`} alt="" />
-                        : (act.autor_nombre || 'E').charAt(0).toUpperCase()
-                      }
-                    </div>
-                    <div className="act-body-cliente">
-                      <div className="act-meta-cliente">
-                        <strong>{act.autor_nombre || 'Empleado'}</strong>
-                        <span>{formatearFecha(act.created_at)}</span>
-                        {act.sugiere_cambio_fecha && act.fecha_sugerida && (
-                          <span className="act-badge-fecha-cliente">
-                            <CalendarDays size={13} style={{ verticalAlign: 'middle', marginRight: 4 }} />
-                            Sugiere fin: {formatearFecha(act.fecha_sugerida)}
-                          </span>
-                        )}
-                      </div>
-                      {act.realizado && (
-                        <div className="act-bloque-cliente act-bloque-realizado">
-                          <span className="act-bloque-label-cliente">Realizado</span>
-                          <p>{act.realizado}</p>
-                        </div>
-                      )}
-                      {act.pendiente && (
-                        <div className="act-bloque-cliente act-bloque-pendiente">
-                          <span className="act-bloque-label-cliente">Pendiente</span>
-                          <p>{act.pendiente}</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );
