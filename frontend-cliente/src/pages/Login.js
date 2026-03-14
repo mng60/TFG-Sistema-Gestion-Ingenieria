@@ -76,21 +76,18 @@ function Login() {
   return (
     <div className="login-split">
       <div className="login-split-form login-split-form--white">
-        <div className="login-split-form-inner">
-          <button
-            className="login-back-link"
-            onClick={() => {
-              navigate('/');
-              window.scrollTo(0, 0);
-            }}
-          >
-            ← BLUEARC ENERGY
-          </button>
+        <button
+          className="login-back-link"
+          onClick={() => { navigate('/'); window.scrollTo(0, 0); }}
+        >
+          ← BLUEARC ENERGY
+        </button>
 
+        <div className="login-split-form-inner">
           {!showOlvide ? (
             <>
-              <h1 className="login-split-title login-split-title--dark">INICIO DE SESION</h1>
-              <p className="login-split-subtitle">Accede a tus proyectos y documentacion</p>
+              <h1 className="login-split-title login-split-title--dark login-split-title--oneline">INICIO DE SESIÓN</h1>
+              <p className="login-split-subtitle">Accede a tus proyectos y documentación</p>
 
               <form onSubmit={handleSubmit} className="login-split-form-fields">
                 {error && <div className="login-split-error">{error}</div>}

@@ -12,7 +12,8 @@ import {
   ChevronRight,
   TrendingUp,
   MessagesSquare,
-  FileText
+  FileText,
+  Euro
 } from 'lucide-react';
 import '../styles/AdminDashboard.css';
 
@@ -101,16 +102,17 @@ function AdminDashboard() {
 
   const e = estadisticas || {};
   const admin = isAdmin();
-  const proyectosRecientes = e.proyectos_recientes || [];
-  const ultimosPresupuestos = e.ultimos_presupuestos || [];
-  const ultimosTickets = e.ultimos_tickets || [];
+  const proyectosRecientes = (e.proyectos_recientes || []).slice(0, 5);
+  const ultimosPresupuestos = (e.ultimos_presupuestos || []).slice(0, 5);
+  const ultimosTickets = (e.ultimos_tickets || []).slice(0, 5);
 
   const kpis = admin
     ? [
         { icon: <FolderOpen size={20} />, label: 'Proyectos', value: e.total_proyectos || 0, color: '#4DB6A8', onClick: () => navigate('/proyectos') },
         { icon: <Zap size={20} />, label: 'En progreso', value: e.por_estado?.en_progreso || 0, color: '#3498db', onClick: () => navigate('/proyectos') },
         { icon: <CheckCircle2 size={20} />, label: 'Completados', value: e.por_estado?.completado || 0, color: '#27ae60', onClick: () => navigate('/proyectos') },
-        { icon: <TicketCheck size={20} />, label: 'Tickets', value: e.tickets_pendientes || 0, color: '#e67e22', onClick: () => navigate('/tickets') }
+        { icon: <TicketCheck size={20} />, label: 'Tickets pendientes', value: e.tickets_pendientes || 0, color: '#e67e22', onClick: () => navigate('/tickets') },
+        { icon: <Euro size={20} />, label: 'Facturación total (proyectos aceptados)', value: formatCurrency(e.presupuesto_real_total), color: '#8e44ad', wide: true }
       ]
     : [
         { icon: <FolderOpen size={22} />, label: 'Mis Proyectos', value: e.total_proyectos || 0, color: '#4DB6A8', onClick: () => navigate('/proyectos') },
@@ -190,7 +192,7 @@ function AdminDashboard() {
         {kpis.map((kpi, index) => (
           <div
             key={index}
-            className={`dash-kpi${kpi.onClick ? ' dash-kpi--clickable' : ''}`}
+            className={`dash-kpi${kpi.onClick ? ' dash-kpi--clickable' : ''}${kpi.wide ? ' dash-kpi--wide' : ''}`}
             onClick={kpi.onClick}
             style={{ '--kpi-color': kpi.color }}
           >
