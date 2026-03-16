@@ -111,13 +111,15 @@ const uploadDocumento = async (req, res) => {
     // Verificar que el proyecto existe
     const proyecto = await Proyecto.findById(proyecto_id);
     if (!proyecto) {
-      // Eliminar el archivo subido si el proyecto no existe
-      fs.unlinkSync(req.file.path);
+      if (req.file && !req.file.path?.startsWith('http') && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
       return res.status(404).json({
         success: false,
         message: 'Proyecto no encontrado'
       });
     }
+
+    // Con Cloudinary req.file.path es la URL completa; en local es la ruta del disco
+    const ruta_archivo = req.file.path;
 
     // Crear registro en la base de datos
     const documentoData = {
@@ -125,7 +127,7 @@ const uploadDocumento = async (req, res) => {
       nombre: req.file.originalname,
       tipo_documento: tipo_documento || 'otro',
       descripcion: descripcion || '',
-      ruta_archivo: req.file.path,
+      ruta_archivo,
       tamano_bytes: req.file.size,
       extension: path.extname(req.file.originalname),
       subido_por: req.user.id,
@@ -141,8 +143,7 @@ const uploadDocumento = async (req, res) => {
       documento: nuevoDocumento
     });
   } catch (error) {
-    // Si hay error, eliminar el archivo subido
-    if (req.file && fs.existsSync(req.file.path)) {
+    if (req.file && !req.file.path?.startsWith('http') && fs.existsSync(req.file.path)) {
       fs.unlinkSync(req.file.path);
     }
 
@@ -168,7 +169,11 @@ const downloadDocumento = async (req, res) => {
       });
     }
 
-    // Verificar que el archivo existe
+    // Si es URL de Cloudinary, redirigir; si es local, descargar
+    if (documento.ruta_archivo.startsWith('http')) {
+      return res.redirect(documento.ruta_archivo);
+    }
+
     if (!fs.existsSync(documento.ruta_archivo)) {
       return res.status(404).json({
         success: false,
@@ -176,7 +181,6 @@ const downloadDocumento = async (req, res) => {
       });
     }
 
-    // Enviar archivo
     res.download(documento.ruta_archivo, documento.nombre);
   } catch (error) {
     console.error('Error en downloadDocumento:', error);
@@ -239,8 +243,8 @@ const deleteDocumento = async (req, res) => {
       });
     }
 
-    // Eliminar archivo físico
-    if (fs.existsSync(documento.ruta_archivo)) {
+    // Eliminar archivo físico (solo si es almacenamiento local)
+    if (!documento.ruta_archivo.startsWith('http') && fs.existsSync(documento.ruta_archivo)) {
       fs.unlinkSync(documento.ruta_archivo);
     }
 

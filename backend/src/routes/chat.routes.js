@@ -267,8 +267,8 @@ router.post('/upload', (req, res, next) => {
       });
     }
 
-    // Construir URL del archivo
-    const archivo_url = `/uploads/chat/${file.filename}`;
+    // Con Cloudinary file.path es la URL completa; en local construimos la ruta relativa
+    const archivo_url = file.path?.startsWith('http') ? file.path : `/uploads/chat/${file.filename}`;
 
     // Crear mensaje en BD
     const nuevoMensaje = await Mensaje.create({
