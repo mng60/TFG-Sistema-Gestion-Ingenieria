@@ -109,6 +109,12 @@ function ChatLayout() {
     ));
   }, []);
 
+  const handleMarcarLeida = useCallback((conversacionId) => {
+    setConversaciones(prev => prev.map(c =>
+      c.id === conversacionId ? { ...c, mensajes_no_leidos: 0 } : c
+    ));
+  }, []);
+
   const handleNewConversacion = () => {
   setShowNuevoModal(true);
 };
@@ -172,6 +178,7 @@ const handleConversacionEfimeraCreada = useCallback((realConv) => {
         socket={socket}
         currentUser={empleado}
         onReloadConversaciones={cargarConversaciones}
+        onMarcarLeida={handleMarcarLeida}
         onConversacionEliminada={handleConversacionEliminada}
         showToast={showToast}
         isActive={activeView === 'window'}

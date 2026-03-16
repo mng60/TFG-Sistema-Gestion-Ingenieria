@@ -5,7 +5,7 @@ import ChatFooter from './ChatFooter';
 import MessageBubble from './MessageBubble';
 import {MessagesSquare} from 'lucide-react'
 
-function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones, isActive, onBack, onlineUsers = new Set() }) {
+function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones, onMarcarLeida, isActive, onBack, onlineUsers = new Set() }) {
   const [mensajes, setMensajes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
@@ -70,10 +70,10 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
     };
   }, [socket, conversacion?.id, currentUser?.id]);
 
-  useEffect(() => { scrollToBottom(); }, [mensajes]);
+  useEffect(() => { scrollToBottom('smooth'); }, [mensajes]);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const scrollToBottom = (behavior = 'smooth') => {
+    messagesEndRef.current?.scrollIntoView({ behavior });
   };
 
   const cargarMensajes = async () => {
@@ -86,7 +86,10 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
-      if (data.success) setMensajes(data.mensajes || []);
+      if (data.success) {
+        setMensajes(data.mensajes || []);
+        setTimeout(() => scrollToBottom('instant'), 50);
+      }
     } catch (error) {
       console.error('Error al cargar mensajes:', error);
     } finally {
@@ -104,7 +107,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (socket) socket.emit('mark_read', { conversacion_id: conversacion.id });
-      onReloadConversaciones();
+      if (onMarcarLeida) onMarcarLeida(conversacion.id);
     } catch (error) {
       console.error('Error al marcar como leído:', error);
     }

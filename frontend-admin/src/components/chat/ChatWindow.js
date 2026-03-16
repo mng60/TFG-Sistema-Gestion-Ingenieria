@@ -5,7 +5,7 @@ import ChatFooter from './ChatFooter';
 import MessageBubble from './MessageBubble';
 import { MessagesSquare } from 'lucide-react';
 
-function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones, onConversacionEliminada, showToast, isActive, onBack, onlineUsers = new Set(), onOpenDirectChat, onConversacionCreada }) {
+function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones, onMarcarLeida, onConversacionEliminada, showToast, isActive, onBack, onlineUsers = new Set(), onOpenDirectChat, onConversacionCreada }) {
   const [mensajes, setMensajes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
@@ -121,11 +121,11 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
 
   // Scroll automático al final
   useEffect(() => {
-    scrollToBottom();
+    scrollToBottom('smooth');
   }, [mensajes]);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const scrollToBottom = (behavior = 'smooth') => {
+    messagesEndRef.current?.scrollIntoView({ behavior });
   };
 
   const cargarMensajes = async () => {
@@ -144,6 +144,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
       
       if (data.success) {
         setMensajes(data.mensajes || []);
+        setTimeout(() => scrollToBottom('instant'), 50);
       }
     } catch (error) {
       console.error('❌ Error al cargar mensajes:', error);
@@ -168,7 +169,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
         socket.emit('mark_read', { conversacion_id: conversacion.id });
       }
 
-      onReloadConversaciones();
+      if (onMarcarLeida) onMarcarLeida(conversacion.id);
     } catch (error) {
       console.error('❌ Error al marcar como leído:', error);
     }
