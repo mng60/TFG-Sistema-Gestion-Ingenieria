@@ -10,6 +10,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
   const [loading, setLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
   const conversacionIdRef = useRef(null);
   const [conversacionLocal, setConversacionLocal] = useState(conversacion); 
 
@@ -35,7 +36,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
     const handleNewMessage = (mensaje) => {
       if (mensaje.conversacion_id === conversacion.id) {
         setMensajes(prev => [...prev, mensaje]);
-        scrollToBottom();
+        setTimeout(() => scrollToBottom(true), 30);
         marcarComoLeido();
       }
     };
@@ -119,13 +120,14 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
     }
   };
 
-  // Scroll automático al final
-  useEffect(() => {
-    scrollToBottom('smooth');
-  }, [mensajes]);
-
-  const scrollToBottom = (behavior = 'smooth') => {
-    messagesEndRef.current?.scrollIntoView({ behavior });
+  const scrollToBottom = (smooth = false) => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+    if (smooth) {
+      container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+    } else {
+      container.scrollTop = container.scrollHeight;
+    }
   };
 
   const cargarMensajes = async () => {
@@ -144,7 +146,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
       
       if (data.success) {
         setMensajes(data.mensajes || []);
-        setTimeout(() => scrollToBottom('instant'), 50);
+        setTimeout(() => scrollToBottom(false), 50);
       }
     } catch (error) {
       console.error('❌ Error al cargar mensajes:', error);
@@ -269,7 +271,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
         </div>
       )}
 
-      <div className="chat-messages">
+      <div className="chat-messages" ref={messagesContainerRef}>
         {loading ? (
           <div className="loading-messages">
             <div className="spinner"></div>
