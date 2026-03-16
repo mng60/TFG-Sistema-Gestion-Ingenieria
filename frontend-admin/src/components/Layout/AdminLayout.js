@@ -22,21 +22,26 @@ function AdminLayout({ children }) {
   const isTickets = location.pathname === '/tickets';
 
   useEffect(() => {
+    if (isChat) {
+      setMensajesNoLeidos(0);
+      return;
+    }
     cargarMensajesNoLeidos();
-    if (isAdmin() && !isTickets) cargarTicketsPendientes();
+    const interval = setInterval(cargarMensajesNoLeidos, 10000);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isChat]);
 
-    const interval = setInterval(() => {
-      if (location.pathname !== '/chat') cargarMensajesNoLeidos();
-      if (isAdmin() && location.pathname !== '/tickets') cargarTicketsPendientes();
-    }, 10000);
-
+  useEffect(() => {
+    if (isTickets) {
+      setTicketsPendientes(0);
+      return;
+    }
+    if (isAdmin()) cargarTicketsPendientes();
+    const interval = setInterval(() => { if (isAdmin()) cargarTicketsPendientes(); }, 10000);
     return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isTickets]);
-
-  useEffect(() => {
-    if (isChat) setMensajesNoLeidos(0);
-  }, [isChat]);
 
   useEffect(() => {
     if (isTickets) setTicketsPendientes(0);

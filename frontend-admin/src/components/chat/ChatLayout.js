@@ -104,6 +104,9 @@ function ChatLayout() {
   const handleSelectConversacion = useCallback((conversacion) => {
     setConversacionActiva(conversacion);
     setActiveView('window');
+    setConversaciones(prev => prev.map(c =>
+      c.id === conversacion.id ? { ...c, mensajes_no_leidos: 0 } : c
+    ));
   }, []);
 
   const handleNewConversacion = () => {

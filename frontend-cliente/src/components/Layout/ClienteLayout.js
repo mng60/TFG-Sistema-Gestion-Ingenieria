@@ -15,40 +15,32 @@ function ClienteLayout({ children }) {
   const isSolicitudSection = location.pathname === '/solicitar-proyecto';
 
   useEffect(() => {
-    cargarMensajesNoLeidos();
-    const interval = setInterval(cargarMensajesNoLeidos, 10000);
-    return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (isChat) setMensajesNoLeidos(0);
-  }, [isChat]);
-
-  const cargarMensajesNoLeidos = async () => {
-    try {
-      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-      const token = localStorage.getItem('token');
-      if (!token) return;
-
-      const response = await fetch(`${API_URL}/chat/conversaciones`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      if (!response.ok) return;
-
-      const data = await response.json();
-      if (data.success) {
-        const total = data.conversaciones.reduce((sum, conv) => {
-          return sum + (parseInt(conv.mensajes_no_leidos, 10) || 0);
-        }, 0);
-
-        if (location.pathname !== '/chat') setMensajesNoLeidos(total);
-      }
-    } catch {
-      // silencioso
+    if (isChat) {
+      setMensajesNoLeidos(0);
+      return;
     }
-  };
+    const cargar = async () => {
+      try {
+        const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        const response = await fetch(`${API_URL}/chat/conversaciones`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!response.ok) return;
+        const data = await response.json();
+        if (data.success) {
+          const total = data.conversaciones.reduce((sum, conv) =>
+            sum + (parseInt(conv.mensajes_no_leidos, 10) || 0), 0);
+          setMensajesNoLeidos(total);
+        }
+      } catch { /* silencioso */ }
+    };
+    cargar();
+    const interval = setInterval(cargar, 10000);
+    return () => clearInterval(interval);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isChat]);
 
   const handleLogout = () => {
     logout();
