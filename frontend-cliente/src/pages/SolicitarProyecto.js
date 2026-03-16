@@ -28,8 +28,6 @@ function SolicitarProyecto() {
 
   const nombreContacto = cliente?.persona_contacto || cliente?.nombre_empresa || 'Cliente portal';
   const empresa = cliente?.nombre_empresa || '';
-  const email = cliente?.email_contacto || cliente?.email || '';
-  const telefono = cliente?.telefono_contacto || cliente?.telefono || '';
 
   const updateField = (key, value) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
@@ -43,33 +41,20 @@ function SolicitarProyecto() {
       return;
     }
 
-    if (!email || !telefono) {
-      setFormError('Faltan datos de contacto en tu perfil. Completa email y telefono antes de enviar la solicitud.');
-      return;
-    }
-
     setSending(true);
     setFormError('');
 
     try {
+      const token = localStorage.getItem('token');
       const payload = {
-        tipo: 'solicitud_nuevo_proyecto',
-        nombre: nombreContacto,
-        empresa,
-        email,
-        telefono,
-        mensaje: [
-          'Solicitud de proyecto desde portal cliente',
-          `Tipo de proyecto: ${TIPO_PROYECTO_OPTIONS.find((option) => option.value === formData.tipoProyecto)?.label || formData.tipoProyecto}`,
-          `Ubicacion: ${formData.ubicacion || 'No indicada'}`,
-          '',
-          formData.mensaje
-        ].join('\n')
+        tipoProyecto: TIPO_PROYECTO_OPTIONS.find((option) => option.value === formData.tipoProyecto)?.label || formData.tipoProyecto,
+        ubicacion: formData.ubicacion,
+        mensaje: formData.mensaje
       };
 
-      const res = await fetch(`${API_URL}/tickets/contacto`, {
+      const res = await fetch(`${API_URL}/portal/tickets`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify(payload)
       });
 

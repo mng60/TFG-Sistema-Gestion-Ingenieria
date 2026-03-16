@@ -151,4 +151,55 @@ const crearTicketSolicitud = async (req, res) => {
   }
 };
 
-module.exports = { crearTicket, getTickets, resolverTicket, resetPasswordTicket, crearTicketContacto, crearTicketSolicitud, MAX_INTENTOS, LOCK_MINUTOS };
+// Crear ticket de solicitud de nuevo proyecto (cliente autenticado desde portal)
+const crearTicketPortal = async (req, res) => {
+  try {
+    const { tipoProyecto, ubicacion, mensaje } = req.body;
+    if (!tipoProyecto || !mensaje) {
+      return res.status(400).json({ success: false, message: 'Tipo de proyecto y descripcion son obligatorios' });
+    }
+
+    // Obtener datos completos del cliente desde la BD
+    const clienteResult = await pool.query(
+      'SELECT nombre_empresa, persona_contacto, email, telefono_contacto FROM clientes WHERE id = $1',
+      [req.user.id]
+    );
+    const cliente = clienteResult.rows[0];
+    if (!cliente) return res.status(404).json({ success: false, message: 'Cliente no encontrado' });
+
+    const mensajeCompleto = [
+      `Tipo de proyecto: ${tipoProyecto}`,
+      `Ubicacion: ${ubicacion || 'No indicada'}`,
+      '',
+      mensaje
+    ].join('\n');
+
+    const ticket = await Ticket.create({
+      tipo: 'solicitud_nuevo_proyecto',
+      tipo_usuario: 'cliente',
+      email: cliente.email,
+      nombre: cliente.persona_contacto || cliente.nombre_empresa,
+      empresa: cliente.nombre_empresa,
+      telefono: cliente.telefono_contacto || null,
+      mensaje: mensajeCompleto
+    });
+
+    res.json({ success: true, ticket });
+  } catch (error) {
+    console.error('Error en crearTicketPortal:', error);
+    res.status(500).json({ success: false, message: 'Error al enviar solicitud', error: error.message });
+  }
+};
+
+// Obtener tickets propios del empleado autenticado
+const getMisTickets = async (req, res) => {
+  try {
+    const tickets = await Ticket.findByEmail(req.user.email);
+    res.json({ success: true, tickets });
+  } catch (error) {
+    console.error('Error en getMisTickets:', error);
+    res.status(500).json({ success: false, message: 'Error al obtener tickets', error: error.message });
+  }
+};
+
+module.exports = { crearTicket, getTickets, getMisTickets, resolverTicket, resetPasswordTicket, crearTicketContacto, crearTicketSolicitud, crearTicketPortal, MAX_INTENTOS, LOCK_MINUTOS };

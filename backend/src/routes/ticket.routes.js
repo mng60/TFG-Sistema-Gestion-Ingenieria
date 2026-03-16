@@ -1,5 +1,5 @@
 const express = require('express');
-const { crearTicket, getTickets, resolverTicket, resetPasswordTicket, crearTicketContacto, crearTicketSolicitud } = require('../controllers/ticket.controller');
+const { crearTicket, getTickets, getMisTickets, resolverTicket, resetPasswordTicket, crearTicketContacto, crearTicketSolicitud } = require('../controllers/ticket.controller');
 const authMiddleware = require('../middlewares/auth.middleware');
 const checkRole = require('../middlewares/role.middleware');
 
@@ -13,6 +13,9 @@ router.post('/contacto', crearTicketContacto);
 
 // POST /api/tickets/solicitud - Crear ticket de solicitud de presupuesto (empleados)
 router.post('/solicitud', authMiddleware, crearTicketSolicitud);
+
+// GET /api/tickets/mis-tickets - Tickets propios del empleado autenticado
+router.get('/mis-tickets', authMiddleware, getMisTickets);
 
 // GET /api/tickets - Obtener tickets (admin)
 router.get('/', authMiddleware, checkRole('admin'), getTickets);

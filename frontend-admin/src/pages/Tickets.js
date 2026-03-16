@@ -256,7 +256,7 @@ function TicketDetailModal({ ticket, onClose, onResolve, onResetPassword }) {
             <button type="button" className="btn-secondary" onClick={onClose}>
               Cerrar
             </button>
-            {ticket.estado === 'pendiente' && (
+            {ticket.estado === 'pendiente' && onResolve && (
               tipoNormalizado === 'olvido_password' ? (
                 <button type="button" className="btn-primary" onClick={onResetPassword}>
                   <KeyRound size={15} /> Reactivar y resolver
@@ -297,10 +297,22 @@ function Tickets() {
     }
   };
 
+  const fetchMisTickets = async () => {
+    try {
+      const token = localStorage.getItem('empleado_token');
+      const res = await axios.get(`${API_URL}/tickets/mis-tickets`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setTickets(res.data.tickets || []);
+    } catch {
+      showToast('Error al cargar tus solicitudes', 'error');
+    }
+  };
+
   useEffect(() => {
-    if (!isAdmin()) return;
     setLoading(true);
-    fetchTickets(filtro).finally(() => setLoading(false));
+    const load = isAdmin() ? fetchTickets(filtro) : fetchMisTickets();
+    load.finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -308,7 +320,7 @@ function Tickets() {
     fetchTickets(filtro);
   }, [filtro]);
 
-  const cargarTickets = () => fetchTickets(filtro);
+  const cargarTickets = () => isAdmin() ? fetchTickets(filtro) : fetchMisTickets();
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
@@ -344,13 +356,125 @@ function Tickets() {
     });
   };
 
-  if (!isAdmin()) {
-    return (
-      <AdminLayout>
-        <p style={{ padding: 24 }}>Acceso solo para administradores.</p>
-      </AdminLayout>
-    );
-  }
+  const ticketTable = (showActions) => (
+    <div className="content-card">
+      {loading ? (
+        <div className="loading-container">
+          <div className="spinner"></div>
+          <p>Cargando...</p>
+        </div>
+      ) : tickets.length === 0 ? (
+        <p className="empty-message">No hay solicitudes {!isAdmin() || filtro !== 'todos' ? '' : ''}</p>
+      ) : (
+        <div className="table-container">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Tipo</th>
+                {showActions && <th>Email</th>}
+                {showActions && <th>Nombre</th>}
+                {!showActions && <th>Proyecto</th>}
+                <th>Mensaje</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+                {showActions && filtro !== 'resuelto' && <th>Acciones</th>}
+              </tr>
+            </thead>
+            <tbody>
+              {tickets.map((ticket) => {
+                const badge = getTipoBadge(ticket);
+                return (
+                  <tr
+                    key={ticket.id}
+                    onClick={() => setDetalleTicket(ticket)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <td>
+                      <span
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 4,
+                          padding: '3px 10px',
+                          borderRadius: 20,
+                          fontSize: '0.8rem',
+                          fontWeight: 600,
+                          background: badge.bg,
+                          color: badge.color
+                        }}
+                      >
+                        {badge.icon}
+                        {badge.label}
+                      </span>
+                    </td>
+                    {showActions && (
+                      <td>
+                        <div>{ticket.email}</div>
+                        {ticket.empresa && (
+                          <div style={{ fontSize: '0.78rem', color: '#7f8c8d' }}>{ticket.empresa}</div>
+                        )}
+                        {ticket.telefono && (
+                          <div style={{ fontSize: '0.78rem', color: '#7f8c8d' }}>{ticket.telefono}</div>
+                        )}
+                      </td>
+                    )}
+                    {showActions && <td>{ticket.nombre || '-'}</td>}
+                    {!showActions && (
+                      <td style={{ color: '#2c3e50' }}>{ticket.proyecto_nombre || ticket.empresa || '-'}</td>
+                    )}
+                    <td style={{ maxWidth: 260, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {ticket.mensaje || '-'}
+                    </td>
+                    <td style={{ fontSize: '0.85rem', color: '#7f8c8d' }}>{formatFecha(ticket.created_at)}</td>
+                    <td>
+                      {ticket.estado === 'pendiente' ? (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: '#e67e22', fontWeight: 600, fontSize: '0.85rem' }}>
+                          <Clock size={13} /> Pendiente
+                        </span>
+                      ) : (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: '#27ae60', fontWeight: 600, fontSize: '0.85rem' }}>
+                          <CheckCheck size={13} /> Resuelto
+                          {ticket.resuelto_por_nombre && (
+                            <span style={{ color: '#7f8c8d', fontWeight: 400 }}> · {ticket.resuelto_por_nombre}</span>
+                          )}
+                        </span>
+                      )}
+                    </td>
+                    {showActions && filtro !== 'resuelto' && (
+                      <td onClick={(e) => e.stopPropagation()}>
+                        {ticket.estado === 'pendiente' && (
+                          <div className="action-buttons">
+                            {getTicketTipoNormalizado(ticket) === 'olvido_password' ? (
+                              <button
+                                className="btn-sm btn-edit"
+                                onClick={() => setResetModal(ticket)}
+                                style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
+                                title="Reactivar acceso y resolver"
+                              >
+                                <KeyRound size={13} /> Resolver
+                              </button>
+                            ) : (
+                              <button
+                                className="btn-sm btn-edit"
+                                onClick={() => handleResolver(ticket)}
+                                title="Marcar como resuelto"
+                              >
+                                ✓ Resolver
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </td>
+                    )}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <AdminLayout>
@@ -376,8 +500,9 @@ function Tickets() {
       <header className="page-header">
         <div>
           <h1 style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <TicketCheck size={26} color="#4DB6A8" /> Tickets de Soporte
-            {pendientes > 0 && (
+            <TicketCheck size={26} color="#4DB6A8" />
+            {isAdmin() ? 'Tickets de Soporte' : 'Mis solicitudes'}
+            {isAdmin() && pendientes > 0 && (
               <span
                 style={{
                   background: '#e74c3c',
@@ -392,153 +517,48 @@ function Tickets() {
               </span>
             )}
           </h1>
-          <p>Solicitudes de acceso, nuevos proyectos y mensajes recibidos desde la web.</p>
+          <p>
+            {isAdmin()
+              ? 'Solicitudes de acceso, nuevos proyectos y mensajes recibidos desde la web.'
+              : 'Historial de solicitudes que has enviado al administrador.'}
+          </p>
         </div>
       </header>
 
-      <div className="filters-bar" style={{ marginBottom: 20 }}>
-        {['pendiente', 'resuelto', 'todos'].map((estado) => (
-          <button
-            key={estado}
-            onClick={() => setFiltro(estado)}
-            style={{
-              padding: '8px 18px',
-              borderRadius: 8,
-              border: 'none',
-              cursor: 'pointer',
-              fontWeight: 600,
-              fontSize: '0.9rem',
-              background: filtro === estado ? '#4DB6A8' : '#f0f0f0',
-              color: filtro === estado ? 'white' : '#2c3e50'
-            }}
-          >
-            {estado === 'pendiente' ? 'Pendientes' : estado === 'resuelto' ? 'Resueltos' : 'Todos'}
-          </button>
-        ))}
-      </div>
+      {isAdmin() && (
+        <div className="filters-bar" style={{ marginBottom: 20 }}>
+          {['pendiente', 'resuelto', 'todos'].map((estado) => (
+            <button
+              key={estado}
+              onClick={() => setFiltro(estado)}
+              style={{
+                padding: '8px 18px',
+                borderRadius: 8,
+                border: 'none',
+                cursor: 'pointer',
+                fontWeight: 600,
+                fontSize: '0.9rem',
+                background: filtro === estado ? '#4DB6A8' : '#f0f0f0',
+                color: filtro === estado ? 'white' : '#2c3e50'
+              }}
+            >
+              {estado === 'pendiente' ? 'Pendientes' : estado === 'resuelto' ? 'Resueltos' : 'Todos'}
+            </button>
+          ))}
+        </div>
+      )}
 
-      <div className="content-card">
-        {loading ? (
-          <div className="loading-container">
-            <div className="spinner"></div>
-            <p>Cargando tickets...</p>
-          </div>
-        ) : tickets.length === 0 ? (
-          <p className="empty-message">No hay tickets {filtro !== 'todos' ? `${filtro}s` : ''}</p>
-        ) : (
-          <div className="table-container">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Tipo</th>
-                  <th>Email</th>
-                  <th>Nombre</th>
-                  <th>Mensaje</th>
-                  <th>Fecha</th>
-                  <th>Estado</th>
-                  {filtro !== 'resuelto' && <th>Acciones</th>}
-                </tr>
-              </thead>
-              <tbody>
-                {tickets.map((ticket) => {
-                  const badge = getTipoBadge(ticket);
-
-                  return (
-                    <tr
-                      key={ticket.id}
-                      onClick={() => setDetalleTicket(ticket)}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      <td>
-                        <span
-                          style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: 4,
-                            padding: '3px 10px',
-                            borderRadius: 20,
-                            fontSize: '0.8rem',
-                            fontWeight: 600,
-                            background: badge.bg,
-                            color: badge.color
-                          }}
-                        >
-                          {badge.icon}
-                          {badge.label}
-                        </span>
-                      </td>
-                      <td>
-                        <div>{ticket.email}</div>
-                        {ticket.empresa && (
-                          <div style={{ fontSize: '0.78rem', color: '#7f8c8d' }}>{ticket.empresa}</div>
-                        )}
-                        {ticket.telefono && (
-                          <div style={{ fontSize: '0.78rem', color: '#7f8c8d' }}>{ticket.telefono}</div>
-                        )}
-                      </td>
-                      <td>{ticket.nombre || '-'}</td>
-                      <td style={{ maxWidth: 260, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {ticket.mensaje || '-'}
-                      </td>
-                      <td style={{ fontSize: '0.85rem', color: '#7f8c8d' }}>{formatFecha(ticket.created_at)}</td>
-                      <td>
-                        {ticket.estado === 'pendiente' ? (
-                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: '#e67e22', fontWeight: 600, fontSize: '0.85rem' }}>
-                            <Clock size={13} /> Pendiente
-                          </span>
-                        ) : (
-                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: '#27ae60', fontWeight: 600, fontSize: '0.85rem' }}>
-                            <CheckCheck size={13} /> Resuelto
-                            {ticket.resuelto_por_nombre && (
-                              <span style={{ color: '#7f8c8d', fontWeight: 400 }}> · {ticket.resuelto_por_nombre}</span>
-                            )}
-                          </span>
-                        )}
-                      </td>
-                      {filtro !== 'resuelto' && (
-                        <td onClick={(e) => e.stopPropagation()}>
-                          {ticket.estado === 'pendiente' && (
-                            <div className="action-buttons">
-                              {getTicketTipoNormalizado(ticket) === 'olvido_password' ? (
-                                <button
-                                  className="btn-sm btn-edit"
-                                  onClick={() => setResetModal(ticket)}
-                                  style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
-                                  title="Reactivar acceso y resolver"
-                                >
-                                  <KeyRound size={13} /> Resolver
-                                </button>
-                              ) : (
-                                <button
-                                  className="btn-sm btn-edit"
-                                  onClick={() => handleResolver(ticket)}
-                                  title="Marcar como resuelto"
-                                >
-                                  ✓ Resolver
-                                </button>
-                              )}
-                            </div>
-                          )}
-                        </td>
-                      )}
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+      {ticketTable(isAdmin())}
 
       {detalleTicket && (
         <TicketDetailModal
           ticket={detalleTicket}
           onClose={() => setDetalleTicket(null)}
-          onResolve={() => handleResolver(detalleTicket)}
-          onResetPassword={() => {
+          onResolve={isAdmin() ? () => handleResolver(detalleTicket) : undefined}
+          onResetPassword={isAdmin() ? () => {
             setDetalleTicket(null);
             setResetModal(detalleTicket);
-          }}
+          } : undefined}
         />
       )}
 

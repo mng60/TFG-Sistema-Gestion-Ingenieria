@@ -23,6 +23,7 @@ pool.query(`
 pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS empresa VARCHAR(255)`).catch(() => {});
 pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS telefono VARCHAR(50)`).catch(() => {});
 pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS proyecto_id INTEGER REFERENCES proyectos(id) ON DELETE SET NULL`).catch(() => {});
+pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS resuelto_at TIMESTAMP`).catch(() => {});
 
 // Añadir columnas de intentos de login a users y clientes
 pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS login_attempts INTEGER DEFAULT 0`)
@@ -57,6 +58,17 @@ class Ticket {
     }
     query += ' ORDER BY CASE WHEN t.estado = \'pendiente\' THEN 0 ELSE 1 END, t.created_at DESC';
     const result = await pool.query(query, values);
+    return result.rows;
+  }
+
+  static async findByEmail(email) {
+    const result = await pool.query(`
+      SELECT t.*, p.nombre as proyecto_nombre
+      FROM tickets t
+      LEFT JOIN proyectos p ON t.proyecto_id = p.id
+      WHERE t.email = $1
+      ORDER BY CASE WHEN t.estado = 'pendiente' THEN 0 ELSE 1 END, t.created_at DESC
+    `, [email]);
     return result.rows;
   }
 
