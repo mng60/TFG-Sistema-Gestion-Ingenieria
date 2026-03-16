@@ -3,16 +3,27 @@ const { Pool } = require('pg');
 require('dotenv').config();
 
 // Configuración del pool de conexiones
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  max: 20, // Número máximo de conexiones en el pool
-  idleTimeoutMillis: 30000, // Tiempo antes de cerrar conexión inactiva
-  connectionTimeoutMillis: 2000, // Tiempo de espera para conectar
-});
+// Soporta DATABASE_URL (Neon/Railway) o variables individuales (desarrollo local)
+const poolConfig = process.env.DATABASE_URL
+  ? {
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false },
+      max: 20,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 2000,
+    }
+  : {
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+      max: 20,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 2000,
+    };
+
+const pool = new Pool(poolConfig);
 
 // Evento cuando se conecta
 pool.on('connect', () => {

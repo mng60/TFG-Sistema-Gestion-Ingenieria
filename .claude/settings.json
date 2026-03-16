@@ -3,7 +3,9 @@
     "allow": [
       "Bash(for dir in \"backend/src/services\" \"frontend-admin/src/assets\" \"frontend-admin/src/utils\" \"frontend-cliente/src/assets\" \"frontend-cliente/src/utils\" \"mobile/src/assets\" \"mobile/src/navigation\" \"mobile/src/screens\" \"mobile/src/utils\")",
       "Bash(do rm -rf \"$dir\")",
-      "Read(//c/Users/migue/.claude/projects/c--Users-migue-Documents-4o-TFG-Visual-TFG-Sistema-Gestion-Ingenieria/memory/**)"
+      "Read(//c/Users/migue/.claude/projects/c--Users-migue-Documents-4o-TFG-Visual-TFG-Sistema-Gestion-Ingenieria/memory/**)",
+      "Bash(/dev/null cat:*)",
+      "Read(//c/Program Files/PostgreSQL/**)"
     ],
     "additionalDirectories": [
       "c:\\Users\\migue\\.claude\\projects\\c--Users-migue-Documents-4o-TFG-Visual-TFG-Sistema-Gestion-Ingenieria\\memory"
