@@ -50,25 +50,19 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
       }
     };
 
-    const handleMessagesRead = async (data) => {
-      
+    const handleMessagesRead = (data) => {
       if (data.conversacion_id === conversacion.id) {
-        try {
-          const API_URL = process.env.REACT_APP_API_URL || `http://${window.location.hostname}:5000/api`;
-          const token = localStorage.getItem('empleado_token');
-
-          const response = await fetch(`${API_URL}/chat/conversaciones/${conversacion.id}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
-
-          const result = await response.json();
-          
-          if (result.success) {
-            setConversacionLocal(result.conversacion);
-          }
-        } catch (error) {
-          console.error('Error al actualizar conversación:', error);
-        }
+        setConversacionLocal(prev => {
+          if (!prev?.participantes) return prev;
+          return {
+            ...prev,
+            participantes: prev.participantes.map(p =>
+              p.user_id === data.user_id && p.tipo_usuario === data.tipo_usuario
+                ? { ...p, last_read: data.timestamp }
+                : p
+            )
+          };
+        });
       }
     };
 
@@ -122,11 +116,10 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
     if (mensajes.length === 0) return;
 
     if (isInitialLoad) {
-      // Carga inicial: scroll instantáneo sin animación
-      requestAnimationFrame(() => {
+      setTimeout(() => {
         scrollToBottom(false);
         setIsInitialLoad(false);
-      });
+      }, 0);
     }
   }, [mensajes, isInitialLoad]);
 
@@ -160,8 +153,8 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
       const data = await response.json();
       
       if (data.success) {
-        setIsInitialLoad(true);
         setMensajes(data.mensajes || []);
+        setIsInitialLoad(true);
       }
     } catch (error) {
       console.error('❌ Error al cargar mensajes:', error);
@@ -272,7 +265,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
         </div>
       )}
 
-      <div className="chat-messages">
+      <div className="chat-messages" ref={messagesContainerRef}>
         {loading ? (
           <div className="loading-messages">
             <div className="spinner"></div>
