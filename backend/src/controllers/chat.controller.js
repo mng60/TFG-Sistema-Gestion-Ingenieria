@@ -5,7 +5,7 @@ const Mensaje = require('../models/Mensaje');
 const getConversaciones = async (req, res) => {
   try {
     const userId = req.user.id;
-    const tipoUsuario = req.user.rol ? 'empleado' : 'cliente';
+    const tipoUsuario = req.user.tipo_usuario;
 
     const conversaciones = await Conversacion.getByUser(userId, tipoUsuario);
 
@@ -95,7 +95,7 @@ const getMensajes = async (req, res) => {
 
     // Verificar que el usuario sea participante
     const userId = req.user.id;
-    const tipoUsuario = req.user.rol ? 'empleado' : 'cliente';
+    const tipoUsuario = req.user.tipo_usuario;
 
     const conversacion = await Conversacion.findById(conversacionId);
     if (!conversacion) {
@@ -143,7 +143,7 @@ const sendMensaje = async (req, res) => {
     const { conversacion_id, mensaje, tipo_mensaje = 'texto' } = req.body;
 
     const userId = req.user.id;
-    const tipoUsuario = req.user.rol ? 'empleado' : 'cliente';
+    const tipoUsuario = req.user.tipo_usuario;
 
     // Verificar que sea participante
     const conversacion = await Conversacion.findById(conversacion_id);
@@ -193,7 +193,7 @@ const markAsRead = async (req, res) => {
   try {
     const { conversacionId } = req.params;
     const userId = req.user.id;
-    const tipoUsuario = req.user.rol ? 'empleado' : 'cliente';
+    const tipoUsuario = req.user.tipo_usuario;
 
     await Conversacion.markAsRead(conversacionId, userId, tipoUsuario);
 
@@ -216,7 +216,7 @@ const getConversacionById = async (req, res) => {
   try {
     const { conversacionId } = req.params;
     const userId = req.user.id;
-    const tipoUsuario = req.user.rol ? 'empleado' : 'cliente';
+    const tipoUsuario = req.user.tipo_usuario;
 
     const conversacion = await Conversacion.findById(conversacionId);
 

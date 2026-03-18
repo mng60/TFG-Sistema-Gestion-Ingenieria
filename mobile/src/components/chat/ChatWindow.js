@@ -113,12 +113,13 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
   };
 
   useEffect(() => {
-    if (isInitialLoad && !loading && mensajes.length > 0) {
-      setTimeout(() => {
+    if (!isInitialLoad || loading || mensajes.length === 0) return;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
         scrollToBottom(false);
         setIsInitialLoad(false);
-      }, 0);
-    }
+      });
+    });
   }, [mensajes, isInitialLoad, loading]);
 
   const scrollToBottom = (smooth = false) => {

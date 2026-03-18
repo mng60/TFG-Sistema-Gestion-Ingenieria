@@ -60,7 +60,8 @@ class Conversacion {
                 'foto_url', CASE
                   WHEN cp.tipo_usuario = 'empleado' THEN u.foto_url
                   WHEN cp.tipo_usuario = 'cliente' THEN cl.foto_url
-                END
+                END,
+                'last_read', cp.last_read
               )
             )
             FROM conversacion_participantes cp
