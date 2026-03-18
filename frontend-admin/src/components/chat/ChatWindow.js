@@ -175,6 +175,27 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
       if (data.success) {
         setMensajes(data.mensajes || []);
         setIsInitialLoad(true);
+
+        if (socket && conversacion?.id) {
+          socket.emit('mark_read', { conversacion_id: conversacion.id });
+        }
+
+        if (onMarcarLeida && conversacion?.id) {
+          onMarcarLeida(conversacion.id);
+        }
+
+        setConversacionLocal((prev) => {
+          if (!prev?.participantes) return prev;
+          const now = new Date().toISOString();
+          return {
+            ...prev,
+            participantes: prev.participantes.map((p) =>
+              p.user_id === currentUser.id && p.tipo_usuario === currentUser.tipo_usuario
+                ? { ...p, last_read: now }
+                : p
+            )
+          };
+        });
       }
     } catch (error) {
       console.error('❌ Error al cargar mensajes:', error);
