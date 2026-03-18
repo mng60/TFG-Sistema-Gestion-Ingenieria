@@ -167,7 +167,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
         keepalive: bestEffort
       });
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+        console.warn(`⚠️ markAsRead HTTP ${response.status}`);
       }
       if (socket) socket.emit('mark_read', { conversacion_id: conversacion.id });
       if (onMarcarLeida) onMarcarLeida(conversacion.id);

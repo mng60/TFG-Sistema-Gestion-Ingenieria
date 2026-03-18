@@ -218,7 +218,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+        console.warn(`⚠️ markAsRead HTTP ${response.status}`);
       }
 
       if (socket) {
