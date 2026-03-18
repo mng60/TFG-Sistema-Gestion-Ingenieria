@@ -61,24 +61,9 @@ export const AuthProvider = ({ children }) => {
     logout,
     actualizarPerfil,
     actualizarCliente,
+    loading,
     isAuthenticated: !!cliente
   };
-
-  if (loading) {
-    return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        color: 'white',
-        fontSize: '1.5rem'
-      }}>
-        Cargando...
-      </div>
-    );
-  }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

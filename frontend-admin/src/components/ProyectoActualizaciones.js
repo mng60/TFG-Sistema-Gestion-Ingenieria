@@ -3,6 +3,7 @@ import axios from 'axios';
 import { CalendarClock, ChevronUp, Plus, Trash2 } from 'lucide-react';
 import { useEmpleadoAuth } from '../context/EmpleadoAuthContext';
 import '../styles/ProyectoActualizaciones.css';
+import { formatearFecha, formatearFechaHora } from '../utils/format';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
@@ -104,26 +105,6 @@ function ProyectoActualizaciones({ proyectoId, actualizaciones, isAdmin, onReloa
     } finally {
       setSolicitudSubmitting(false);
     }
-  };
-
-  const formatFecha = (fecha) => {
-    if (!fecha) return '';
-    return new Date(fecha).toLocaleString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  const formatFechaCorta = (fecha) => {
-    if (!fecha) return '';
-    return new Date(fecha).toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
   };
 
   const getAvatar = (actualizacion) => {
@@ -280,10 +261,10 @@ function ProyectoActualizaciones({ proyectoId, actualizaciones, isAdmin, onReloa
               <div className="act-item-body">
                 <div className="act-item-meta">
                   <span className="act-autor">{act.empleado_nombre}</span>
-                  <span className="act-fecha">{formatFecha(act.created_at)}</span>
+                  <span className="act-fecha">{formatearFechaHora(act.created_at)}</span>
                   {act.sugiere_cambio_fecha && (
                     <span className="act-badge-fecha">
-                      <CalendarClock size={12} /> Sugiere fecha: {formatFechaCorta(act.fecha_sugerida)}
+                      <CalendarClock size={12} /> Sugiere fecha: {formatearFecha(act.fecha_sugerida)}
                     </span>
                   )}
                 </div>

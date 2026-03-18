@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import DocumentoModal from './modals/DocumentoModal';
 import axios from 'axios';
+import { formatearFecha } from '../utils/format';
 import { Upload, Download, Trash2, Eye, EyeOff, Users } from 'lucide-react';
 import '../styles/Modal.css';
 
@@ -104,11 +105,6 @@ function ProyectoDocumentos({
   const [showDocumentoModal, setShowDocumentoModal] = useState(false);
   const [toggling, setToggling] = useState({});
   const [accesoModal, setAccesoModal] = useState(null);
-
-  const formatearFecha = (fecha) => {
-    if (!fecha) return '-';
-    return new Date(fecha).toLocaleDateString('es-ES');
-  };
 
   const formatearTamano = (bytes) => {
     if (!bytes) return '-';

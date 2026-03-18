@@ -1,49 +1,33 @@
-import axios from 'axios';
-
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-
-const empleadoApi = axios.create({
-  baseURL: API_URL,
-  headers: { 'Content-Type': 'application/json' }
-});
-
-empleadoApi.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('empleado_token');
-    if (token) config.headers.Authorization = `Bearer ${token}`;
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+import api from './api';
 
 const usuarioService = {
   getAll: async () => {
-    const response = await empleadoApi.get('/users');
+    const response = await api.get('/users');
     return response.data;
   },
 
   getById: async (id) => {
-    const response = await empleadoApi.get(`/users/${id}`);
+    const response = await api.get(`/users/${id}`);
     return response.data;
   },
 
   create: async (userData) => {
-    const response = await empleadoApi.post('/users', userData);
+    const response = await api.post('/users', userData);
     return response.data;
   },
 
   update: async (id, userData) => {
-    const response = await empleadoApi.put(`/users/${id}`, userData);
+    const response = await api.put(`/users/${id}`, userData);
     return response.data;
   },
 
   delete: async (id) => {
-    const response = await empleadoApi.delete(`/users/${id}`);
+    const response = await api.delete(`/users/${id}`);
     return response.data;
   },
 
   cambiarPassword: async (id, passwords) => {
-    const response = await empleadoApi.put(`/users/${id}/password`, passwords);
+    const response = await api.put(`/users/${id}/password`, passwords);
     return response.data;
   }
 };

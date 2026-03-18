@@ -170,17 +170,12 @@ class Conversacion {
 
   // Marcar mensajes como leídos
   static async markAsRead(conversacionId, userId, tipoUsuario) {
-    try {
-      const query = `
-        UPDATE conversacion_participantes
-        SET last_read = CURRENT_TIMESTAMP
-        WHERE conversacion_id = $1 AND user_id = $2 AND tipo_usuario = $3
-      `;
-
-      await pool.query(query, [conversacionId, userId, tipoUsuario]);
-    } catch (error) {
-      throw error;
-    }
+    const query = `
+      UPDATE conversacion_participantes
+      SET last_read = CURRENT_TIMESTAMP
+      WHERE conversacion_id = $1 AND user_id = $2 AND tipo_usuario = $3
+    `;
+    await pool.query(query, [conversacionId, userId, tipoUsuario]);
   }
 }
 

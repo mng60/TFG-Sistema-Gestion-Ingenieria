@@ -3,6 +3,7 @@ import proyectoService from '../services/proyectoService';
 import EditarProyectoModal from './modals/EditarProyectoModal';
 import AsignarEmpleadoModal from './modals/AsignarEmpleadoModal';
 import { Plus, Pencil, CircleMinus } from 'lucide-react';
+import { formatearFecha } from '../utils/format';
 
 function ProyectoInfo({ 
   proyecto, 
@@ -17,11 +18,6 @@ function ProyectoInfo({
 }) {
   const [showEditarModal, setShowEditarModal] = useState(false);
   const [showAsignarModal, setShowAsignarModal] = useState(false);
-
-  const formatearFecha = (fecha) => {
-    if (!fecha) return '-';
-    return new Date(fecha).toLocaleDateString('es-ES');
-  };
 
   const handleDesasignarEmpleado = (empleado) => {
     setConfirmModal({

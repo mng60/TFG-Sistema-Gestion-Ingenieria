@@ -193,7 +193,7 @@ const markAsRead = async (req, res) => {
   try {
     const { conversacionId } = req.params;
     const userId = req.user.id;
-    const tipoUsuario = req.user.tipo_usuario;
+    const tipoUsuario = req.user.rol ? 'empleado' : 'cliente';
 
     await Conversacion.markAsRead(conversacionId, userId, tipoUsuario);
 

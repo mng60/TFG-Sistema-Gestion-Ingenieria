@@ -126,8 +126,8 @@ const initializeSocket = (io) => {
         // Notificar a otros participantes
         io.to(`conversacion_${conversacion_id}`).emit('messages_read', {
           conversacion_id,
-          user_id: socket.id,
-          tipo_usuario: socket.tipo_usuario,
+          user_id: socket.userId,
+          tipo_usuario: socket.tipoUsuario,
           timestamp: new Date()
         });
       } catch (error) {
@@ -149,9 +149,12 @@ const initializeSocket = (io) => {
   });
 
   // Emitir estado online de usuarios
-  setInterval(() => {
+  const onlineUsersInterval = setInterval(() => {
     io.emit('online_users', Array.from(connectedUsers.keys()));
-  }, 30000); // Cada 30 segundos
+  }, 30000);
+
+  // Limpiar al cerrar
+  process.on('SIGTERM', () => clearInterval(onlineUsersInterval));
 };
 
 module.exports = { initializeSocket, connectedUsers };

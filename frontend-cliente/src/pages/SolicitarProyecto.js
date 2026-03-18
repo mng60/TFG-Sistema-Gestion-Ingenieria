@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { BriefcaseBusiness, CircleHelp, UserRound } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import '../styles/SolicitarProyecto.css';
-
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+import api from '../services/api';
 
 const TIPO_PROYECTO_OPTIONS = [
   { value: 'fotovoltaica', label: 'Instalacion fotovoltaica' },
@@ -45,21 +44,14 @@ function SolicitarProyecto() {
     setFormError('');
 
     try {
-      const token = localStorage.getItem('token');
       const payload = {
         tipoProyecto: TIPO_PROYECTO_OPTIONS.find((option) => option.value === formData.tipoProyecto)?.label || formData.tipoProyecto,
         ubicacion: formData.ubicacion,
         mensaje: formData.mensaje
       };
 
-      const res = await fetch(`${API_URL}/portal/tickets`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Error al enviar');
+      const data = await api.post('/portal/tickets', payload);
+      if (!data.data) throw new Error('Error al enviar');
 
       setFormSent(true);
     } catch (err) {

@@ -22,40 +22,40 @@ function PublicRoute({ children }) {
 function App() {
   const [splashDone, setSplashDone] = useState(false);
 
-  if (!splashDone) {
-    return <SplashScreen onDone={() => setSplashDone(true)} />;
-  }
-
   return (
-    <Router>
-      <AuthProvider>
-        <Routes>
-          <Route path="/" element={<Navigate to="/login" />} />
+    <AuthProvider>
+      {!splashDone ? (
+        <SplashScreen onDone={() => setSplashDone(true)} />
+      ) : (
+        <Router>
+          <Routes>
+            <Route path="/" element={<Navigate to="/login" />} />
 
-          <Route path="/login" element={
-            <PublicRoute><Login /></PublicRoute>
-          } />
+            <Route path="/login" element={
+              <PublicRoute><Login /></PublicRoute>
+            } />
 
-          <Route path="/proyectos" element={
-            <ProtectedRoute><Proyectos /></ProtectedRoute>
-          } />
+            <Route path="/proyectos" element={
+              <ProtectedRoute><Proyectos /></ProtectedRoute>
+            } />
 
-          <Route path="/proyectos/:id" element={
-            <ProtectedRoute><ProyectoCompleto /></ProtectedRoute>
-          } />
+            <Route path="/proyectos/:id" element={
+              <ProtectedRoute><ProyectoCompleto /></ProtectedRoute>
+            } />
 
-          <Route path="/chat" element={
-            <ProtectedRoute><Chat /></ProtectedRoute>
-          } />
+            <Route path="/chat" element={
+              <ProtectedRoute><Chat /></ProtectedRoute>
+            } />
 
-          <Route path="/perfil" element={
-            <ProtectedRoute><Perfil /></ProtectedRoute>
-          } />
+            <Route path="/perfil" element={
+              <ProtectedRoute><Perfil /></ProtectedRoute>
+            } />
 
-          <Route path="*" element={<Navigate to="/login" />} />
-        </Routes>
-      </AuthProvider>
-    </Router>
+            <Route path="*" element={<Navigate to="/login" />} />
+          </Routes>
+        </Router>
+      )}
+    </AuthProvider>
   );
 }
 

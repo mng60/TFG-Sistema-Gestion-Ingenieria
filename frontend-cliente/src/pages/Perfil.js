@@ -1,9 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import api from '../services/api';
 import { Camera, Save, Lock, Building2 } from 'lucide-react';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
 const card = {
@@ -58,8 +57,6 @@ function Perfil() {
     setTimeout(() => setToast(null), 3500);
   };
 
-  const token = () => localStorage.getItem('token');
-
   const handleFotoChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -67,8 +64,8 @@ function Perfil() {
     try {
       const fd = new FormData();
       fd.append('foto', file);
-      const res = await axios.post(`${API_URL}/portal/perfil/foto`, fd, {
-        headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token()}` }
+      const res = await api.post('/portal/perfil/foto', fd, {
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
       actualizarCliente({ foto_url: res.data.foto_url });
       showToast('Logo actualizado');
@@ -84,9 +81,7 @@ function Perfil() {
     e.preventDefault();
     setSavingInfo(true);
     try {
-      const res = await axios.put(`${API_URL}/portal/perfil`, form, {
-        headers: { Authorization: `Bearer ${token()}` }
-      });
+      const res = await api.put('/portal/perfil', form);
       actualizarCliente(res.data.cliente);
       showToast('Información actualizada');
     } catch {
@@ -102,9 +97,8 @@ function Perfil() {
     if (passForm.newPassword.length < 6) return showToast('Mínimo 6 caracteres', 'error');
     setSavingPass(true);
     try {
-      await axios.put(`${API_URL}/portal/cambiar-password`,
-        { currentPassword: passForm.currentPassword, newPassword: passForm.newPassword },
-        { headers: { Authorization: `Bearer ${token()}` } }
+      await api.put('/portal/cambiar-password',
+        { currentPassword: passForm.currentPassword, newPassword: passForm.newPassword }
       );
       setPassForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
       showToast('Contraseña actualizada');

@@ -1,7 +1,4 @@
 import api from './api';
-import axios from 'axios';
-
-const API_URL = process.env.REACT_APP_API_URL || `http://${window.location.hostname}:5000/api`;
 
 const documentoService = {
   getByProyecto: async (proyectoId) => {
@@ -15,9 +12,7 @@ const documentoService = {
   },
 
   descargar: async (documento) => {
-    const token = localStorage.getItem('empleado_token');
-    const response = await axios.get(`${API_URL}/documentos/${documento.id}/download`, {
-      headers: { Authorization: `Bearer ${token}` },
+    const response = await api.get(`/documentos/${documento.id}/download`, {
       responseType: 'blob'
     });
     const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -36,12 +31,8 @@ const documentoService = {
   },
 
   upload: async (formDataPayload) => {
-    const token = localStorage.getItem('empleado_token');
-    const response = await axios.post(`${API_URL}/documentos/upload`, formDataPayload, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        'Authorization': `Bearer ${token}`
-      }
+    const response = await api.post('/documentos/upload', formDataPayload, {
+      headers: { 'Content-Type': 'multipart/form-data' }
     });
     return response.data;
   }

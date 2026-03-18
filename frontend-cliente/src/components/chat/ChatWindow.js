@@ -9,6 +9,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
   const [mensajes, setMensajes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(false);
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
   const conversacionIdRef = useRef(null);
@@ -23,6 +24,18 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
       marcarComoLeido();
     }
   }, [conversacion?.id]);
+
+  useEffect(() => {
+    if (mensajes.length === 0) return;
+
+    if (isInitialLoad) {
+      // Carga inicial: scroll instantáneo sin animación
+      requestAnimationFrame(() => {
+        scrollToBottom(false);
+        setIsInitialLoad(false);
+      });
+    }
+  }, [mensajes, isInitialLoad]);
 
   useEffect(() => {
     if (!socket || !conversacion) return;
@@ -73,11 +86,16 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
 
   const scrollToBottom = (smooth = false) => {
     const container = messagesContainerRef.current;
-    if (!container) return;
-    if (smooth) {
-      container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
-    } else {
-      container.scrollTop = container.scrollHeight;
+    if (container) {
+      if (smooth) {
+        container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+      } else {
+        container.scrollTop = container.scrollHeight;
+      }
+    }
+    // Fallback con el ref del elemento final
+    if (!smooth && messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ block: 'end' });
     }
   };
 
@@ -92,8 +110,8 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
       });
       const data = await response.json();
       if (data.success) {
+        setIsInitialLoad(true);
         setMensajes(data.mensajes || []);
-        setTimeout(() => scrollToBottom(false), 50);
       }
     } catch (error) {
       console.error('Error al cargar mensajes:', error);
@@ -103,7 +121,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
   };
 
   const marcarComoLeido = async () => {
-    if (!conversacion) return;
+    if (!conversacion || conversacion.ephemeral) return;
     try {
       const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
       const token = localStorage.getItem('token');

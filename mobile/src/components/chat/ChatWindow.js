@@ -8,7 +8,9 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
   const [mensajes, setMensajes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(false);
   const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
   const conversacionIdRef = useRef(null);
   const [conversacionLocal, setConversacionLocal] = useState(conversacion); 
 
@@ -116,13 +118,31 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
     }
   };
 
-  // Scroll automático al final
   useEffect(() => {
-    scrollToBottom();
-  }, [mensajes]);
+    if (mensajes.length === 0) return;
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (isInitialLoad) {
+      // Carga inicial: scroll instantáneo sin animación
+      requestAnimationFrame(() => {
+        scrollToBottom(false);
+        setIsInitialLoad(false);
+      });
+    }
+  }, [mensajes, isInitialLoad]);
+
+  const scrollToBottom = (smooth = false) => {
+    const container = messagesContainerRef.current;
+    if (container) {
+      if (smooth) {
+        container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+      } else {
+        container.scrollTop = container.scrollHeight;
+      }
+    }
+    // Fallback con el ref del elemento final
+    if (!smooth && messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ block: 'end' });
+    }
   };
 
   const cargarMensajes = async () => {
@@ -140,6 +160,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
       const data = await response.json();
       
       if (data.success) {
+        setIsInitialLoad(true);
         setMensajes(data.mensajes || []);
       }
     } catch (error) {
@@ -165,7 +186,6 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
         socket.emit('mark_read', { conversacion_id: conversacion.id });
       }
 
-      onReloadConversaciones();
     } catch (error) {
       console.error('❌ Error al marcar como leído:', error);
     }

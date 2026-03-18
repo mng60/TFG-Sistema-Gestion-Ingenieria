@@ -15,6 +15,7 @@ import AdminLayout from '../components/Layout/AdminLayout';
 import { useEmpleadoAuth } from '../context/EmpleadoAuthContext';
 import ConfirmModal from '../components/ConfirmModal';
 import '../styles/GestionPages.css';
+import { formatearFechaHora } from '../utils/format';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
@@ -65,17 +66,6 @@ function getTipoBadge(ticket) {
     label: ticket?.tipo_usuario === 'empleado' ? 'Empleado' : 'Cliente',
     icon: <UserRound size={12} />
   };
-}
-
-function formatFecha(fecha) {
-  if (!fecha) return '-';
-  return new Date(fecha).toLocaleString('es-ES', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
 }
 
 function ResetPasswordModal({ ticket, onClose, onSuccess, showToast }) {
@@ -229,7 +219,7 @@ function TicketDetailModal({ ticket, onClose, onResolve, onResetPassword }) {
             <div className="form-group form-group-full">
               <label>Fecha</label>
               <div className="modal-description" style={{ marginBottom: 0 }}>
-                {formatFecha(ticket.created_at)}
+                {formatearFechaHora(ticket.created_at)}
               </div>
             </div>
 
@@ -425,7 +415,7 @@ function Tickets() {
                     <td style={{ maxWidth: 260, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {ticket.mensaje || '-'}
                     </td>
-                    <td style={{ fontSize: '0.85rem', color: '#7f8c8d' }}>{formatFecha(ticket.created_at)}</td>
+                    <td style={{ fontSize: '0.85rem', color: '#7f8c8d' }}>{formatearFechaHora(ticket.created_at)}</td>
                     <td>
                       {ticket.estado === 'pendiente' ? (
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: '#e67e22', fontWeight: 600, fontSize: '0.85rem' }}>

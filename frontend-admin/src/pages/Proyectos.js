@@ -8,7 +8,10 @@ import Toast from '../components/Toast';
 import ConfirmModal from '../components/ConfirmModal';
 import usuarioService from '../services/usuarioService';
 import '../styles/GestionPages.css';
-import { Search, Plus, Pencil, Trash2, UserPlus } from 'lucide-react'
+import { Search, Plus, Pencil, Trash2, UserPlus } from 'lucide-react';
+import EditarProyectoModal from '../components/modals/EditarProyectoModal';
+import AsignarEmpleadoModal from '../components/modals/AsignarEmpleadoModal';
+import { formatearFecha, formatearMoneda } from '../utils/format';
 
 function Proyectos() {
   const { empleado, isAdmin } = useEmpleadoAuth();
@@ -244,19 +247,6 @@ function Proyectos() {
     });
   };
 
-  const formatearFecha = (fecha) => {
-    if (!fecha) return '-';
-    return new Date(fecha).toLocaleDateString('es-ES');
-  };
-
-  const formatearMoneda = (cantidad) => {
-    if (!cantidad) return '-';
-    return new Intl.NumberFormat('es-ES', {
-      style: 'currency',
-      currency: 'EUR'
-    }).format(cantidad);
-  };
-
   if (loading) {
     return (
       <AdminLayout>
@@ -433,12 +423,12 @@ function Proyectos() {
         )}
       </div>
 
-      {/* Modal Crear/Editar Proyecto */}
-      {showModal && (
+      {/* Modal Crear Proyecto */}
+      {showModal && modalMode === 'crear' && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>{modalMode === 'crear' ? 'Nuevo Proyecto' : 'Editar Proyecto'}</h2>
+              <h2>Nuevo Proyecto</h2>
               <button className="modal-close" onClick={() => setShowModal(false)}>✕</button>
             </div>
 
@@ -579,7 +569,7 @@ function Proyectos() {
                   Cancelar
                 </button>
                 <button type="submit" className="btn-primary">
-                  {modalMode === 'crear' ? 'Crear Proyecto' : 'Guardar Cambios'}
+                  Crear Proyecto
                 </button>
               </div>
             </form>
@@ -587,64 +577,28 @@ function Proyectos() {
         </div>
       )}
 
+      {/* Modal Editar Proyecto */}
+      {showModal && modalMode === 'editar' && proyectoSeleccionado && (
+        <EditarProyectoModal
+          proyecto={proyectoSeleccionado}
+          clientes={clientes}
+          usuarios={usuarios}
+          onClose={() => setShowModal(false)}
+          onSuccess={() => { setShowModal(false); cargarDatos(); showToast('Proyecto actualizado', 'success'); }}
+          onError={(msg) => showToast(msg, 'error')}
+        />
+      )}
+
       {/* Modal Asignar Empleado */}
       {showAsignarModal && proyectoSeleccionado && (
-        <div className="modal-overlay" onClick={() => setShowAsignarModal(false)}>
-          <div className="modal-content modal-small" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>Asignar Empleado</h2>
-              <button className="modal-close" onClick={() => setShowAsignarModal(false)}>✕</button>
-            </div>
-
-            <form onSubmit={handleAsignarEmpleado} className="modal-form">
-              <p className="modal-description">
-                Asignar empleado al proyecto: <strong>{proyectoSeleccionado.nombre}</strong>
-              </p>
-
-              <div className="form-group">
-                <label>Empleado *</label>
-                <select
-                  name="user_id"
-                  value={asignarForm.user_id}
-                  onChange={handleAsignarInputChange}
-                  required
-                >
-                  <option value="">Seleccionar empleado...</option>
-                  {(() => {
-                    const idsAsignados = new Set(empleadosAsignados.map(e => e.user_id || e.id));
-                    return usuarios.filter(u => !idsAsignados.has(u.id)).map(user => (
-                      <option key={user.id} value={user.id}>
-                        {user.nombre} ({user.rol})
-                        {user.id === empleado.id && ' - Tú'}
-                      </option>
-                    ));
-                  })()}
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>Rol en el Proyecto *</label>
-                <input
-                  type="text"
-                  name="rol_proyecto"
-                  value={asignarForm.rol_proyecto}
-                  onChange={handleAsignarInputChange}
-                  placeholder="Ej: Ingeniero eléctrico principal"
-                  required
-                />
-              </div>
-
-              <div className="modal-actions">
-                <button type="button" className="btn-secondary" onClick={() => setShowAsignarModal(false)}>
-                  Cancelar
-                </button>
-                <button type="submit" className="btn-primary">
-                  Asignar Empleado
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <AsignarEmpleadoModal
+          proyectoId={proyectoSeleccionado.id}
+          usuarios={usuarios}
+          empleadosProyecto={empleadosAsignados}
+          onClose={() => setShowAsignarModal(false)}
+          onSuccess={() => { setShowAsignarModal(false); cargarDatos(); showToast('Empleado asignado', 'success'); }}
+          onError={(msg) => showToast(msg, 'error')}
+        />
       )}
 
       {/* Modal de Confirmación */}

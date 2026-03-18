@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import '../styles/Login.css';
-
-const API_URL = process.env.REACT_APP_API_URL || `http://${window.location.hostname}:5000/api`;
+import api from '../services/api';
 
 function Login() {
   const { login } = useAuth();
@@ -50,15 +49,7 @@ function Login() {
     setOlvideLoading(true);
 
     try {
-      await fetch(`${API_URL}/tickets`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          tipo_usuario: 'empleado',
-          email: olvideEmail,
-          mensaje: 'Solicitud de recuperacion de contrasena desde la app movil.'
-        })
-      });
+      await api.post('/tickets', { tipo: 'olvido_password', email: olvideEmail });
       setOlvideMsg('Solicitud enviada. Un administrador restablecera tu contrasena en breve.');
     } catch {
       setOlvideMsg('Error al enviar la solicitud. Intentalo de nuevo.');

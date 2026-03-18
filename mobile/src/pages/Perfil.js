@@ -2,10 +2,9 @@ import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import MobileLayout from '../components/layout/MobileLayout';
-import axios from 'axios';
+import api from '../services/api';
 import { Camera, Save, Lock, LogOut, ChevronDown, ChevronUp } from 'lucide-react';
 
-const API_URL = process.env.REACT_APP_API_URL || `http://${window.location.hostname}:5000/api`;
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || `http://${window.location.hostname}:5000`;
 
 const card = {
@@ -57,8 +56,6 @@ function Perfil() {
     setTimeout(() => setToast(null), 3500);
   };
 
-  const token = localStorage.getItem('empleado_token');
-
   const handleFotoChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -66,8 +63,8 @@ function Perfil() {
     try {
       const fd = new FormData();
       fd.append('foto', file);
-      const res = await axios.post(`${API_URL}/auth/profile/foto`, fd, {
-        headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` }
+      const res = await api.post('/auth/profile/foto', fd, {
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
       actualizarEmpleado({ foto_url: res.data.foto_url });
       showToast('Foto actualizada');
@@ -83,9 +80,7 @@ function Perfil() {
     if (!form.nombre.trim()) return showToast('El nombre es obligatorio', 'error');
     setSavingInfo(true);
     try {
-      const res = await axios.put(`${API_URL}/auth/profile`, form, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.put('/auth/profile', form);
       actualizarEmpleado(res.data.user);
       showToast('Información actualizada');
     } catch {
@@ -100,9 +95,8 @@ function Perfil() {
     if (passForm.newPassword.length < 6) return showToast('Mínimo 6 caracteres', 'error');
     setSavingPass(true);
     try {
-      await axios.put(`${API_URL}/auth/change-password`,
-        { currentPassword: passForm.currentPassword, newPassword: passForm.newPassword },
-        { headers: { Authorization: `Bearer ${token}` } }
+      await api.put('/auth/change-password',
+        { currentPassword: passForm.currentPassword, newPassword: passForm.newPassword }
       );
       setPassForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
       setShowPass(false);

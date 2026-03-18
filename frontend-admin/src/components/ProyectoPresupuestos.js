@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import presupuestoService from '../services/presupuestoService';
 import PresupuestoModal from './modals/PresupuestoModal';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { formatearFecha, formatearMoneda } from '../utils/format';
 
 function ProyectoPresupuestos({ 
   proyectoId, 
@@ -14,19 +15,6 @@ function ProyectoPresupuestos({
 }) {
   const [showPresupuestoModal, setShowPresupuestoModal] = useState(false);
   const [presupuestoSeleccionado, setPresupuestoSeleccionado] = useState(null);
-
-  const formatearFecha = (fecha) => {
-    if (!fecha) return '-';
-    return new Date(fecha).toLocaleDateString('es-ES');
-  };
-
-  const formatearMoneda = (cantidad) => {
-    if (!cantidad) return '0,00 €';
-    return new Intl.NumberFormat('es-ES', {
-      style: 'currency',
-      currency: 'EUR'
-    }).format(cantidad);
-  };
 
   const abrirModalPresupuesto = (presupuesto = null) => {
     if (presupuesto && presupuesto.aceptado) {
