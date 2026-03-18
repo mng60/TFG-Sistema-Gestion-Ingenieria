@@ -58,6 +58,7 @@ function ChatLayout() {
     return () => socket.off('new_message', handleNewMessage);
   }, [socket]);
 
+  // Propagar messages_read al estado global de conversaciones y conversacionActiva
   useEffect(() => {
     if (!socket) return;
     const handleMessagesRead = (data) => {

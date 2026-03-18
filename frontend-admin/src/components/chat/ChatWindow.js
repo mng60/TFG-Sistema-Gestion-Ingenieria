@@ -15,6 +15,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
   const conversacionIdRef = useRef(null);
   const [conversacionLocal, setConversacionLocal] = useState(conversacion);
 
+  // Sincronizar conversacionLocal cuando el padre actualiza la conversación activa
   useEffect(() => {
     setConversacionLocal(conversacion || null);
   }, [conversacion]);
@@ -35,6 +36,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
     }
   }, [conversacion?.id]);
 
+  // Scroll inicial: múltiples intentos para cubrir imágenes que modifican altura tras el render
   useEffect(() => {
     if (!isInitialLoad || loading || mensajes.length === 0) return;
 
@@ -119,7 +121,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
       formData.append('file', file);
       formData.append('conversacion_id', conversacion.id);
       formData.append('tipo_mensaje', tipoMensaje);
-      
+
       // Subir archivo
       const response = await fetch(`${API_URL}/chat/upload`, {
         method: 'POST',
@@ -170,7 +172,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
         setMensajes(data.mensajes || []);
         setIsInitialLoad(true);
@@ -320,7 +322,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
                 conversacion={conversacionLocal}
               />
             ))}
-            
+
             {isTyping && (
               <div className="typing-indicator">
                 <span></span>

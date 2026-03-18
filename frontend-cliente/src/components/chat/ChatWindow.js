@@ -15,6 +15,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
   const conversacionIdRef = useRef(null);
   const [conversacionLocal, setConversacionLocal] = useState(conversacion);
 
+  // Sincronizar conversacionLocal cuando el padre actualiza la conversación activa
   useEffect(() => {
     setConversacionLocal(conversacion || null);
   }, [conversacion]);
@@ -29,6 +30,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
     }
   }, [conversacion?.id]);
 
+  // Scroll inicial: múltiples intentos para cubrir imágenes que modifican altura tras el render
   useEffect(() => {
     if (!isInitialLoad || loading || mensajes.length === 0) return;
 
