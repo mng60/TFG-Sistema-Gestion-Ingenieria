@@ -136,14 +136,15 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
     }
   };
 
-  const marcarComoLeido = async () => {
+  const marcarComoLeido = async (bestEffort = false) => {
     if (!conversacion || conversacion.ephemeral) return;
     try {
       const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
       const token = localStorage.getItem('token');
       const response = await fetch(`${API_URL}/chat/conversaciones/${conversacion.id}/read`, {
         method: 'PUT',
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 'Authorization': `Bearer ${token}` },
+        keepalive: bestEffort
       });
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
@@ -154,6 +155,36 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
       console.error('Error al marcar como leído:', error);
     }
   };
+
+  const flushReadState = () => {
+    if (!conversacion || conversacion.ephemeral) return;
+    marcarComoLeido(true).catch(() => {});
+  };
+
+  // Flush al salir de la página o al ocultarse
+  useEffect(() => {
+    if (!conversacion || conversacion.ephemeral) return;
+
+    const handlePageHide = () => { flushReadState(); };
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') flushReadState();
+    };
+
+    window.addEventListener('pagehide', handlePageHide);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      flushReadState();
+      window.removeEventListener('pagehide', handlePageHide);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [conversacion?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Flush cuando el chat deja de estar activo dentro de la pantalla
+  useEffect(() => {
+    if (!conversacion || conversacion.ephemeral) return;
+    if (!isActive) flushReadState();
+  }, [isActive, conversacion?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSendMessage = (mensaje, tipoMensaje = 'texto') => {
     if (!socket || !conversacion) return;
