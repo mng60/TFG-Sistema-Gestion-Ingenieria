@@ -36,7 +36,7 @@ function MessageBubble({ mensaje, isOwn, conversacion }) {
 
     // Obtener otros participantes (excluir al emisor del mensaje)
     const otrosParticipantes = conversacion.participantes.filter(
-      p => !(p.user_id == mensaje.user_id && p.tipo_usuario === mensaje.tipo_usuario)
+      p => !(p.user_id === mensaje.user_id && p.tipo_usuario === mensaje.tipo_usuario)
     );
 
     // Si no hay otros participantes, mostrar grises

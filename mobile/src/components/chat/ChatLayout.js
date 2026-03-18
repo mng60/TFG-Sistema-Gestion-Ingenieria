@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { io } from 'socket.io-client';
 import ConversationList from './ConversationList';
 import NuevoConversacionModal from './NuevoConversacionModal';
@@ -60,7 +60,7 @@ function ChatLayout() {
     socket.emit('join_conversations', conversaciones.map((c) => c.id));
   }, [socket, conversaciones.length]);
 
-  // Badge: incrementar no leídos en conversaciones que no están activas
+  // Badge: listener registrado una sola vez por socket, usa ref para evitar stale closure
   useEffect(() => {
     if (!socket) return;
     const handleNewMessage = (mensaje) => {

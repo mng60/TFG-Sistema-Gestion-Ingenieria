@@ -22,12 +22,11 @@ function ChatLayout() {
   // Unirse a las salas de conversación cuando cambien
   useEffect(() => {
     if (!socket || conversaciones.length === 0) return;
-
     const conversacionesIds = conversaciones.map(c => c.id);
     socket.emit('join_conversations', conversacionesIds);
   }, [socket, conversaciones.length]);
 
-  // Badge: incrementar no leídos en conversaciones que no están activas
+  // Badge: listener registrado una sola vez por socket, usa ref para evitar stale closure
   useEffect(() => {
     if (!socket) return;
     const handleNewMessage = (mensaje) => {
@@ -64,7 +63,6 @@ function ChatLayout() {
       }
 
       const data = await response.json();
-
       if (data.success) {
         setConversaciones(data.conversaciones || []);
       }
@@ -113,8 +111,10 @@ function ChatLayout() {
       c.participantes?.some(p => p.user_id === participant.user_id && p.tipo_usuario === participant.tipo_usuario)
     );
     if (existing) {
+      conversacionActivaIdRef.current = existing.id;
       setConversacionActiva(existing);
     } else {
+      conversacionActivaIdRef.current = null;
       setConversacionActiva({
         id: null,
         ephemeral: true,
@@ -131,6 +131,7 @@ function ChatLayout() {
   }, [conversaciones, empleado]);
 
   const handleConversacionEfimeraCreada = useCallback((realConv) => {
+    conversacionActivaIdRef.current = realConv.id;
     setConversacionActiva(realConv);
     cargarConversaciones();
   }, []);

@@ -28,7 +28,7 @@ function ChatLayout() {
     socket.emit('join_conversations', ids);
   }, [socket, conversaciones.length]);
 
-  // Badge: incrementar no leídos en conversaciones que no están activas
+  // Badge: listener registrado una sola vez por socket, usa ref para evitar stale closure
   useEffect(() => {
     if (!socket) return;
     const handleNewMessage = (mensaje) => {
@@ -58,6 +58,7 @@ function ChatLayout() {
     );
 
     if (conversacionProyecto) {
+      conversacionActivaIdRef.current = conversacionProyecto.id;
       setConversacionActiva(conversacionProyecto);
       setActiveView('window');
     } else {
@@ -101,6 +102,7 @@ function ChatLayout() {
   const handleConversacionCreada = (nuevaConversacion) => {
     setShowNuevoModal(false);
     cargarConversaciones();
+    conversacionActivaIdRef.current = nuevaConversacion.id;
     setConversacionActiva(nuevaConversacion);
     setActiveView('window');
   };
