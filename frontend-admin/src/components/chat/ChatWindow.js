@@ -66,13 +66,13 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
 
     const handleMessagesRead = (data) => {
       if (data.conversacion_id === conversacion.id) {
-        // Actualizar last_read del participante directamente, sin fetch
         setConversacionLocal(prev => {
           if (!prev?.participantes) return prev;
           return {
             ...prev,
             participantes: prev.participantes.map(p =>
-              p.user_id === data.user_id && p.tipo_usuario === data.tipo_usuario
+              // == evita mismatch number/string en user_id
+              p.user_id == data.user_id && p.tipo_usuario === data.tipo_usuario
                 ? { ...p, last_read: data.timestamp }
                 : p
             )
@@ -177,6 +177,20 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
       await fetch(`${API_URL}/chat/conversaciones/${conversacion.id}/read`, {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      // Actualizar last_read del usuario actual inmediatamente, sin esperar el socket
+      const ahora = new Date().toISOString();
+      setConversacionLocal(prev => {
+        if (!prev?.participantes) return prev;
+        return {
+          ...prev,
+          participantes: prev.participantes.map(p =>
+            p.user_id == currentUser.id && p.tipo_usuario === (currentUser.rol ? 'empleado' : 'cliente')
+              ? { ...p, last_read: ahora }
+              : p
+          )
+        };
       });
 
       if (socket) {

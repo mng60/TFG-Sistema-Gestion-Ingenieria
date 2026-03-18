@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { io } from 'socket.io-client';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import ConversationList from './ConversationList';
 import NuevoConversacionModal from './NuevoConversacionModal';
 import ChatWindow from './ChatWindow';
@@ -7,61 +6,18 @@ import Toast from '../Toast';
 import { useEmpleadoAuth } from '../../context/EmpleadoAuthContext';
 
 function ChatLayout() {
-  const { empleado } = useEmpleadoAuth();
-  const [socket, setSocket] = useState(null);
+  const { empleado, socket, onlineUsers } = useEmpleadoAuth();
   const [conversaciones, setConversaciones] = useState([]);
   const [conversacionActiva, setConversacionActiva] = useState(null);
+  const conversacionActivaIdRef = useRef(null);
   const [showNuevoModal, setShowNuevoModal] = useState(false);
   const [toast, setToast] = useState(null);
   const [activeView, setActiveView] = useState('list');
-  const [onlineUsers, setOnlineUsers] = useState(new Set());
-
-  // Conectar Socket.io (solo una vez)
-  useEffect(() => {
-    const token = localStorage.getItem('empleado_token');
-    if (!token) return;
-
-    const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || 'http://localhost:5000';
-
-    const newSocket = io(SOCKET_URL, {
-      auth: { token },
-      transports: ['websocket', 'polling'],
-      reconnection: true,
-      reconnectionDelay: 1000,
-      reconnectionAttempts: 5
-    });
-
-    newSocket.on('error', (error) => {
-      console.error('❌ Error Socket.io:', error);
-    });
-
-    newSocket.on('online_users', (keys) => {
-      setOnlineUsers(new Set(keys));
-    });
-
-    newSocket.on('user_online', ({ userId, tipoUsuario }) => {
-      setOnlineUsers(prev => new Set([...prev, `${userId}_${tipoUsuario}`]));
-    });
-
-    newSocket.on('user_offline', ({ userId, tipoUsuario }) => {
-      setOnlineUsers(prev => {
-        const next = new Set(prev);
-        next.delete(`${userId}_${tipoUsuario}`);
-        return next;
-      });
-    });
-
-    setSocket(newSocket);
-
-    return () => {
-      newSocket.close();
-    };
-  }, []); 
 
   // Cargar conversaciones (solo una vez al montar)
   useEffect(() => {
     cargarConversaciones();
-  }, []); 
+  }, []);
 
   // Unirse a las salas de conversación cuando cambien
   useEffect(() => {
@@ -69,13 +25,13 @@ function ChatLayout() {
 
     const conversacionesIds = conversaciones.map(c => c.id);
     socket.emit('join_conversations', conversacionesIds);
-  }, [socket, conversaciones.length]); // ✅ Solo cuando cambie socket o la cantidad
+  }, [socket, conversaciones.length]);
 
   // Badge: incrementar no leídos en conversaciones que no están activas
   useEffect(() => {
     if (!socket) return;
     const handleNewMessage = (mensaje) => {
-      if (mensaje.conversacion_id !== conversacionActiva?.id) {
+      if (mensaje.conversacion_id !== conversacionActivaIdRef.current) {
         setConversaciones(prev => prev.map(c =>
           c.id === mensaje.conversacion_id
             ? { ...c, mensajes_no_leidos: (c.mensajes_no_leidos || 0) + 1 }
@@ -85,7 +41,7 @@ function ChatLayout() {
     };
     socket.on('new_message', handleNewMessage);
     return () => socket.off('new_message', handleNewMessage);
-  }, [socket, conversacionActiva?.id]);
+  }, [socket]);
 
   const showToast = useCallback((message, type = 'success') => {
     setToast({ message, type });
@@ -118,6 +74,7 @@ function ChatLayout() {
   };
 
   const handleSelectConversacion = useCallback((conversacion) => {
+    conversacionActivaIdRef.current = conversacion?.id || null;
     setConversacionActiva(conversacion);
     setActiveView('window');
     setConversaciones(prev => prev.map(c =>
@@ -132,50 +89,51 @@ function ChatLayout() {
   }, []);
 
   const handleNewConversacion = () => {
-  setShowNuevoModal(true);
-};
+    setShowNuevoModal(true);
+  };
 
-const handleConversacionEliminada = useCallback(() => {
-  setConversacionActiva(null);
-  setActiveView('list');
-  cargarConversaciones();
-}, []);
+  const handleConversacionEliminada = useCallback(() => {
+    conversacionActivaIdRef.current = null;
+    setConversacionActiva(null);
+    setActiveView('list');
+    cargarConversaciones();
+  }, []);
 
-const handleConversacionCreada = (nuevaConversacion) => {
-  setShowNuevoModal(false);
-  cargarConversaciones();
-  setConversacionActiva(nuevaConversacion);
-  setActiveView('window');
-};
+  const handleConversacionCreada = (nuevaConversacion) => {
+    setShowNuevoModal(false);
+    cargarConversaciones();
+    setConversacionActiva(nuevaConversacion);
+    setActiveView('window');
+  };
 
-const handleOpenDirectChat = useCallback((participant) => {
-  const tipoConv = participant.tipo_usuario === 'cliente' ? 'empleado_cliente' : 'empleado_empleado';
-  const existing = conversaciones.find(c =>
-    c.tipo === tipoConv &&
-    c.participantes?.some(p => p.user_id === participant.user_id && p.tipo_usuario === participant.tipo_usuario)
-  );
-  if (existing) {
-    setConversacionActiva(existing);
-  } else {
-    setConversacionActiva({
-      id: null,
-      ephemeral: true,
-      tipo: tipoConv,
-      nombre: null,
-      proyecto_id: null,
-      participantes: [
-        { user_id: empleado.id, tipo_usuario: 'empleado', nombre: empleado.nombre, email: empleado.email, rol: empleado.rol, foto_url: empleado.foto_url },
-        { user_id: participant.user_id, tipo_usuario: participant.tipo_usuario, nombre: participant.nombre, email: participant.email, rol: participant.rol, foto_url: participant.foto_url }
-      ]
-    });
-  }
-  setActiveView('window');
-}, [conversaciones, empleado]);
+  const handleOpenDirectChat = useCallback((participant) => {
+    const tipoConv = participant.tipo_usuario === 'cliente' ? 'empleado_cliente' : 'empleado_empleado';
+    const existing = conversaciones.find(c =>
+      c.tipo === tipoConv &&
+      c.participantes?.some(p => p.user_id === participant.user_id && p.tipo_usuario === participant.tipo_usuario)
+    );
+    if (existing) {
+      setConversacionActiva(existing);
+    } else {
+      setConversacionActiva({
+        id: null,
+        ephemeral: true,
+        tipo: tipoConv,
+        nombre: null,
+        proyecto_id: null,
+        participantes: [
+          { user_id: empleado.id, tipo_usuario: 'empleado', nombre: empleado.nombre, email: empleado.email, rol: empleado.rol, foto_url: empleado.foto_url },
+          { user_id: participant.user_id, tipo_usuario: participant.tipo_usuario, nombre: participant.nombre, email: participant.email, rol: participant.rol, foto_url: participant.foto_url }
+        ]
+      });
+    }
+    setActiveView('window');
+  }, [conversaciones, empleado]);
 
-const handleConversacionEfimeraCreada = useCallback((realConv) => {
-  setConversacionActiva(realConv);
-  cargarConversaciones();
-}, []);
+  const handleConversacionEfimeraCreada = useCallback((realConv) => {
+    setConversacionActiva(realConv);
+    cargarConversaciones();
+  }, []);
 
   return (
     <div className="chat-layout">
@@ -205,14 +163,14 @@ const handleConversacionEfimeraCreada = useCallback((realConv) => {
       />
 
       {showNuevoModal && (
-      <NuevoConversacionModal
-        onClose={() => setShowNuevoModal(false)}
-        onCrear={handleConversacionCreada}
-        currentUser={empleado}
-        showToast={showToast}
-        conversaciones={conversaciones}
-      />
-    )}
+        <NuevoConversacionModal
+          onClose={() => setShowNuevoModal(false)}
+          onCrear={handleConversacionCreada}
+          currentUser={empleado}
+          showToast={showToast}
+          conversaciones={conversaciones}
+        />
+      )}
     </div>
   );
 }

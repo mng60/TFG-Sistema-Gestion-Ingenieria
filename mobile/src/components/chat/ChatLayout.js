@@ -12,6 +12,7 @@ function ChatLayout() {
   const [socket, setSocket] = useState(null);
   const [conversaciones, setConversaciones] = useState([]);
   const [conversacionActiva, setConversacionActiva] = useState(null);
+  const conversacionActivaIdRef = useRef(null);
   const [showNuevoModal, setShowNuevoModal] = useState(false);
   const [toast, setToast] = useState(null);
   // Mobile: 'list' | 'window'
@@ -63,7 +64,7 @@ function ChatLayout() {
   useEffect(() => {
     if (!socket) return;
     const handleNewMessage = (mensaje) => {
-      if (mensaje.conversacion_id !== conversacionActiva?.id) {
+      if (mensaje.conversacion_id !== conversacionActivaIdRef.current) {
         setConversaciones(prev => prev.map(c =>
           c.id === mensaje.conversacion_id
             ? { ...c, mensajes_no_leidos: (c.mensajes_no_leidos || 0) + 1 }
@@ -73,7 +74,7 @@ function ChatLayout() {
     };
     socket.on('new_message', handleNewMessage);
     return () => socket.off('new_message', handleNewMessage);
-  }, [socket, conversacionActiva?.id]);
+  }, [socket]);
 
   const showToast = useCallback((message, type = 'success') => {
     setToast({ message, type });
@@ -95,6 +96,7 @@ function ChatLayout() {
   };
 
   const handleSelectConversacion = useCallback((conv) => {
+    conversacionActivaIdRef.current = conv?.id || null;
     setConversacionActiva(conv);
     setActiveView('window');
   }, []);
@@ -104,6 +106,7 @@ function ChatLayout() {
   };
 
   const handleConversacionEliminada = useCallback(() => {
+    conversacionActivaIdRef.current = null;
     setConversacionActiva(null);
     setActiveView('list');
     cargarConversaciones();

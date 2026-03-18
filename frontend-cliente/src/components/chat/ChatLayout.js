@@ -1,60 +1,20 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { io } from 'socket.io-client';
 import ConversationList from './ConversationList';
 import NuevoConversacionModal from './NuevoConversacionModal';
 import ChatWindow from './ChatWindow';
 import { useAuth } from '../../context/AuthContext';
 
 function ChatLayout() {
-  const { cliente } = useAuth();
+  const { cliente, socket, onlineUsers } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const [socket, setSocket] = useState(null);
   const [conversaciones, setConversaciones] = useState([]);
   const [conversacionActiva, setConversacionActiva] = useState(null);
+  const conversacionActivaIdRef = useRef(null);
   const [showNuevoModal, setShowNuevoModal] = useState(false);
   const [toast, setToast] = useState(null);
   const [activeView, setActiveView] = useState('list');
-  const [onlineUsers, setOnlineUsers] = useState(new Set());
-
-  // Conectar Socket.io con el token del cliente
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-
-    const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || 'http://localhost:5000';
-
-    const newSocket = io(SOCKET_URL, {
-      auth: { token },
-      transports: ['websocket', 'polling'],
-      reconnection: true,
-      reconnectionDelay: 1000,
-      reconnectionAttempts: 5
-    });
-
-    newSocket.on('online_users', (keys) => {
-      setOnlineUsers(new Set(keys));
-    });
-
-    newSocket.on('user_online', ({ userId, tipoUsuario }) => {
-      setOnlineUsers(prev => new Set([...prev, `${userId}_${tipoUsuario}`]));
-    });
-
-    newSocket.on('user_offline', ({ userId, tipoUsuario }) => {
-      setOnlineUsers(prev => {
-        const next = new Set(prev);
-        next.delete(`${userId}_${tipoUsuario}`);
-        return next;
-      });
-    });
-
-    setSocket(newSocket);
-
-    return () => {
-      newSocket.close();
-    };
-  }, []);
 
   // Cargar conversaciones al montar
   useEffect(() => {
@@ -72,7 +32,7 @@ function ChatLayout() {
   useEffect(() => {
     if (!socket) return;
     const handleNewMessage = (mensaje) => {
-      if (mensaje.conversacion_id !== conversacionActiva?.id) {
+      if (mensaje.conversacion_id !== conversacionActivaIdRef.current) {
         setConversaciones(prev => prev.map(c =>
           c.id === mensaje.conversacion_id
             ? { ...c, mensajes_no_leidos: (c.mensajes_no_leidos || 0) + 1 }
@@ -82,7 +42,7 @@ function ChatLayout() {
     };
     socket.on('new_message', handleNewMessage);
     return () => socket.off('new_message', handleNewMessage);
-  }, [socket, conversacionActiva?.id]);
+  }, [socket]);
 
   const showToast = useCallback((message, type = 'success') => {
     setToast({ message, type });
@@ -124,6 +84,7 @@ function ChatLayout() {
   };
 
   const handleSelectConversacion = useCallback((conversacion) => {
+    conversacionActivaIdRef.current = conversacion?.id || null;
     setConversacionActiva(conversacion);
     setActiveView('window');
     setConversaciones(prev => prev.map(c =>
