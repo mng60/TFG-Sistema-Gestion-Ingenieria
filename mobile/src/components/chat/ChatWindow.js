@@ -25,9 +25,9 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
     if (conversacionIdRef.current !== conversacion.id) {
       conversacionIdRef.current = conversacion.id;
       cargarMensajes();
-      marcarComoLeido();
+      marcarComoLeido().catch(() => {});
     }
-  }, [conversacion?.id]); 
+  }, [conversacion?.id]);
 
   // Escuchar nuevos mensajes via Socket.io
   useEffect(() => {
@@ -113,15 +113,13 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
   };
 
   useEffect(() => {
-    if (mensajes.length === 0) return;
-
-    if (isInitialLoad) {
+    if (isInitialLoad && !loading && mensajes.length > 0) {
       setTimeout(() => {
         scrollToBottom(false);
         setIsInitialLoad(false);
       }, 0);
     }
-  }, [mensajes, isInitialLoad]);
+  }, [mensajes, isInitialLoad, loading]);
 
   const scrollToBottom = (smooth = false) => {
     const container = messagesContainerRef.current;

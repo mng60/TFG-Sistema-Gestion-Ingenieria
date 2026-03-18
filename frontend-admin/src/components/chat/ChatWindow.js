@@ -27,21 +27,18 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
       conversacionIdRef.current = conversacion.id;
       setConversacionLocal(conversacion);
       cargarMensajes();
-      marcarComoLeido();
+      marcarComoLeido().catch(() => {});
     }
   }, [conversacion?.id]);
 
   useEffect(() => {
-    if (mensajes.length === 0) return;
-
-    if (isInitialLoad) {
-      // Esperar al paint real antes de hacer scroll
+    if (isInitialLoad && !loading && mensajes.length > 0) {
       setTimeout(() => {
         scrollToBottom(false);
         setIsInitialLoad(false);
       }, 0);
     }
-  }, [mensajes, isInitialLoad]);
+  }, [mensajes, isInitialLoad, loading]);
 
   // Escuchar nuevos mensajes via Socket.io
   useEffect(() => {

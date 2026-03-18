@@ -71,6 +71,22 @@ function ChatLayout() {
     socket.emit('join_conversations', conversacionesIds);
   }, [socket, conversaciones.length]); // ✅ Solo cuando cambie socket o la cantidad
 
+  // Badge: incrementar no leídos en conversaciones que no están activas
+  useEffect(() => {
+    if (!socket) return;
+    const handleNewMessage = (mensaje) => {
+      if (mensaje.conversacion_id !== conversacionActiva?.id) {
+        setConversaciones(prev => prev.map(c =>
+          c.id === mensaje.conversacion_id
+            ? { ...c, mensajes_no_leidos: (c.mensajes_no_leidos || 0) + 1 }
+            : c
+        ));
+      }
+    };
+    socket.on('new_message', handleNewMessage);
+    return () => socket.off('new_message', handleNewMessage);
+  }, [socket, conversacionActiva?.id]);
+
   const showToast = useCallback((message, type = 'success') => {
     setToast({ message, type });
   }, []);
