@@ -38,15 +38,20 @@ function ConversationList({ conversaciones, conversacionActiva, onSelectConversa
     return other?.nombre?.charAt(0).toUpperCase() || '?';
   };
 
-  const conversacionesFiltradas = conversaciones.filter(conv => {
-    if (!searchTerm) return true;
-    const searchLower = searchTerm.toLowerCase();
-    if (conv.tipo === 'proyecto_grupo' && conv.nombre) {
-      return conv.nombre.toLowerCase().includes(searchLower);
-    }
-    const other = getOtherParticipant(conv);
-    return other?.nombre?.toLowerCase().includes(searchLower);
-  });
+  const getConversationSortDate = (conv) =>
+    conv?.ultimo_mensaje?.created_at || conv?.updated_at || conv?.created_at || 0;
+
+  const conversacionesFiltradas = conversaciones
+    .filter(conv => {
+      if (!searchTerm) return true;
+      const searchLower = searchTerm.toLowerCase();
+      if (conv.tipo === 'proyecto_grupo' && conv.nombre) {
+        return conv.nombre.toLowerCase().includes(searchLower);
+      }
+      const other = getOtherParticipant(conv);
+      return other?.nombre?.toLowerCase().includes(searchLower);
+    })
+    .sort((a, b) => new Date(getConversationSortDate(b)) - new Date(getConversationSortDate(a)));
 
   return (
     <div className="conversation-list">

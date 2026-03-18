@@ -36,7 +36,14 @@ class Mensaje {
       ];
 
       const result = await pool.query(query, values);
-      return result.rows[0];
+      const nuevoMensaje = result.rows[0];
+
+      await pool.query(
+        `UPDATE conversaciones SET updated_at = $2 WHERE id = $1`,
+        [conversacion_id, nuevoMensaje.created_at]
+      );
+
+      return nuevoMensaje;
     } catch (error) {
       throw error;
     }

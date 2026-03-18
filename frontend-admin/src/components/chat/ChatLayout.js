@@ -14,6 +14,32 @@ function ChatLayout() {
   const [toast, setToast] = useState(null);
   const [activeView, setActiveView] = useState('list');
 
+  const buildLastMessage = (mensaje) => ({
+    mensaje: mensaje.mensaje,
+    tipo_mensaje: mensaje.tipo_mensaje,
+    created_at: mensaje.created_at,
+    user_id: mensaje.user_id,
+    tipo_usuario: mensaje.tipo_usuario
+  });
+
+  const applyIncomingMessageToConversation = (conv, mensaje, isActive, isOwn) => {
+    if (!conv || conv.id !== mensaje.conversacion_id) return conv;
+    return {
+      ...conv,
+      ultimo_mensaje: buildLastMessage(mensaje),
+      updated_at: mensaje.created_at,
+      mensajes_no_leidos: isActive || isOwn
+        ? 0
+        : (conv.mensajes_no_leidos || 0) + 1
+    };
+  };
+
+  const moveConversationToTop = (list, conversacionId) => {
+    const target = list.find((c) => c.id === conversacionId);
+    if (!target) return list;
+    return [target, ...list.filter((c) => c.id !== conversacionId)];
+  };
+
   const applyReadReceiptToConversation = (conv, data) => {
     if (!conv || conv.id !== data.conversacion_id) return conv;
     return {
@@ -55,21 +81,31 @@ function ChatLayout() {
     };
   }, [socket, conversaciones]);
 
-  // Badge: listener registrado una sola vez por socket, usa ref para evitar stale closure
+  // Actualizar lista y conversación activa al recibir mensaje nuevo
   useEffect(() => {
-    if (!socket) return;
+    if (!socket || !empleado) return;
+
     const handleNewMessage = (mensaje) => {
-      if (mensaje.conversacion_id !== conversacionActivaIdRef.current) {
-        setConversaciones(prev => prev.map(c =>
-          c.id === mensaje.conversacion_id
-            ? { ...c, mensajes_no_leidos: (c.mensajes_no_leidos || 0) + 1 }
-            : c
-        ));
-      }
+      const isActive = mensaje.conversacion_id === conversacionActivaIdRef.current;
+      const isOwn = mensaje.user_id === empleado.id && mensaje.tipo_usuario === 'empleado';
+
+      setConversaciones((prev) => {
+        const updated = prev.map((c) =>
+          applyIncomingMessageToConversation(c, mensaje, isActive, isOwn)
+        );
+        return moveConversationToTop(updated, mensaje.conversacion_id);
+      });
+
+      setConversacionActiva((prev) =>
+        prev?.id === mensaje.conversacion_id
+          ? applyIncomingMessageToConversation(prev, mensaje, true, isOwn)
+          : prev
+      );
     };
+
     socket.on('new_message', handleNewMessage);
     return () => socket.off('new_message', handleNewMessage);
-  }, [socket]);
+  }, [socket, empleado]);
 
   // Propagar messages_read al estado global de conversaciones y conversacionActiva
   useEffect(() => {
