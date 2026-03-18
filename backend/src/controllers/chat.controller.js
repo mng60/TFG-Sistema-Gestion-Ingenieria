@@ -122,6 +122,8 @@ const getMensajes = async (req, res) => {
       parseInt(offset)
     );
 
+    await Conversacion.markAsRead(conversacionId, userId, tipoUsuario);
+
     res.json({
       success: true,
       mensajes,
@@ -195,7 +197,14 @@ const markAsRead = async (req, res) => {
     const userId = req.user.id;
     const tipoUsuario = req.user.tipo_usuario;
 
-    await Conversacion.markAsRead(conversacionId, userId, tipoUsuario);
+    const updated = await Conversacion.markAsRead(conversacionId, userId, tipoUsuario);
+
+    if (!updated) {
+      return res.status(404).json({
+        success: false,
+        message: 'Participante no encontrado en la conversación'
+      });
+    }
 
     res.json({
       success: true,

@@ -175,8 +175,10 @@ class Conversacion {
       UPDATE conversacion_participantes
       SET last_read = CURRENT_TIMESTAMP
       WHERE conversacion_id = $1 AND user_id = $2 AND tipo_usuario = $3
+      RETURNING conversacion_id, user_id, tipo_usuario, last_read
     `;
-    await pool.query(query, [conversacionId, userId, tipoUsuario]);
+    const result = await pool.query(query, [conversacionId, userId, tipoUsuario]);
+    return result.rows[0] || null;
   }
 }
 

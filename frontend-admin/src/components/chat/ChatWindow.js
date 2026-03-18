@@ -32,9 +32,8 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
       conversacionIdRef.current = conversacion.id;
       setConversacionLocal(conversacion);
       cargarMensajes();
-      marcarComoLeido().catch(() => {});
     }
-  }, [conversacion?.id]);
+  }, [conversacion?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Scroll inicial: múltiples intentos para cubrir imágenes que modifican altura tras el render
   useEffect(() => {
