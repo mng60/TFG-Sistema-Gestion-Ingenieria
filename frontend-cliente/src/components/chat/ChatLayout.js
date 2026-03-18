@@ -35,12 +35,27 @@ function ChatLayout() {
     cargarConversaciones();
   }, []);
 
-  // Unirse a las salas cuando cambie el socket o las conversaciones
+  // Unirse a las salas cuando cambie el socket o las conversaciones, y re-unirse tras reconexión
   useEffect(() => {
     if (!socket || conversaciones.length === 0) return;
-    const ids = conversaciones.map(c => c.id);
-    socket.emit('join_conversations', ids);
-  }, [socket, conversaciones.length]);
+
+    const joinRooms = () => {
+      const ids = conversaciones.map(c => c.id);
+      if (ids.length > 0) {
+        socket.emit('join_conversations', ids);
+      }
+    };
+
+    if (socket.connected) {
+      joinRooms();
+    }
+
+    socket.on('connect', joinRooms);
+
+    return () => {
+      socket.off('connect', joinRooms);
+    };
+  }, [socket, conversaciones]);
 
   // Badge: listener registrado una sola vez por socket, usa ref para evitar stale closure
   useEffect(() => {

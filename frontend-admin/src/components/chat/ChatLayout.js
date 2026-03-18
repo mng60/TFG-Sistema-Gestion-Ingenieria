@@ -33,12 +33,27 @@ function ChatLayout() {
     cargarConversaciones();
   }, []);
 
-  // Unirse a las salas de conversación cuando cambien
+  // Unirse a las salas de conversación cuando cambien, y re-unirse tras reconexión
   useEffect(() => {
     if (!socket || conversaciones.length === 0) return;
-    const conversacionesIds = conversaciones.map(c => c.id);
-    socket.emit('join_conversations', conversacionesIds);
-  }, [socket, conversaciones.length]);
+
+    const joinRooms = () => {
+      const conversacionesIds = conversaciones.map(c => c.id);
+      if (conversacionesIds.length > 0) {
+        socket.emit('join_conversations', conversacionesIds);
+      }
+    };
+
+    if (socket.connected) {
+      joinRooms();
+    }
+
+    socket.on('connect', joinRooms);
+
+    return () => {
+      socket.off('connect', joinRooms);
+    };
+  }, [socket, conversaciones]);
 
   // Badge: listener registrado una sola vez por socket, usa ref para evitar stale closure
   useEffect(() => {

@@ -2,8 +2,31 @@ const jwt = require('jsonwebtoken');
 const Mensaje = require('../models/Mensaje');
 const Conversacion = require('../models/Conversacion');
 
-// Mapa de usuarios conectados: { userId_tipoUsuario: socketId }
+// Mapa de usuarios conectados: userKey -> Set(socketId)
 const connectedUsers = new Map();
+
+const getOnlineUserKeys = () => Array.from(connectedUsers.keys());
+
+const addUserConnection = (userKey, socketId) => {
+  if (!connectedUsers.has(userKey)) {
+    connectedUsers.set(userKey, new Set());
+  }
+  const sockets = connectedUsers.get(userKey);
+  const wasOffline = sockets.size === 0;
+  sockets.add(socketId);
+  return wasOffline;
+};
+
+const removeUserConnection = (userKey, socketId) => {
+  const sockets = connectedUsers.get(userKey);
+  if (!sockets) return false;
+  sockets.delete(socketId);
+  if (sockets.size === 0) {
+    connectedUsers.delete(userKey);
+    return true;
+  }
+  return false;
+};
 
 const initializeSocket = (io) => {
   // Middleware de autenticación para Socket.io
@@ -33,16 +56,20 @@ const initializeSocket = (io) => {
 
     // Registrar usuario conectado
     const userKey = `${socket.userId}_${socket.tipoUsuario}`;
-    connectedUsers.set(userKey, socket.id);
+    socket.userKey = userKey;
 
-    // Notificar a otros que este usuario está online
-    socket.broadcast.emit('user_online', {
-      userId: socket.userId,
-      tipoUsuario: socket.tipoUsuario
-    });
+    const becameOnline = addUserConnection(userKey, socket.id);
+
+    // Notificar a otros solo si este usuario pasó de offline a online
+    if (becameOnline) {
+      socket.broadcast.emit('user_online', {
+        userId: socket.userId,
+        tipoUsuario: socket.tipoUsuario
+      });
+    }
 
     // Enviar al recién conectado la lista actual de online
-    socket.emit('online_users', Array.from(connectedUsers.keys()));
+    socket.emit('online_users', getOnlineUserKeys());
 
     // Unirse a las conversaciones del usuario
     socket.on('join_conversations', async (conversacionesIds) => {
@@ -138,19 +165,21 @@ const initializeSocket = (io) => {
     // Desconexión
     socket.on('disconnect', () => {
       console.log(`❌ Usuario desconectado: ${socket.userId} (${socket.tipoUsuario})`);
-      connectedUsers.delete(userKey);
+      const becameOffline = removeUserConnection(socket.userKey, socket.id);
 
-      // Notificar a otros usuarios
-      socket.broadcast.emit('user_offline', {
-        userId: socket.userId,
-        tipoUsuario: socket.tipoUsuario
-      });
+      // Notificar a otros solo si ya no tiene ningún socket activo
+      if (becameOffline) {
+        socket.broadcast.emit('user_offline', {
+          userId: socket.userId,
+          tipoUsuario: socket.tipoUsuario
+        });
+      }
     });
   });
 
   // Emitir estado online de usuarios
   const onlineUsersInterval = setInterval(() => {
-    io.emit('online_users', Array.from(connectedUsers.keys()));
+    io.emit('online_users', getOnlineUserKeys());
   }, 30000);
 
   // Limpiar al cerrar

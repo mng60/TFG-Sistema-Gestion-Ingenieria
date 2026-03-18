@@ -141,10 +141,13 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
     try {
       const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
       const token = localStorage.getItem('token');
-      await fetch(`${API_URL}/chat/conversaciones/${conversacion.id}/read`, {
+      const response = await fetch(`${API_URL}/chat/conversaciones/${conversacion.id}/read`, {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${token}` }
       });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
       if (socket) socket.emit('mark_read', { conversacion_id: conversacion.id });
       if (onMarcarLeida) onMarcarLeida(conversacion.id);
     } catch (error) {
