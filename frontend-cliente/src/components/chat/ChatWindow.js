@@ -16,6 +16,10 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
   const [conversacionLocal, setConversacionLocal] = useState(conversacion);
 
   useEffect(() => {
+    setConversacionLocal(conversacion || null);
+  }, [conversacion]);
+
+  useEffect(() => {
     if (!conversacion) { setMensajes([]); return; }
     if (conversacionIdRef.current !== conversacion.id) {
       conversacionIdRef.current = conversacion.id;
@@ -27,13 +31,24 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
 
   useEffect(() => {
     if (!isInitialLoad || loading || mensajes.length === 0) return;
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        scrollToBottom(false);
-        setIsInitialLoad(false);
-      });
-    });
-  }, [mensajes, isInitialLoad, loading]);
+
+    const runScroll = () => scrollToBottom(false);
+
+    requestAnimationFrame(runScroll);
+
+    const t1 = setTimeout(runScroll, 60);
+    const t2 = setTimeout(runScroll, 180);
+    const t3 = setTimeout(() => {
+      runScroll();
+      setIsInitialLoad(false);
+    }, 320);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
+  }, [mensajes.length, isInitialLoad, loading]);
 
   useEffect(() => {
     if (!socket || !conversacion) return;
@@ -205,7 +220,13 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
         </div>
       )}
 
-      <div className="chat-messages" ref={messagesContainerRef}>
+      <div
+        className="chat-messages"
+        ref={messagesContainerRef}
+        onLoadCapture={() => {
+          if (isInitialLoad) scrollToBottom(false);
+        }}
+      >
         {loading ? (
           <div className="loading-messages">
             <div className="spinner"></div>

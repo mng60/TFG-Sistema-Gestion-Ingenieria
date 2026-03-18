@@ -16,6 +16,20 @@ function ChatLayout() {
   const [toast, setToast] = useState(null);
   const [activeView, setActiveView] = useState('list');
 
+  const applyReadReceiptToConversation = (conv, data) => {
+    if (!conv || conv.id !== data.conversacion_id) return conv;
+    return {
+      ...conv,
+      participantes: Array.isArray(conv.participantes)
+        ? conv.participantes.map((p) =>
+            p.user_id === data.user_id && p.tipo_usuario === data.tipo_usuario
+              ? { ...p, last_read: data.timestamp }
+              : p
+          )
+        : conv.participantes
+    };
+  };
+
   // Cargar conversaciones al montar
   useEffect(() => {
     cargarConversaciones();
@@ -42,6 +56,22 @@ function ChatLayout() {
     };
     socket.on('new_message', handleNewMessage);
     return () => socket.off('new_message', handleNewMessage);
+  }, [socket]);
+
+  useEffect(() => {
+    if (!socket) return;
+    const handleMessagesRead = (data) => {
+      setConversaciones((prev) =>
+        prev.map((c) => applyReadReceiptToConversation(c, data))
+      );
+      setConversacionActiva((prev) =>
+        applyReadReceiptToConversation(prev, data)
+      );
+    };
+    socket.on('messages_read', handleMessagesRead);
+    return () => {
+      socket.off('messages_read', handleMessagesRead);
+    };
   }, [socket]);
 
   const showToast = useCallback((message, type = 'success') => {
@@ -85,19 +115,50 @@ function ChatLayout() {
   };
 
   const handleSelectConversacion = useCallback((conversacion) => {
+    const now = new Date().toISOString();
+    const readData = {
+      conversacion_id: conversacion.id,
+      user_id: cliente.id,
+      tipo_usuario: 'cliente',
+      timestamp: now
+    };
+    const conversacionActualizada = {
+      ...applyReadReceiptToConversation(conversacion, readData),
+      mensajes_no_leidos: 0
+    };
     conversacionActivaIdRef.current = conversacion?.id || null;
-    setConversacionActiva(conversacion);
+    setConversacionActiva(conversacionActualizada);
     setActiveView('window');
-    setConversaciones(prev => prev.map(c =>
-      c.id === conversacion.id ? { ...c, mensajes_no_leidos: 0 } : c
-    ));
-  }, []);
+    setConversaciones((prev) =>
+      prev.map((c) =>
+        c.id === conversacion.id
+          ? { ...applyReadReceiptToConversation(c, readData), mensajes_no_leidos: 0 }
+          : c
+      )
+    );
+  }, [cliente]);
 
   const handleMarcarLeida = useCallback((conversacionId) => {
-    setConversaciones(prev => prev.map(c =>
-      c.id === conversacionId ? { ...c, mensajes_no_leidos: 0 } : c
-    ));
-  }, []);
+    const now = new Date().toISOString();
+    const readData = {
+      conversacion_id: conversacionId,
+      user_id: cliente.id,
+      tipo_usuario: 'cliente',
+      timestamp: now
+    };
+    setConversaciones((prev) =>
+      prev.map((c) =>
+        c.id === conversacionId
+          ? { ...applyReadReceiptToConversation(c, readData), mensajes_no_leidos: 0 }
+          : c
+      )
+    );
+    setConversacionActiva((prev) =>
+      prev?.id === conversacionId
+        ? { ...applyReadReceiptToConversation(prev, readData), mensajes_no_leidos: 0 }
+        : prev
+    );
+  }, [cliente]);
 
   const handleConversacionCreada = (nuevaConversacion) => {
     setShowNuevoModal(false);
