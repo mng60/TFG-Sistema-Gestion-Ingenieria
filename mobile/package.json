@@ -4,6 +4,9 @@
   "description": "PWA móvil para empleados — Sistema de Gestión de Ingeniería",
   "private": true,
   "dependencies": {
+    "@capacitor/android": "^8.2.0",
+    "@capacitor/cli": "^8.2.0",
+    "@capacitor/core": "^8.2.0",
     "ajv": "^8.18.0",
     "axios": "^1.6.2",
     "lucide-react": "^0.577.0",
@@ -35,5 +38,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5"
   }
 }
