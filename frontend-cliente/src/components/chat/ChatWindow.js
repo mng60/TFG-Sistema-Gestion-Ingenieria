@@ -157,6 +157,17 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
             readAt
           });
         }
+
+        // Diagnóstico: recargar conversación fresca desde backend
+        const convResponse = await fetch(`${API_URL}/chat/conversaciones/${conversacion.id}`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+          cache: 'no-store'
+        });
+        const convData = await convResponse.json();
+        if (convData.success && convData.conversacion) {
+          setConversacionLocal(convData.conversacion);
+          console.log('[cliente/chat] participantes frescos tras carga', convData.conversacion.participantes);
+        }
       }
     } catch (error) {
       console.error('Error al cargar mensajes:', error);
