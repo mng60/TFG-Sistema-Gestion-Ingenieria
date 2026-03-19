@@ -12,12 +12,20 @@ function BottomNav() {
   const [mensajesNoLeidos, setMensajesNoLeidos] = useState(0);
 
   useEffect(() => {
+    if (location.pathname === '/chat') {
+      setMensajesNoLeidos(0);
+      return;
+    }
     cargarNoLeidos();
     const interval = setInterval(cargarNoLeidos, 15000);
     return () => clearInterval(interval);
-  }, []);
+  }, [location.pathname]);
 
   const cargarNoLeidos = async () => {
+    if (location.pathname === '/chat') {
+      setMensajesNoLeidos(0);
+      return;
+    }
     try {
       const API_URL = process.env.REACT_APP_API_URL || `http://${window.location.hostname}:5000/api`;
       const token = localStorage.getItem('empleado_token');

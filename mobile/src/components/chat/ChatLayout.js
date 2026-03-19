@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { io } from 'socket.io-client';
 import ConversationList from './ConversationList';
 import NuevoConversacionModal from './NuevoConversacionModal';
 import ChatWindow from './ChatWindow';
@@ -8,8 +7,7 @@ import { useAuth } from '../../context/AuthContext';
 import '../../styles/Chat.css';
 
 function ChatLayout() {
-  const { empleado } = useAuth();
-  const [socket, setSocket] = useState(null);
+  const { empleado, socket, onlineUsers } = useAuth();
   const [conversaciones, setConversaciones] = useState([]);
   const [conversacionActiva, setConversacionActiva] = useState(null);
   const conversacionActivaIdRef = useRef(null);
@@ -17,39 +15,6 @@ function ChatLayout() {
   const [toast, setToast] = useState(null);
   // Mobile: 'list' | 'window'
   const [activeView, setActiveView] = useState('list');
-  const [onlineUsers, setOnlineUsers] = useState(new Set());
-
-  useEffect(() => {
-    const token = localStorage.getItem('empleado_token');
-    if (!token) return;
-    const hostname = window.location.hostname;
-    const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || `http://${hostname}:5000`;
-    const newSocket = io(SOCKET_URL, {
-      auth: { token },
-      transports: ['websocket', 'polling'],
-      reconnection: true,
-      reconnectionDelay: 1000,
-      reconnectionAttempts: 5
-    });
-    newSocket.on('online_users', (keys) => {
-      setOnlineUsers(new Set(keys));
-    });
-
-    newSocket.on('user_online', ({ userId, tipoUsuario }) => {
-      setOnlineUsers(prev => new Set([...prev, `${userId}_${tipoUsuario}`]));
-    });
-
-    newSocket.on('user_offline', ({ userId, tipoUsuario }) => {
-      setOnlineUsers(prev => {
-        const next = new Set(prev);
-        next.delete(`${userId}_${tipoUsuario}`);
-        return next;
-      });
-    });
-
-    setSocket(newSocket);
-    return () => newSocket.close();
-  }, []);
 
   useEffect(() => {
     cargarConversaciones();

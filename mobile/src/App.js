@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Capacitor } from '@capacitor/core';
+import { StatusBar, Style } from '@capacitor/status-bar';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import SplashScreen from './components/SplashScreen';
 import Login from './pages/Login';
@@ -21,6 +23,20 @@ function PublicRoute({ children }) {
 
 function App() {
   const [splashDone, setSplashDone] = useState(false);
+
+  useEffect(() => {
+    const setupStatusBar = async () => {
+      if (!Capacitor.isNativePlatform()) return;
+      try {
+        await StatusBar.setOverlaysWebView({ overlay: false });
+        await StatusBar.setStyle({ style: Style.Dark });
+        await StatusBar.setBackgroundColor({ color: '#F0F2F5' });
+      } catch (e) {
+        console.error('Error configurando StatusBar:', e);
+      }
+    };
+    setupStatusBar();
+  }, []);
 
   return (
     <AuthProvider>
