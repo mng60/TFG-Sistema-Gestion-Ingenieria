@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LandingNav from '../components/LandingNav';
+import Chatbot from '../components/Chatbot';
 import { MessageCircle, FileText, CheckSquare, Zap, ClipboardList, Wrench, ChevronLeft, ChevronRight } from 'lucide-react';
 import '../styles/Landing.css';
 
@@ -308,6 +309,8 @@ function Landing() {
           </button>
         </div>
       </footer>
+
+      <Chatbot />
     </div>
   );
 }
