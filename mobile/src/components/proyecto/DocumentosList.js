@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Download, Eye, EyeOff, FileText, Upload, Users } from 'lucide-react';
 import documentoService from '../../services/documentoService';
+import { formatearFecha } from '../../utils/format';
 import '../../styles/Modal.css';
 
 const fmtTamano = (bytes) => {
@@ -10,7 +11,6 @@ const fmtTamano = (bytes) => {
   return `${(kb / 1024).toFixed(1)} MB`;
 };
 
-const fmtFecha = (f) => f ? new Date(f).toLocaleDateString('es-ES') : '-';
 
 function SubirDocumentoModal({ proyectoId, onClose, onSuccess, showToast }) {
   const [uploading, setUploading] = useState(false);
@@ -253,7 +253,7 @@ function DocumentosList({ proyectoId, documentos, empleadosProyecto = [], isAdmi
               <div className="doc-nombre">{doc.nombre}</div>
               <div className="doc-meta">
                 <span className="badge badge-tipo">{doc.tipo_documento}</span>
-                <span>{fmtFecha(doc.created_at)}</span>
+                <span>{formatearFecha(doc.created_at)}</span>
                 <span>{fmtTamano(doc.tamano_bytes)}</span>
               </div>
               {isAdmin && (

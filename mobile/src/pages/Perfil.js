@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import MobileLayout from '../components/layout/MobileLayout';
 import api from '../services/api';
+import { getAvatarInitial } from '../utils/format';
 import { Camera, Save, Lock, LogOut, ChevronDown, ChevronUp } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || `http://${window.location.hostname}:5000`;
@@ -138,7 +139,7 @@ function Perfil() {
             }}>
               {avatarSrc
                 ? <img src={avatarSrc} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                : (empleado?.nombre || 'U').charAt(0).toUpperCase()
+                : getAvatarInitial(empleado?.nombre, 'U')
               }
             </div>
             <button

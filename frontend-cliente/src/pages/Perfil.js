@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import { getAvatarInitial } from '../utils/format';
+import Toast from '../components/Toast';
 import { Camera, Save, Lock, Building2 } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
@@ -53,8 +55,7 @@ function Perfil() {
   const [uploadingFoto, setUploadingFoto] = useState(false);
 
   const showToast = (msg, type = 'success') => {
-    setToast({ msg, type });
-    setTimeout(() => setToast(null), 3500);
+    setToast({ message: msg, type });
   };
 
   const handleFotoChange = async (e) => {
@@ -120,16 +121,7 @@ function Perfil() {
         <p style={{ color: '#7f8c8d', margin: '4px 0 0' }}>{cliente?.email}</p>
       </div>
 
-      {toast && (
-        <div style={{
-          padding: '12px 20px', borderRadius: 10, marginBottom: 20, fontWeight: 600,
-          background: toast.type === 'success' ? '#d4edda' : '#f8d7da',
-          color: toast.type === 'success' ? '#155724' : '#721c24',
-          border: `1px solid ${toast.type === 'success' ? '#c3e6cb' : '#f5c6cb'}`
-        }}>
-          {toast.msg}
-        </div>
-      )}
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
       <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 24, alignItems: 'start' }}>
 
@@ -144,7 +136,7 @@ function Perfil() {
             }}>
               {avatarSrc
                 ? <img src={avatarSrc} alt="logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                : (cliente?.nombre_empresa || 'C').charAt(0).toUpperCase()
+                : getAvatarInitial(cliente?.nombre_empresa, 'C')
               }
             </div>
             <button

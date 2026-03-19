@@ -2,11 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Users, Calendar, MapPin } from 'lucide-react';
 import '../../styles/Proyectos.css';
-
-const formatFecha = (fecha) => {
-  if (!fecha) return '-';
-  return new Date(fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
-};
+import { formatearFechaCorta } from '../../utils/format';
 
 const ESTADO_LABELS = {
   planificacion: 'Planificación',
@@ -40,7 +36,7 @@ function ProyectoCard({ proyecto }) {
           <span><Users size={12} style={{ verticalAlign: 'middle', marginRight: 3 }} />{proyecto.nombre_cliente}</span>
         )}
         {proyecto.fecha_fin && (
-          <span><Calendar size={12} style={{ verticalAlign: 'middle', marginRight: 3 }} />Fin: {formatFecha(proyecto.fecha_fin)}</span>
+          <span><Calendar size={12} style={{ verticalAlign: 'middle', marginRight: 3 }} />Fin: {formatearFechaCorta(proyecto.fecha_fin)}</span>
         )}
         {proyecto.ubicacion && (
           <span><MapPin size={12} style={{ verticalAlign: 'middle', marginRight: 3 }} />{proyecto.ubicacion}</span>

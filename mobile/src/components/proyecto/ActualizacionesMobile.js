@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Trash2, Calendar } from 'lucide-react';
 import proyectoService from '../../services/proyectoService';
+import { formatearFecha, formatearFechaHora } from '../../utils/format';
 
 function ActualizacionesMobile({ proyectoId, actualizaciones, isAdmin, empleadoId, onReload, showToast }) {
   const [showForm, setShowForm] = useState(false);
@@ -55,15 +56,6 @@ function ActualizacionesMobile({ proyectoId, actualizaciones, isAdmin, empleadoI
     }
   };
 
-  const formatFecha = (f) => {
-    if (!f) return '';
-    return new Date(f).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-  };
-
-  const formatFechaCorta = (f) => {
-    if (!f) return '';
-    return new Date(f).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
-  };
 
   return (
     <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -163,7 +155,7 @@ function ActualizacionesMobile({ proyectoId, actualizaciones, isAdmin, empleadoI
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                 <div>
                   <span style={{ fontWeight: 700, fontSize: '0.9rem', color: '#2c3e50' }}>{act.empleado_nombre}</span>
-                  <span style={{ fontSize: '0.75rem', color: '#95a5a6', marginLeft: 8 }}>{formatFecha(act.created_at)}</span>
+                  <span style={{ fontSize: '0.75rem', color: '#95a5a6', marginLeft: 8 }}>{formatearFechaHora(act.created_at)}</span>
                 </div>
                 {(isAdmin || act.empleado_id === empleadoId) && (
                   <button
@@ -177,7 +169,7 @@ function ActualizacionesMobile({ proyectoId, actualizaciones, isAdmin, empleadoI
               </div>
               {act.sugiere_cambio_fecha && (
                 <div style={{ background: '#fff3cd', color: '#856404', fontSize: '0.75rem', fontWeight: 600, padding: '3px 8px', borderRadius: 20, display: 'inline-flex', alignItems: 'center', gap: 4, marginBottom: 8 }}>
-                  <Calendar size={12} /> Sugiere fecha: {formatFechaCorta(act.fecha_sugerida)}
+                  <Calendar size={12} /> Sugiere fecha: {formatearFecha(act.fecha_sugerida)}
                 </div>
               )}
               {act.realizado && (

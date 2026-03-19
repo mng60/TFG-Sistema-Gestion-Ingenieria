@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Paperclip, Mail, Phone } from 'lucide-react';
 import ArchivosPanel from './ArchivosPanel';
+import { getAvatarInitial } from '../../utils/format';
 
 function InfoPanel({ participant, conversacion, currentUser, onClose }) {
   const [infoAdicional, setInfoAdicional] = useState(null);
@@ -42,7 +43,7 @@ function InfoPanel({ participant, conversacion, currentUser, onClose }) {
         <div className="info-panel-content">
           <div className="info-avatar-large">
             <div className="avatar-circle-large">
-              {participant.nombre?.charAt(0).toUpperCase() || '?'}
+              {getAvatarInitial(participant.nombre)}
             </div>
           </div>
 
@@ -80,7 +81,7 @@ function InfoPanel({ participant, conversacion, currentUser, onClose }) {
                 <div key={grupo.id} className="grupo-item">
                   <div className="grupo-icon">
                     <div className="avatar-circle" style={{ width: 32, height: 32, fontSize: '0.8rem' }}>
-                      {grupo.nombre?.charAt(0).toUpperCase() || 'G'}
+                      {getAvatarInitial(grupo.nombre, 'G')}
                     </div>
                   </div>
                   <div className="grupo-info">

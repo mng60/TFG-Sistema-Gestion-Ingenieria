@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { ClipboardList, FolderOpen, MessagesSquare } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { getAvatarInitial } from '../../utils/format';
 import '../../styles/ClienteLayout.css';
 
 function ClienteLayout({ children }) {
@@ -96,7 +97,7 @@ function ClienteLayout({ children }) {
             <div className="user-avatar">
               {cliente?.foto_url
                 ? <img src={`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'}${cliente.foto_url}`} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
-                : (cliente?.nombre_empresa || 'C').charAt(0).toUpperCase()
+                : getAvatarInitial(cliente?.nombre_empresa, 'C')
               }
             </div>
             <div className="user-details">

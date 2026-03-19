@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Calendar, Flag } from 'lucide-react';
 import api from '../services/api';
+import { formatearFecha } from '../utils/format';
 import '../styles/Dashboard.css';
 
 function Dashboard() {
@@ -16,10 +17,6 @@ function Dashboard() {
       .finally(() => setLoading(false));
   }, []);
 
-  const formatearFecha = (fecha) => {
-    if (!fecha) return '-';
-    return new Date(fecha).toLocaleDateString('es-ES');
-  };
 
   if (loading) {
     return (

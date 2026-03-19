@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import ConversationList from './ConversationList';
 import NuevoConversacionModal from './NuevoConversacionModal';
 import ChatWindow from './ChatWindow';
+import Toast from '../Toast';
 import { useAuth } from '../../context/AuthContext';
 
 function ChatLayout() {
@@ -128,7 +129,6 @@ function ChatLayout() {
 
   const showToast = useCallback((message, type = 'success') => {
     setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
   }, []);
 
   useEffect(() => {
@@ -228,9 +228,7 @@ function ChatLayout() {
 
   return (
     <div className="chat-layout">
-      {toast && (
-        <div className={`chat-toast chat-toast-${toast.type}`}>{toast.message}</div>
-      )}
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
       <ConversationList
         conversaciones={conversaciones}

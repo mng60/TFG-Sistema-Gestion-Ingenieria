@@ -3,6 +3,7 @@ import { Plus, Users } from 'lucide-react';
 import proyectoService from '../../services/proyectoService';
 import usuarioService from '../../services/usuarioService';
 import ConfirmModal from '../common/ConfirmModal';
+import { getAvatarInitial } from '../../utils/format';
 import '../../styles/Modal.css';
 
 function AsignarModal({ proyectoId, empleadosAsignados, onClose, onSuccess }) {
@@ -73,7 +74,7 @@ function AsignarModal({ proyectoId, empleadosAsignados, onClose, onSuccess }) {
                     color: 'white', display: 'flex', alignItems: 'center',
                     justifyContent: 'center', fontWeight: 700, flexShrink: 0
                   }}>
-                    {(emp.nombre || '?').charAt(0).toUpperCase()}
+                    {getAvatarInitial(emp.nombre)}
                   </div>
                   <div>
                     <div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{emp.nombre}</div>
@@ -139,7 +140,7 @@ function EmpleadosList({ proyectoId, empleados, isAdmin, onReload, showToast }) 
         empleados.map((emp) => (
           <div key={emp.user_id || emp.id} className="empleado-card-m">
             <div className="empleado-avatar-m">
-              {(emp.empleado_nombre || emp.nombre || '?').charAt(0).toUpperCase()}
+              {getAvatarInitial(emp.empleado_nombre || emp.nombre)}
             </div>
             <div className="empleado-info-m">
               <div className="empleado-nombre-m">{emp.empleado_nombre || emp.nombre}</div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Paperclip, FolderOpen } from 'lucide-react';
 import ArchivosPanel from './ArchivosPanel';
+import { getAvatarInitial } from '../../utils/format';
 
 function InfoPanelGrupo({ conversacion, currentUser, onClose }) {
   const navigate = useNavigate();
@@ -52,7 +53,7 @@ function InfoPanelGrupo({ conversacion, currentUser, onClose }) {
         <div className="info-panel-content">
           <div className="info-avatar-large">
             <div className="avatar-circle-large">
-              {conversacion.nombre?.charAt(0).toUpperCase() || 'G'}
+              {getAvatarInitial(conversacion.nombre, 'G')}
             </div>
           </div>
 
@@ -75,7 +76,7 @@ function InfoPanelGrupo({ conversacion, currentUser, onClose }) {
                     <div className="avatar-circle" style={{ width: 34, height: 34, fontSize: '0.85rem' }}>
                       {participante.foto_url
                         ? <img src={`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'}${participante.foto_url}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
-                        : participante.nombre?.charAt(0).toUpperCase() || '?'
+                        : getAvatarInitial(participante.nombre)
                       }
                     </div>
                   </div>

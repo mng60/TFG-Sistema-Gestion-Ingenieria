@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import InfoPanelGrupo from './InfoPanelGrupo';
+import { getAvatarInitial } from '../../utils/format';
 
 function ChatHeaderGrupo({ conversacion, currentUser }) {
   const [showMenu, setShowMenu] = useState(false);
@@ -15,7 +16,7 @@ function ChatHeaderGrupo({ conversacion, currentUser }) {
         <div className="chat-header-info">
           <div className="header-avatar">
             <div className="avatar-circle">
-              {conversacion.nombre?.charAt(0).toUpperCase() || 'G'}
+              {getAvatarInitial(conversacion.nombre, 'G')}
             </div>
           </div>
           <div className="header-details">

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import InfoPanel from './InfoPanel';
+import { getAvatarInitial } from '../../utils/format';
 import { useNavigate } from 'react-router-dom';
 import ConfirmModal from '../common/ConfirmModal';
 import { ArrowLeft } from 'lucide-react';
@@ -94,7 +95,7 @@ function ChatHeader({ conversacion, currentUser, onConversacionEliminada, onBack
             <div className="avatar-circle">
               {otherParticipant?.foto_url
                 ? <img src={`${process.env.REACT_APP_BACKEND_URL || `http://${window.location.hostname}:5000`}${otherParticipant.foto_url}`} alt="av" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
-                : otherParticipant?.nombre?.charAt(0).toUpperCase() || '?'
+                : getAvatarInitial(otherParticipant?.nombre)
               }
             </div>
             <div className={`status-indicator ${otherParticipant && onlineUsers.has(`${otherParticipant.user_id}_${otherParticipant.tipo_usuario}`) ? 'online' : ''}`}></div>

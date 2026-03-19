@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ImageViewer from './ImageViewer';
 import { FileText, Archive, Music, Image, FolderOpen } from 'lucide-react';
+import { formatearFechaCorta } from '../../utils/format';
 
 function ArchivosPanel({ conversacionId, onClose }) {
   const [archivos, setArchivos] = useState({ imagenes: [], documentos: [], audios: [] });
@@ -42,13 +43,6 @@ function ArchivosPanel({ conversacionId, onClose }) {
     }
   };
 
-  const formatearFecha = (fecha) => {
-    return new Date(fecha).toLocaleDateString('es-ES', { 
-      day: '2-digit', 
-      month: 'short', 
-      year: 'numeric' 
-    });
-  };
 
   const getIconoArchivo = (archivoTipo) => {
     if (!archivoTipo) return <FileText size={26} color="#7f8c8d" />;
@@ -145,7 +139,7 @@ function ArchivosPanel({ conversacionId, onClose }) {
                           }}
                         />
                         <div className="archivo-imagen-info">
-                          <small>{formatearFecha(archivo.created_at)}</small>
+                          <small>{formatearFechaCorta(archivo.created_at)}</small>
                         </div>
                       </div>
                     ))}
@@ -173,7 +167,7 @@ function ArchivosPanel({ conversacionId, onClose }) {
                         <div className="archivo-info">
                           <strong>{archivo.archivo_nombre}</strong>
                           <small>
-                            {archivo.usuario_nombre} • {formatearFecha(archivo.created_at)}
+                            {archivo.usuario_nombre} • {formatearFechaCorta(archivo.created_at)}
                           </small>
                         </div>
                         <button 
@@ -204,7 +198,7 @@ function ArchivosPanel({ conversacionId, onClose }) {
                         </div>
                         <div className="archivo-info">
                           <strong>Audio de {archivo.usuario_nombre}</strong>
-                          <small>{formatearFecha(archivo.created_at)}</small>
+                          <small>{formatearFechaCorta(archivo.created_at)}</small>
                         </div>
                         <audio 
                           controls 

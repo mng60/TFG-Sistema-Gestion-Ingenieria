@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Plus, Paperclip } from 'lucide-react';
 import { formatearFechaLista, getConversationSortDate } from './chatUtils';
+import { getAvatarInitial } from '../../utils/format';
 
 function ConversationList({ conversaciones, conversacionActiva, onSelectConversacion, onNewConversacion, currentUser, onlineUsers = new Set() }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -23,10 +24,10 @@ function ConversationList({ conversaciones, conversacionActiva, onSelectConversa
 
   const getAvatarContent = (conversacion) => {
     if (conversacion.tipo === 'proyecto_grupo') {
-      return conversacion.nombre?.charAt(0).toUpperCase() || 'G';
+      return getAvatarInitial(conversacion.nombre, 'G');
     }
     const other = getOtherParticipant(conversacion);
-    return other?.nombre?.charAt(0).toUpperCase() || '?';
+    return getAvatarInitial(other?.nombre);
   };
 
 

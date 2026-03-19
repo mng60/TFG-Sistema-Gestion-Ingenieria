@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ImageViewer from './ImageViewer';
 import { FileText, Archive, Music, Image, FolderOpen, Download } from 'lucide-react';
+import { formatearFechaArchivo } from '../../utils/format';
 
 function ArchivosPanel({ conversacionId, onClose }) {
   const [archivos, setArchivos] = useState({ imagenes: [], documentos: [], audios: [] });
@@ -38,8 +39,6 @@ function ArchivosPanel({ conversacionId, onClose }) {
     cargarArchivos();
   }, [conversacionId]);
 
-  const formatearFecha = (fecha) =>
-    new Date(fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
 
   const getIconoArchivo = (archivoTipo) => {
     if (!archivoTipo) return <FileText size={26} color="#7f8c8d" />;
@@ -126,7 +125,7 @@ function ArchivosPanel({ conversacionId, onClose }) {
                           }}
                         />
                         <div className="archivo-imagen-info">
-                          <small>{formatearFecha(archivo.created_at)}</small>
+                          <small>{formatearFechaArchivo(archivo.created_at)}</small>
                         </div>
                       </div>
                     ))}
@@ -147,7 +146,7 @@ function ArchivosPanel({ conversacionId, onClose }) {
                         <div className="archivo-icono">{getIconoArchivo(archivo.archivo_tipo)}</div>
                         <div className="archivo-info">
                           <strong>{archivo.archivo_nombre}</strong>
-                          <small>{archivo.usuario_nombre} • {formatearFecha(archivo.created_at)}</small>
+                          <small>{archivo.usuario_nombre} • {formatearFechaArchivo(archivo.created_at)}</small>
                         </div>
                         <button className="btn-descargar" onClick={() => handleDescargar(archivo)}>
                           <Download size={16} />
@@ -171,7 +170,7 @@ function ArchivosPanel({ conversacionId, onClose }) {
                         <div className="archivo-icono"><Music size={26} color="#8e44ad" /></div>
                         <div className="archivo-info">
                           <strong>Audio de {archivo.usuario_nombre}</strong>
-                          <small>{formatearFecha(archivo.created_at)}</small>
+                          <small>{formatearFechaArchivo(archivo.created_at)}</small>
                         </div>
                         <audio controls src={getFullUrl(archivo.archivo_url)}>
                           Tu navegador no soporta audio.

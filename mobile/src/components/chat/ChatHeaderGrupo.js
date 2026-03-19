@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import InfoPanelGrupo from './InfoPanelGrupo';
 import ConfirmModal from '../common/ConfirmModal';
 import { ArrowLeft } from 'lucide-react';
+import { getAvatarInitial } from '../../utils/format';
 
 function ChatHeaderGrupo({ conversacion, currentUser, onConversacionEliminada, showToast, onBack, onOpenDirectChat }) {
   const [showMenu, setShowMenu] = useState(false);
@@ -76,7 +77,7 @@ function ChatHeaderGrupo({ conversacion, currentUser, onConversacionEliminada, s
           )}
           <div className="header-avatar">
             <div className="avatar-circle">
-              {conversacion.nombre?.charAt(0).toUpperCase() || 'G'}
+              {getAvatarInitial(conversacion.nombre, 'G')}
             </div>
           </div>
 

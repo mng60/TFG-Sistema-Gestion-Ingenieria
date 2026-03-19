@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Award, ClipboardList, Download, FileText, Image, MapPin, Ruler, Scroll, BarChart2 } from 'lucide-react';
 import api from '../services/api';
+import { formatearFecha, formatearMoneda, getAvatarInitial } from '../utils/format';
+import Toast from '../components/Toast';
 import '../styles/ProyectoCompleto.css';
 
 const TIPO_DOC_ICONS = {
@@ -59,8 +61,7 @@ function ProyectoCompleto() {
   }, [id, navigate]);
 
   const showToast = (msg, tipo = 'success') => {
-    setToast({ msg, tipo });
-    setTimeout(() => setToast(null), 3000);
+    setToast({ message: msg, type: tipo });
   };
 
   const aceptarPresupuesto = async (presupuestoId) => {
@@ -106,12 +107,6 @@ function ProyectoCompleto() {
     navigate('/chat', { state: { proyectoId: proyecto.id } });
   };
 
-  const formatearFecha = (fecha) => fecha ? new Date(fecha).toLocaleDateString('es-ES') : '-';
-  const formatearMoneda = (valor) => (
-    valor
-      ? new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(valor)
-      : '0,00 €'
-  );
 
   const formatearTamano = (bytes) => {
     if (!bytes) return '-';
@@ -133,7 +128,7 @@ function ProyectoCompleto() {
 
   return (
     <div className="proyecto-completo">
-      {toast && <div className={`toast toast-${toast.tipo}`}>{toast.msg}</div>}
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
       <header className="proyecto-header">
         <button className="btn-back" onClick={() => navigate('/dashboard')}>← Volver</button>
@@ -217,7 +212,7 @@ function ProyectoCompleto() {
                   {empleados.map((emp) => (
                     <div key={emp.id} className="empleado-card">
                       <div className="empleado-avatar">
-                        {emp.nombre.charAt(0).toUpperCase()}
+                        {getAvatarInitial(emp.nombre)}
                       </div>
                       <div className="empleado-info">
                         <strong>{emp.nombre}</strong>
