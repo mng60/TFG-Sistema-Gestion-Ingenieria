@@ -22,7 +22,7 @@ const FAQ = [
   {
     id: 'zona',
     pregunta: '¿En qué zonas trabajáis?',
-    respuesta: 'Trabajamos principalmente en Andalucía. Para proyectos fuera de nuestra zona habitual, consúltanos y lo valoramos sin compromiso.',
+    respuesta: 'Trabajamos principalmente en Murcía. Para proyectos fuera de nuestra zona habitual, consúltanos y lo valoramos sin compromiso.',
   },
   {
     id: 'solar',
@@ -32,7 +32,7 @@ const FAQ = [
   {
     id: 'portal',
     pregunta: 'Soy cliente, ¿cómo accedo?',
-    respuesta: 'Puedes acceder al área privada desde el botón "Área Cliente" en el pie de página. Si no tienes credenciales aún, contáctanos y te las facilitamos.',
+    respuesta: 'Puedes acceder al área privada desde el botón "Área Cliente" en el pie de página o en la cabecera. Si no tienes credenciales aún, contáctanos y te las facilitamos.',
   },
 ];
 
