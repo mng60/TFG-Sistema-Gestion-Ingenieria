@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Plus } from 'lucide-react';
+import { formatearFechaLista, getConversationSortDate } from './chatUtils';
 
 function ConversationList({
   conversaciones,
@@ -10,18 +11,6 @@ function ConversationList({
   onlineUsers = new Set()
 }) {
   const [searchTerm, setSearchTerm] = useState('');
-
-  const formatearFecha = (fecha) => {
-    if (!fecha) return '';
-    const date = new Date(fecha);
-    const hoy = new Date();
-    
-    if (date.toDateString() === hoy.toDateString()) {
-      return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-    }
-    
-    return date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
-  };
 
   const getOtherParticipant = (conversacion) => {
     if (!conversacion.participantes) return null;
@@ -67,8 +56,6 @@ function ConversationList({
     return otherParticipant?.nombre?.charAt(0).toUpperCase() || '?';
   };
 
-  const getConversationSortDate = (conv) =>
-    conv?.ultimo_mensaje?.created_at || conv?.updated_at || conv?.created_at || 0;
 
   const conversacionesFiltradas = conversaciones
     .filter(conv => {
@@ -137,7 +124,7 @@ function ConversationList({
                     <h4>{getNombreConversacion(conversacion)}</h4>
                     {conversacion.ultimo_mensaje && (
                       <span className="conversation-time">
-                        {formatearFecha(conversacion.ultimo_mensaje.created_at)}
+                        {formatearFechaLista(conversacion.ultimo_mensaje.created_at)}
                       </span>
                     )}
                   </div>

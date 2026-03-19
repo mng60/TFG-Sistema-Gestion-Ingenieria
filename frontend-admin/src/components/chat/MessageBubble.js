@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import ImageViewer from './ImageViewer';
+import { formatearHora, allParticipantsRead } from './chatUtils';
 
 function MessageBubble({ mensaje, isOwn, conversacion }) {
 
@@ -18,49 +19,22 @@ function MessageBubble({ mensaje, isOwn, conversacion }) {
     return `${API_BASE}${url}`;
   };
 
-  const parseChatDate = (value) => {
-    if (!value) return null;
-    if (value instanceof Date) return value;
-    const str = String(value);
-    if (/[zZ]|[+\-]\d{2}:\d{2}$/.test(str)) return new Date(str);
-    return new Date(`${str}Z`);
-  };
-
-  const formatearHora = (fecha) => {
-    const d = parseChatDate(fecha);
-    if (!d || Number.isNaN(d.getTime())) return '';
-    return d.toLocaleTimeString('es-ES', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
   const getCheckmarks = () => {
     if (!isOwn) return null;
 
-    // Si no hay conversación o participantes, mostrar checkmarks grises
     if (!conversacion?.participantes || conversacion.participantes.length === 0) {
       return <span className="message-status">✓✓</span>;
     }
 
-    // Obtener otros participantes (excluir al emisor del mensaje)
     const otrosParticipantes = conversacion.participantes.filter(
       p => !(p.user_id === mensaje.user_id && p.tipo_usuario === mensaje.tipo_usuario)
     );
 
-    // Si no hay otros participantes, mostrar grises
     if (otrosParticipantes.length === 0) {
       return <span className="message-status">✓✓</span>;
     }
 
-    // Verificar si TODOS leyeron el mensaje
-    const todosLeyeron = otrosParticipantes.every((p) => {
-      const readDate = parseChatDate(p.last_read);
-      const messageDate = parseChatDate(mensaje.created_at);
-      if (!readDate || !messageDate) return false;
-      if (Number.isNaN(readDate.getTime()) || Number.isNaN(messageDate.getTime())) return false;
-      return readDate.getTime() >= messageDate.getTime();
-    });
+    const todosLeyeron = allParticipantsRead(otrosParticipantes, mensaje);
 
     return (
       <span className={`message-status ${todosLeyeron ? 'read' : ''}`}>

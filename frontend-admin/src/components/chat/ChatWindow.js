@@ -199,23 +199,6 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
           };
         });
 
-        if (!data.read_updated) {
-          console.warn('[admin/chat] getMensajes no actualizó last_read', {
-            conversacionId: conversacion?.id,
-            readAt
-          });
-        }
-
-        // Diagnóstico: recargar conversación fresca desde backend
-        const convResponse = await fetch(`${API_URL}/chat/conversaciones/${conversacion.id}`, {
-          headers: { 'Authorization': `Bearer ${token}` },
-          cache: 'no-store'
-        });
-        const convData = await convResponse.json();
-        if (convData.success && convData.conversacion) {
-          setConversacionLocal(convData.conversacion);
-          console.log('[admin/chat] participantes frescos tras carga', convData.conversacion.participantes);
-        }
       }
     } catch (error) {
       console.error('❌ Error al cargar mensajes:', error);

@@ -146,14 +146,6 @@ const getMensajes = async (req, res) => {
       readAt
     );
 
-    if (!updatedRead) {
-      console.warn('[chat/getMensajes] markAsReadAt no actualizó ninguna fila', {
-        conversacionId,
-        userId,
-        tipoUsuario,
-        readAt
-      });
-    }
 
     res.json({
       success: true,

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import ImageViewer from './ImageViewer';
+import { formatearHora, allParticipantsRead } from './chatUtils';
 
 function MessageBubble({ mensaje, isOwn, conversacion }) {
 
@@ -19,37 +20,22 @@ function MessageBubble({ mensaje, isOwn, conversacion }) {
     return `${API_BASE}${url}`;
   };
 
-  const formatearHora = (fecha) => {
-    if (!fecha) return '';
-    return new Date(fecha).toLocaleTimeString('es-ES', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
   const getCheckmarks = () => {
     if (!isOwn) return null;
 
-    // Si no hay conversación o participantes, mostrar checkmarks grises
     if (!conversacion?.participantes || conversacion.participantes.length === 0) {
       return <span className="message-status">✓✓</span>;
     }
 
-    // Obtener otros participantes (excluir al emisor del mensaje)
     const otrosParticipantes = conversacion.participantes.filter(
       p => !(p.user_id === mensaje.user_id && p.tipo_usuario === mensaje.tipo_usuario)
     );
 
-    // Si no hay otros participantes, mostrar grises
     if (otrosParticipantes.length === 0) {
       return <span className="message-status">✓✓</span>;
     }
 
-    // Verificar si TODOS leyeron el mensaje
-    const todosLeyeron = otrosParticipantes.every(p => {
-      if (!p.last_read) return false;
-      return new Date(p.last_read) >= new Date(mensaje.created_at);
-    });
+    const todosLeyeron = allParticipantsRead(otrosParticipantes, mensaje);
 
     return (
       <span className={`message-status ${todosLeyeron ? 'read' : ''}`}>

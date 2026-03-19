@@ -126,14 +126,14 @@ function InfoPanel({ participant, conversacion, currentUser, onClose }) {
                   className="info-action-btn"
                   onClick={() => { navigate(`/proyectos?cliente_id=${participant.user_id}&nombre=${encodeURIComponent(participant.nombre)}`); onClose(); }}
                 >
-                  📁 Ver proyectos del cliente
+                  <Paperclip size={14} color="grey" /> Ver proyectos del cliente
                 </button>
               ) : (
                 <button
                   className="info-action-btn"
                   onClick={() => { navigate(`/proyectos?solo_empleado_id=${participant.user_id}&nombre=${encodeURIComponent(participant.nombre)}`); onClose(); }}
                 >
-                  📁 Ver todos sus proyectos
+                  <Paperclip size={14} color="grey" /> Ver todos sus proyectos
                 </button>
               )
             )}

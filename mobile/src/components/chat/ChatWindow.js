@@ -30,7 +30,6 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
     if (conversacionIdRef.current !== conversacion.id) {
       conversacionIdRef.current = conversacion.id;
       cargarMensajes();
-      marcarComoLeido().catch(() => {});
     }
   }, [conversacion?.id]);
 
@@ -163,7 +162,8 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
       const token = localStorage.getItem('empleado_token');
 
       const response = await fetch(`${API_URL}/chat/mensajes/${conversacion.id}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 'Authorization': `Bearer ${token}` },
+        cache: 'no-store'
       });
 
       const data = await response.json();
@@ -171,6 +171,24 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
       if (data.success) {
         setMensajes(data.mensajes || []);
         setIsInitialLoad(true);
+
+        const readAt = data.read_at || new Date().toISOString();
+
+        if (socket && conversacion?.id) {
+          socket.emit('mark_read', { conversacion_id: conversacion.id });
+        }
+
+        setConversacionLocal((prev) => {
+          if (!prev?.participantes) return prev;
+          return {
+            ...prev,
+            participantes: prev.participantes.map((p) =>
+              p.user_id === currentUser.id && p.tipo_usuario === 'empleado'
+                ? { ...p, last_read: readAt }
+                : p
+            )
+          };
+        });
       }
     } catch (error) {
       console.error('❌ Error al cargar mensajes:', error);
@@ -179,25 +197,26 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
     }
   };
 
-  const marcarComoLeido = async () => {
+  const marcarComoLeido = () => {
     if (!conversacion || conversacion.ephemeral) return;
 
-    try {
-      const API_URL = process.env.REACT_APP_API_URL || `http://${window.location.hostname}:5000/api`;
-      const token = localStorage.getItem('empleado_token');
+    const now = new Date().toISOString();
 
-      await fetch(`${API_URL}/chat/conversaciones/${conversacion.id}/read`, {
-        method: 'PUT',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-
-      if (socket) {
-        socket.emit('mark_read', { conversacion_id: conversacion.id });
-      }
-
-    } catch (error) {
-      console.error('❌ Error al marcar como leído:', error);
+    if (socket && conversacion.id) {
+      socket.emit('mark_read', { conversacion_id: conversacion.id });
     }
+
+    setConversacionLocal((prev) => {
+      if (!prev?.participantes) return prev;
+      return {
+        ...prev,
+        participantes: prev.participantes.map((p) =>
+          p.user_id === currentUser.id && p.tipo_usuario === 'empleado'
+            ? { ...p, last_read: now }
+            : p
+        )
+      };
+    });
   };
 
   const handleSendMessage = async (mensaje, tipoMensaje = 'texto') => {

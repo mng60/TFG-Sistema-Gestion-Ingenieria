@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FileText } from 'lucide-react';
 import ImageViewer from './ImageViewer';
+import { formatearHora, allParticipantsRead } from './chatUtils';
 
 function MessageBubble({ mensaje, isOwn, conversacion }) {
   const [showImageViewer, setShowImageViewer] = useState(false);
@@ -10,20 +11,6 @@ function MessageBubble({ mensaje, isOwn, conversacion }) {
     if (url.startsWith('http://') || url.startsWith('https://')) return url;
     const API_BASE = process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:5000';
     return `${API_BASE}${url}`;
-  };
-
-  const parseChatDate = (value) => {
-    if (!value) return null;
-    if (value instanceof Date) return value;
-    const str = String(value);
-    if (/[zZ]|[+\-]\d{2}:\d{2}$/.test(str)) return new Date(str);
-    return new Date(`${str}Z`);
-  };
-
-  const formatearHora = (fecha) => {
-    const d = parseChatDate(fecha);
-    if (!d || Number.isNaN(d.getTime())) return '';
-    return d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
   };
 
   const getCheckmarks = () => {
@@ -36,13 +23,7 @@ function MessageBubble({ mensaje, isOwn, conversacion }) {
     );
     if (otrosParticipantes.length === 0) return <span className="message-status">✓✓</span>;
 
-    const todosLeyeron = otrosParticipantes.every((p) => {
-      const readDate = parseChatDate(p.last_read);
-      const messageDate = parseChatDate(mensaje.created_at);
-      if (!readDate || !messageDate) return false;
-      if (Number.isNaN(readDate.getTime()) || Number.isNaN(messageDate.getTime())) return false;
-      return readDate.getTime() >= messageDate.getTime();
-    });
+    const todosLeyeron = allParticipantsRead(otrosParticipantes, mensaje);
 
     return <span className={`message-status ${todosLeyeron ? 'read' : ''}`}>✓✓</span>;
   };
