@@ -16,9 +16,32 @@
   --nav-h:       72px;
 }
 
-.landing * { box-sizing: border-box; margin: 0; padding: 0; }
+.landing,
+.landing * {
+  box-sizing: border-box;
+}
+
 .landing { font-family: 'Inter', 'Segoe UI', sans-serif; color: var(--black); overflow-x: hidden; }
-.landing button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+.landing button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.btn-area-cliente,
+.btn-hamburger,
+.btn-close-menu,
+.btn-ver-mas,
+.circle-nav,
+.btn-cta-main,
+.footer-area-cliente {
+  -webkit-appearance: none;
+  appearance: none;
+  background: none;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+}
 
 /* ════════════════════
    NAV

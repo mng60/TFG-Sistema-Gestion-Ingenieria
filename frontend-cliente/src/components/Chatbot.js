@@ -37,57 +37,108 @@ const FAQ = [
 ];
 
 const MSG_BIENVENIDA =
-  '¡Hola! Soy el asistente virtual de BlueArc Energy 👋 Selecciona una pregunta frecuente o, si no encuentras lo que buscas, te redirijo al formulario de contacto.';
+  '¡Hola! Soy el asistente virtual de BlueArc Energy 👋 Selecciona una pregunta frecuente o indica que no encuentras lo que buscas.';
 
 function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
-  const [step, setStep] = useState('faq'); // 'faq' | 'answered'
-  const [hasOpened, setHasOpened] = useState(false);
+  const [step, setStep] = useState('faq');
+  const [usedFaqs, setUsedFaqs] = useState(new Set());
+  const [processing, setProcessing] = useState(false);
   const bottomRef = useRef(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const prevBodyOverflow = document.body.style.overflow;
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = prevBodyOverflow;
+      document.documentElement.style.overflow = prevHtmlOverflow;
+    }
+
+    return () => {
+      document.body.style.overflow = prevBodyOverflow;
+      document.documentElement.style.overflow = prevHtmlOverflow;
+    };
+  }, [isOpen]);
+
+  const resetConversacion = () => {
+    setMessages([]);
+    setStep('faq');
+    setUsedFaqs(new Set());
+    setProcessing(false);
+  };
 
   const addMessage = (from, text) => {
     setMessages((prev) => [...prev, { from, text }]);
   };
 
-  const open = () => {
+  const handleOpen = () => {
     setIsOpen(true);
-    if (!hasOpened) {
-      setHasOpened(true);
-      setTimeout(() => addMessage('bot', MSG_BIENVENIDA), 300);
-    }
+    setTimeout(() => addMessage('bot', MSG_BIENVENIDA), 300);
+  };
+
+  const handleClose = () => {
+    setIsOpen(false);
+    setTimeout(resetConversacion, 250);
   };
 
   const handleFaq = (faq) => {
+    if (processing) return;
+    setProcessing(true);
     addMessage('user', faq.pregunta);
+    setUsedFaqs((prev) => new Set([...prev, faq.id]));
     setTimeout(() => {
       addMessage('bot', faq.respuesta);
       setStep('answered');
+      setProcessing(false);
     }, 400);
   };
 
   const handleMasPreguntas = () => {
+    if (processing) return;
+    setProcessing(true);
     addMessage('user', 'Tengo más preguntas');
     setTimeout(() => {
-      addMessage('bot', 'Por supuesto, ¿en qué más puedo ayudarte?');
+      addMessage('bot', '¿En qué más puedo ayudarte?');
       setStep('faq');
+      setProcessing(false);
     }, 300);
+  };
+
+  const handleNoEncontrado = () => {
+    if (processing) return;
+    setProcessing(true);
+    addMessage('user', 'No está ahí mi pregunta');
+    setTimeout(() => {
+      addMessage('bot', 'Lamentamos no poder resolver tu duda aquí. Puedes usar nuestro formulario de contacto y te responderemos en menos de 24 horas.');
+      setStep('contact');
+      setProcessing(false);
+    }, 400);
   };
 
   const handleContacto = () => {
     navigate('/contacto');
-    setIsOpen(false);
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    handleClose();
   };
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, step]);
+  }, [messages]);
+
+  const faqsRestantes = FAQ.filter((f) => !usedFaqs.has(f.id));
+  const todasRespondidas = faqsRestantes.length === 0;
 
   return (
     <>
       {isOpen && (
         <div className="chatbot-window">
+          {/* Header sin botón X */}
           <div className="chatbot-header">
             <div className="chatbot-header-info">
               <div className="chatbot-avatar">BE</div>
@@ -96,53 +147,64 @@ function Chatbot() {
                 <span>Respuesta inmediata</span>
               </div>
             </div>
-            <button className="chatbot-close" onClick={() => setIsOpen(false)}>
-              <X size={18} />
-            </button>
           </div>
 
+          {/* Área de mensajes — solo burbujas, sin quick replies */}
           <div className="chatbot-messages">
             {messages.map((msg, i) => (
               <div key={i} className={`chatbot-bubble chatbot-bubble--${msg.from}`}>
                 {msg.text}
               </div>
             ))}
-
-            {messages.length > 0 && (
-              <div className="chatbot-quick-replies">
-                {step === 'faq' &&
-                  FAQ.map((faq) => (
-                    <button key={faq.id} className="chatbot-qr" onClick={() => handleFaq(faq)}>
-                      {faq.pregunta}
-                    </button>
-                  ))}
-                {step === 'answered' && (
-                  <>
-                    <button className="chatbot-qr" onClick={handleMasPreguntas}>
-                      Tengo más preguntas
-                    </button>
-                    <button className="chatbot-qr chatbot-qr--contact" onClick={handleContacto}>
-                      Contactar con vosotros →
-                    </button>
-                  </>
-                )}
-              </div>
-            )}
-
             <div ref={bottomRef} />
           </div>
 
-          <div className="chatbot-footer">
-            <button className="chatbot-contact-btn" onClick={handleContacto}>
-              Ir al formulario de contacto
-            </button>
-          </div>
+          {/* Quick replies FUERA del scroll — fijos en la parte inferior */}
+          {messages.length > 0 && !processing && (
+            <div className="chatbot-quick-replies">
+              {step === 'faq' && (
+                <>
+                  {todasRespondidas ? (
+                    <p className="chatbot-no-more">Has visto todas las preguntas frecuentes.</p>
+                  ) : (
+                    faqsRestantes.map((faq) => (
+                      <button key={faq.id} className="chatbot-qr" onClick={() => handleFaq(faq)}>
+                        {faq.pregunta}
+                      </button>
+                    ))
+                  )}
+                  <button className="chatbot-qr chatbot-qr--secondary" onClick={handleNoEncontrado}>
+                    No está ahí mi pregunta
+                  </button>
+                </>
+              )}
+
+              {step === 'answered' && (
+                <>
+                  {!todasRespondidas && (
+                    <button className="chatbot-qr chatbot-qr--more" onClick={handleMasPreguntas}>
+                      Tengo más preguntas
+                    </button>
+                  )}
+                  <button className="chatbot-qr chatbot-qr--secondary" onClick={handleNoEncontrado}>
+                    No está ahí mi pregunta
+                  </button>
+                </>
+              )}
+
+              {step === 'contact' && (
+                <button className="chatbot-qr chatbot-qr--contact" onClick={handleContacto}>
+                  Ir al formulario de contacto →
+                </button>
+              )}
+            </div>
+          )}
         </div>
       )}
 
       <button
         className={`chatbot-fab ${isOpen ? 'chatbot-fab--open' : ''}`}
-        onClick={isOpen ? () => setIsOpen(false) : open}
+        onClick={isOpen ? handleClose : handleOpen}
         title="Asistente virtual"
       >
         {isOpen ? <X size={22} /> : <MessageCircle size={22} />}
