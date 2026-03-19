@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Capacitor } from '@capacitor/core';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -21,22 +21,36 @@ function PublicRoute({ children }) {
   return !isAuthenticated ? children : <Navigate to="/proyectos" />;
 }
 
-function App() {
-  const [splashDone, setSplashDone] = useState(false);
+function StatusBarManager() {
+  const location = useLocation();
 
   useEffect(() => {
-    const setupStatusBar = async () => {
+    const applyStatusBar = async () => {
       if (!Capacitor.isNativePlatform()) return;
+
+      const isLogin = location.pathname === '/login';
+
       try {
-        await StatusBar.setOverlaysWebView({ overlay: false });
-        await StatusBar.setStyle({ style: Style.Dark });
-        await StatusBar.setBackgroundColor({ color: '#F0F2F5' });
+        if (isLogin) {
+          await StatusBar.setOverlaysWebView({ overlay: true });
+          await StatusBar.setStyle({ style: Style.Light });
+        } else {
+          await StatusBar.setOverlaysWebView({ overlay: false });
+          await StatusBar.setStyle({ style: Style.Dark });
+        }
       } catch (e) {
         console.error('Error configurando StatusBar:', e);
       }
     };
-    setupStatusBar();
-  }, []);
+
+    applyStatusBar();
+  }, [location.pathname]);
+
+  return null;
+}
+
+function App() {
+  const [splashDone, setSplashDone] = useState(false);
 
   return (
     <AuthProvider>
@@ -44,28 +58,55 @@ function App() {
         <SplashScreen onDone={() => setSplashDone(true)} />
       ) : (
         <Router>
+          <StatusBarManager />
+
           <Routes>
             <Route path="/" element={<Navigate to="/login" />} />
 
-            <Route path="/login" element={
-              <PublicRoute><Login /></PublicRoute>
-            } />
+            <Route
+              path="/login"
+              element={
+                <PublicRoute>
+                  <Login />
+                </PublicRoute>
+              }
+            />
 
-            <Route path="/proyectos" element={
-              <ProtectedRoute><Proyectos /></ProtectedRoute>
-            } />
+            <Route
+              path="/proyectos"
+              element={
+                <ProtectedRoute>
+                  <Proyectos />
+                </ProtectedRoute>
+              }
+            />
 
-            <Route path="/proyectos/:id" element={
-              <ProtectedRoute><ProyectoCompleto /></ProtectedRoute>
-            } />
+            <Route
+              path="/proyectos/:id"
+              element={
+                <ProtectedRoute>
+                  <ProyectoCompleto />
+                </ProtectedRoute>
+              }
+            />
 
-            <Route path="/chat" element={
-              <ProtectedRoute><Chat /></ProtectedRoute>
-            } />
+            <Route
+              path="/chat"
+              element={
+                <ProtectedRoute>
+                  <Chat />
+                </ProtectedRoute>
+              }
+            />
 
-            <Route path="/perfil" element={
-              <ProtectedRoute><Perfil /></ProtectedRoute>
-            } />
+            <Route
+              path="/perfil"
+              element={
+                <ProtectedRoute>
+                  <Perfil />
+                </ProtectedRoute>
+              }
+            />
 
             <Route path="*" element={<Navigate to="/login" />} />
           </Routes>

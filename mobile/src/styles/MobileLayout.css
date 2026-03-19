@@ -1,8 +1,8 @@
 .mobile-layout {
   display: flex;
   flex-direction: column;
-  min-height: calc(100dvh - var(--safe-top));
-  padding-top: var(--safe-top);
+  min-height: 100vh;
+  min-height: 100dvh;
   background: var(--color-bg);
 }
 

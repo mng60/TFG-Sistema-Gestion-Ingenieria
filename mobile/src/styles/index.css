@@ -39,12 +39,12 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
-  padding-top: var(--safe-top);
   padding-bottom: var(--safe-bottom);
 }
 
 #root {
-  min-height: calc(100dvh - var(--safe-top));
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 button {
