@@ -41,43 +41,49 @@ class Conversacion {
   static async getByUser(userId, tipoUsuario) {
     try {
       const query = `
-        SELECT 
+        SELECT
           c.*,
           (
             SELECT json_agg(
               json_build_object(
-                'user_id', cp.user_id,
-                'tipo_usuario', cp.tipo_usuario,
+                'user_id', cp_all.user_id,
+                'tipo_usuario', cp_all.tipo_usuario,
                 'nombre', CASE
-                  WHEN cp.tipo_usuario = 'empleado' THEN u.nombre
-                  WHEN cp.tipo_usuario = 'cliente' THEN COALESCE(cl.persona_contacto, cl.nombre_empresa)
+                  WHEN cp_all.tipo_usuario = 'empleado' THEN u.nombre
+                  WHEN cp_all.tipo_usuario = 'cliente' THEN COALESCE(cl.persona_contacto, cl.nombre_empresa)
                 END,
                 'email', CASE
-                  WHEN cp.tipo_usuario = 'empleado' THEN u.email
-                  WHEN cp.tipo_usuario = 'cliente' THEN cl.email
+                  WHEN cp_all.tipo_usuario = 'empleado' THEN u.email
+                  WHEN cp_all.tipo_usuario = 'cliente' THEN cl.email
                 END,
                 'rol', u.rol,
                 'foto_url', CASE
-                  WHEN cp.tipo_usuario = 'empleado' THEN u.foto_url
-                  WHEN cp.tipo_usuario = 'cliente' THEN cl.foto_url
+                  WHEN cp_all.tipo_usuario = 'empleado' THEN u.foto_url
+                  WHEN cp_all.tipo_usuario = 'cliente' THEN cl.foto_url
                 END,
-                'last_read', cp.last_read
+                'last_read', cp_all.last_read
               )
+              ORDER BY cp_all.user_id, cp_all.tipo_usuario
             )
-            FROM conversacion_participantes cp
-            LEFT JOIN users u ON cp.user_id = u.id AND cp.tipo_usuario = 'empleado'
-            LEFT JOIN clientes cl ON cp.user_id = cl.id AND cp.tipo_usuario = 'cliente'
-            WHERE cp.conversacion_id = c.id
-          ) as participantes,
+            FROM conversacion_participantes cp_all
+            LEFT JOIN users u
+              ON cp_all.user_id = u.id
+             AND cp_all.tipo_usuario = 'empleado'
+            LEFT JOIN clientes cl
+              ON cp_all.user_id = cl.id
+             AND cp_all.tipo_usuario = 'cliente'
+            WHERE cp_all.conversacion_id = c.id
+          ) AS participantes,
+
           (
             SELECT COUNT(*)
             FROM mensajes m
-            LEFT JOIN conversacion_participantes cp2 ON cp2.conversacion_id = m.conversacion_id 
-              AND cp2.user_id = $1 AND cp2.tipo_usuario = $2
-            WHERE m.conversacion_id = c.id 
-              AND m.created_at > COALESCE(cp2.last_read, '1970-01-01')
+            WHERE m.conversacion_id = c.id
+              AND m.is_deleted = false
               AND NOT (m.user_id = $1 AND m.tipo_usuario = $2)
-          ) as mensajes_no_leidos,
+              AND m.created_at > COALESCE(cp.last_read, '1970-01-01'::timestamp)
+          )::int AS mensajes_no_leidos,
+
           (
             SELECT json_build_object(
               'mensaje', m.mensaje,
@@ -88,12 +94,16 @@ class Conversacion {
             )
             FROM mensajes m
             WHERE m.conversacion_id = c.id
-            ORDER BY m.created_at DESC
+              AND m.is_deleted = false
+            ORDER BY m.created_at DESC, m.id DESC
             LIMIT 1
-          ) as ultimo_mensaje
+          ) AS ultimo_mensaje
+
         FROM conversaciones c
-        INNER JOIN conversacion_participantes cp ON cp.conversacion_id = c.id
-        WHERE cp.user_id = $1 AND cp.tipo_usuario = $2
+        INNER JOIN conversacion_participantes cp
+          ON cp.conversacion_id = c.id
+         AND cp.user_id = $1
+         AND cp.tipo_usuario = $2
         ORDER BY c.updated_at DESC
       `;
 

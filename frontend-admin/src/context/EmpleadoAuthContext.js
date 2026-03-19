@@ -23,7 +23,7 @@ export const EmpleadoAuthProvider = ({ children }) => {
     const token = empleadoAuthService.getToken();
 
     if (empleadoGuardado && token) {
-      setEmpleado(empleadoGuardado);
+      setEmpleado({ ...empleadoGuardado, tipo_usuario: 'empleado' });
     }
     setLoading(false);
   }, []);
@@ -77,7 +77,7 @@ export const EmpleadoAuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const data = await empleadoAuthService.login(email, password);
-      setEmpleado(data.user);
+      setEmpleado({ ...data.user, tipo_usuario: 'empleado' });
       return data;
     } catch (error) {
       throw error;
@@ -94,7 +94,7 @@ export const EmpleadoAuthProvider = ({ children }) => {
   };
 
   const actualizarEmpleado = (data) => {
-    const updated = { ...(empleadoAuthService.getCurrentEmpleado() || {}), ...data };
+    const updated = { ...(empleadoAuthService.getCurrentEmpleado() || {}), ...data, tipo_usuario: 'empleado' };
     localStorage.setItem('empleado', JSON.stringify(updated));
     setEmpleado(updated);
   };
