@@ -148,14 +148,21 @@ const initializeSocket = (io) => {
       try {
         const { conversacion_id } = data;
 
-        await Conversacion.markAsRead(conversacion_id, socket.userId, socket.tipoUsuario);
+        const now = new Date().toISOString();
+
+        const updatedRead = await Conversacion.markAsReadAt(
+          conversacion_id,
+          socket.userId,
+          socket.tipoUsuario,
+          now
+        );
 
         // Notificar a otros participantes
         io.to(`conversacion_${conversacion_id}`).emit('messages_read', {
           conversacion_id,
           user_id: socket.userId,
           tipo_usuario: socket.tipoUsuario,
-          timestamp: new Date()
+          timestamp: updatedRead?.last_read || now
         });
       } catch (error) {
         console.error('Error al marcar como leído:', error);

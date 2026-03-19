@@ -122,20 +122,33 @@ const getMensajes = async (req, res) => {
       parseInt(offset)
     );
 
-    const updatedRead = await Conversacion.markAsRead(conversacionId, userId, tipoUsuario);
+    const readAt =
+      mensajes.length > 0
+        ? mensajes[mensajes.length - 1].created_at
+        : new Date().toISOString();
+
+    const updatedRead = await Conversacion.markAsReadAt(
+      conversacionId,
+      userId,
+      tipoUsuario,
+      readAt
+    );
 
     if (!updatedRead) {
-      console.warn('[chat/getMensajes] markAsRead no actualizó ninguna fila', {
+      console.warn('[chat/getMensajes] markAsReadAt no actualizó ninguna fila', {
         conversacionId,
         userId,
-        tipoUsuario
+        tipoUsuario,
+        readAt
       });
     }
 
     res.json({
       success: true,
       mensajes,
-      count: mensajes.length
+      count: mensajes.length,
+      read_at: updatedRead?.last_read || readAt,
+      read_updated: !!updatedRead
     });
   } catch (error) {
     console.error('Error en getMensajes:', error);

@@ -180,6 +180,20 @@ class Conversacion {
     const result = await pool.query(query, [conversacionId, userId, tipoUsuario]);
     return result.rows[0] || null;
   }
+
+  static async markAsReadAt(conversacionId, userId, tipoUsuario, readAt) {
+    const query = `
+      UPDATE conversacion_participantes
+      SET last_read = GREATEST(
+        COALESCE(last_read, '1970-01-01'::timestamp),
+        $4::timestamp
+      )
+      WHERE conversacion_id = $1 AND user_id = $2 AND tipo_usuario = $3
+      RETURNING conversacion_id, user_id, tipo_usuario, last_read
+    `;
+    const result = await pool.query(query, [conversacionId, userId, tipoUsuario, readAt]);
+    return result.rows[0] || null;
+  }
 }
 
 module.exports = Conversacion;

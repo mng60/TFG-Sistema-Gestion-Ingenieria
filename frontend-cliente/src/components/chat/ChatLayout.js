@@ -190,8 +190,8 @@ function ChatLayout() {
     );
   }, [cliente]);
 
-  const handleMarcarLeida = useCallback((conversacionId) => {
-    const now = new Date().toISOString();
+  const handleMarcarLeida = useCallback((conversacionId, timestamp) => {
+    const now = timestamp || new Date().toISOString();
     const readData = {
       conversacion_id: conversacionId,
       user_id: cliente.id,

@@ -176,26 +176,34 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
         setMensajes(data.mensajes || []);
         setIsInitialLoad(true);
 
+        const readAt = data.read_at || new Date().toISOString();
+
         if (socket && conversacion?.id) {
           socket.emit('mark_read', { conversacion_id: conversacion.id });
         }
 
         if (onMarcarLeida && conversacion?.id) {
-          onMarcarLeida(conversacion.id);
+          onMarcarLeida(conversacion.id, readAt);
         }
 
         setConversacionLocal((prev) => {
           if (!prev?.participantes) return prev;
-          const now = new Date().toISOString();
           return {
             ...prev,
             participantes: prev.participantes.map((p) =>
               p.user_id === currentUser.id && p.tipo_usuario === currentUser.tipo_usuario
-                ? { ...p, last_read: now }
+                ? { ...p, last_read: readAt }
                 : p
             )
           };
         });
+
+        if (!data.read_updated) {
+          console.warn('[admin/chat] getMensajes no actualizó last_read', {
+            conversacionId: conversacion?.id,
+            readAt
+          });
+        }
       }
     } catch (error) {
       console.error('❌ Error al cargar mensajes:', error);
