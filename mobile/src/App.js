@@ -33,10 +33,10 @@ function StatusBarManager() {
       try {
         if (isLogin) {
           await StatusBar.setOverlaysWebView({ overlay: true });
-          await StatusBar.setStyle({ style: Style.Light });
+          await StatusBar.setStyle({ style: Style.Dark });
         } else {
           await StatusBar.setOverlaysWebView({ overlay: false });
-          await StatusBar.setStyle({ style: Style.Dark });
+          await StatusBar.setStyle({ style: Style.Light });
         }
       } catch (e) {
         console.error('Error configurando StatusBar:', e);

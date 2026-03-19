@@ -4,5 +4,10 @@
   "webDir": "build",
   "server": {
     "url": "https://tfg-mobile.vercel.app"
+  },
+  "plugins": {
+    "Keyboard": {
+      "resizeOnFullScreen": true
+    }
   }
 }

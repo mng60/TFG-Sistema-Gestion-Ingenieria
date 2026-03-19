@@ -1483,5 +1483,5 @@
 }
 
 .chat-window-screen .chat-footer {
-  padding-bottom: calc(10px + var(--safe-bottom));
+  padding-bottom: 10px;
 }
