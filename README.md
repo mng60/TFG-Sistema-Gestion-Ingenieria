@@ -112,13 +112,14 @@ TFG-Sistema-Gestion-Ingenieria/
 - Chat en tiempo real con empleados del proyecto
 - Layout responsive con sidebar deslizante en móvil
 
-### Aplicación Móvil (PWA)
+### Aplicación Móvil (PWA + APK Android)
 - Login para empleados
 - Listado de proyectos asignados
 - Vista detalle de proyecto
 - Chat en tiempo real
 - Perfil de usuario
 - Instalable como PWA en Android e iOS
+- Empaquetada como APK nativa Android mediante Capacitor (sideloading sin Play Store)
 
 ### Backend
 - API REST completa con autenticación dual (empleados / clientes)
@@ -126,7 +127,19 @@ TFG-Sistema-Gestion-Ingenieria/
 - Chat con Socket.io: grupos de proyecto creados automáticamente al crear proyecto
 - Borrado automático de chats 3 días después de completar un proyecto (cron job)
 - Subida de archivos con Multer
-- CORS configurado para los tres frontends
+- CORS configurado para los tres frontends + Capacitor (`capacitor://localhost`, `https://localhost`)
+
+## Versiones en producción (online)
+
+| Servicio | URL | Plataforma |
+|---------|-----|-----------|
+| Backend API | https://tfg-sistema-gestion-ingenieria-production.up.railway.app | Railway |
+| Portal Administración | https://tfg-admin.vercel.app | Vercel |
+| Portal Cliente | https://tfg-cliente.vercel.app | Vercel |
+| Base de datos | PostgreSQL en Neon | Neon |
+| Archivos (imágenes) | Cloudinary | Cloudinary |
+
+> El backend se autodespliega en Railway al hacer push a `main`. Los frontends (Vercel) también se despliegan automáticamente desde GitHub.
 
 ## Instalación y arranque
 
@@ -177,6 +190,43 @@ npm start              # Puerto 3002
 
 Para instalar como PWA en el móvil: abrir `http://<IP-del-PC>:3002` desde el móvil en la misma red WiFi y seleccionar "Añadir a pantalla de inicio".
 
+### 5. Generar APK Android (con Capacitor)
+
+Requisitos previos: Android Studio instalado con SDK Android.
+
+```bash
+cd mobile
+
+# 1. Preparar icono (solo primera vez o si cambia)
+mkdir -p assets
+cp public/logo.png assets/icon.png
+npm install @capacitor/assets --save-dev --legacy-peer-deps
+npx @capacitor/assets generate --android
+
+# 2. Compilar la app React
+npm run build
+
+# 3. Sincronizar con el proyecto Android
+npx cap sync android
+
+# 4. Abrir Android Studio
+npx cap open android
+```
+
+En Android Studio: **Build → Build Bundle(s) / APK(s) → Build APK(s)**
+
+El APK generado se encuentra en:
+`android/app/build/outputs/apk/debug/app-debug.apk`
+
+Para instalar en un dispositivo Android: copiar el APK al móvil y abrirlo (requiere activar "Instalar desde fuentes desconocidas" en los ajustes del dispositivo).
+
+> **Variables de entorno para producción** (`mobile/.env`):
+> ```
+> REACT_APP_API_URL=https://tfg-sistema-gestion-ingenieria-production.up.railway.app/api
+> REACT_APP_BACKEND_URL=https://tfg-sistema-gestion-ingenieria-production.up.railway.app
+> REACT_APP_SOCKET_URL=https://tfg-sistema-gestion-ingenieria-production.up.railway.app
+> ```
+
 ## Metodología
 
 Desarrollo siguiendo metodología **Scrum** con 6 sprints:
@@ -205,6 +255,9 @@ Hacer clic en "Permitir acceso" la primera vez que se arranque el servidor.
 cd mobile
 npm install ajv@^8 --legacy-peer-deps
 ```
+
+### Network error en el APK Android
+El APK Capacitor envía peticiones desde el origen `https://localhost`. Asegurarse de que `FRONTEND_URL` en Railway incluye `capacitor://localhost,https://localhost,http://localhost`.
 
 ### El navegador no conecta a localhost:5000
 1. Verificar que el backend está corriendo (`npm run dev` en `/backend`)
