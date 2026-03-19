@@ -427,20 +427,24 @@ class Proyecto {
       `;
 
       const queryMensajes = `
-        SELECT COALESCE(SUM(sub.cnt), 0) as mensajes_no_leidos
+        SELECT COALESCE(SUM(sub.cnt), 0)::int AS mensajes_no_leidos
         FROM (
           SELECT c.id,
-            (SELECT COUNT(*) FROM mensajes m
-             LEFT JOIN conversacion_participantes cp2
-               ON cp2.conversacion_id = m.conversacion_id AND cp2.user_id = $1 AND cp2.tipo_usuario = 'empleado'
-             WHERE m.conversacion_id = c.id
-               AND m.created_at > COALESCE(cp2.last_read, '1970-01-01'::timestamp)
-               AND NOT (m.user_id = $1 AND m.tipo_usuario = 'empleado')
-            ) as cnt
+            (
+              SELECT COUNT(*)
+              FROM mensajes m
+              WHERE m.conversacion_id = c.id
+                AND m.is_deleted = false
+                AND NOT (m.user_id = $1 AND m.tipo_usuario = 'empleado')
+                AND m.created_at > COALESCE(cp.last_read, '1970-01-01'::timestamp)
+            ) AS cnt
           FROM conversaciones c
           INNER JOIN conversacion_participantes cp
-            ON cp.conversacion_id = c.id AND cp.user_id = $1 AND cp.tipo_usuario = 'empleado'
-          WHERE c.deletion_scheduled_at IS NULL OR c.deletion_scheduled_at > CURRENT_TIMESTAMP
+            ON cp.conversacion_id = c.id
+           AND cp.user_id = $1
+           AND cp.tipo_usuario = 'empleado'
+          WHERE c.deletion_scheduled_at IS NULL
+             OR c.deletion_scheduled_at > CURRENT_TIMESTAMP
         ) sub
       `;
 

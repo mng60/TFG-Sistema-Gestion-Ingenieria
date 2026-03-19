@@ -167,7 +167,8 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
       const token = localStorage.getItem('empleado_token');
 
       const response = await fetch(`${API_URL}/chat/mensajes/${conversacion.id}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 'Authorization': `Bearer ${token}` },
+        cache: 'no-store'
       });
 
       const data = await response.json();

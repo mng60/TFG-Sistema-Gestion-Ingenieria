@@ -1,9 +1,19 @@
 const Conversacion = require('../models/Conversacion');
 const Mensaje = require('../models/Mensaje');
 
+const setNoStore = (res) => {
+  res.set({
+    'Cache-Control': 'no-store, no-cache, must-revalidate, private',
+    'Pragma': 'no-cache',
+    'Expires': '0'
+  });
+};
+
 // Obtener conversaciones del usuario autenticado
 const getConversaciones = async (req, res) => {
   try {
+    setNoStore(res);
+
     const userId = req.user.id;
     const tipoUsuario = req.user.tipo_usuario;
 
@@ -90,6 +100,8 @@ const createConversacion = async (req, res) => {
 // Obtener mensajes de una conversación
 const getMensajes = async (req, res) => {
   try {
+    setNoStore(res);
+
     const { conversacionId } = req.params;
     const { limit = 50, offset = 0 } = req.query;
 
@@ -244,6 +256,8 @@ const markAsRead = async (req, res) => {
 // Obtener detalles de conversación
 const getConversacionById = async (req, res) => {
   try {
+    setNoStore(res);
+
     const { conversacionId } = req.params;
     const userId = req.user.id;
     const tipoUsuario = req.user.tipo_usuario;

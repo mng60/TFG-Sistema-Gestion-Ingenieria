@@ -134,7 +134,8 @@ function ChatLayout() {
       const token = localStorage.getItem('empleado_token');
 
       const response = await fetch(`${API_URL}/chat/conversaciones`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 'Authorization': `Bearer ${token}` },
+        cache: 'no-store'
       });
 
       if (response.status === 401) {

@@ -121,7 +121,8 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
       const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
       const token = localStorage.getItem('token');
       const response = await fetch(`${API_URL}/chat/mensajes/${conversacion.id}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 'Authorization': `Bearer ${token}` },
+        cache: 'no-store'
       });
       const data = await response.json();
       if (data.success) {
