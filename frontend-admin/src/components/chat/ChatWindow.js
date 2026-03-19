@@ -204,62 +204,31 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
     }
   };
 
-  const marcarComoLeido = async (bestEffort = false) => {
+  const marcarComoLeido = () => {
     if (!conversacion || conversacion.ephemeral) return;
 
-    try {
-      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-      const token = localStorage.getItem('empleado_token');
+    const now = new Date().toISOString();
 
-      const response = await fetch(`${API_URL}/chat/conversaciones/${conversacion.id}/read`, {
-        method: 'PUT',
-        headers: { 'Authorization': `Bearer ${token}` },
-        keepalive: bestEffort
-      });
-
-      if (!response.ok) {
-        console.warn(`⚠️ markAsRead HTTP ${response.status}`);
-      }
-
-      if (socket) {
-        socket.emit('mark_read', { conversacion_id: conversacion.id });
-      }
-
-      if (onMarcarLeida) onMarcarLeida(conversacion.id);
-    } catch (error) {
-      console.error('❌ Error al marcar como leído:', error);
+    if (socket && conversacion.id) {
+      socket.emit('mark_read', { conversacion_id: conversacion.id });
     }
+
+    if (onMarcarLeida) {
+      onMarcarLeida(conversacion.id);
+    }
+
+    setConversacionLocal((prev) => {
+      if (!prev?.participantes) return prev;
+      return {
+        ...prev,
+        participantes: prev.participantes.map((p) =>
+          p.user_id === currentUser.id && p.tipo_usuario === currentUser.tipo_usuario
+            ? { ...p, last_read: now }
+            : p
+        )
+      };
+    });
   };
-
-  const flushReadState = () => {
-    if (!conversacion || conversacion.ephemeral) return;
-    marcarComoLeido(true).catch(() => {});
-  };
-
-  // Flush al salir de la página o al ocultarse
-  useEffect(() => {
-    if (!conversacion || conversacion.ephemeral) return;
-
-    const handlePageHide = () => { flushReadState(); };
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') flushReadState();
-    };
-
-    window.addEventListener('pagehide', handlePageHide);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    return () => {
-      flushReadState();
-      window.removeEventListener('pagehide', handlePageHide);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [conversacion?.id]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Flush cuando el chat deja de estar activo dentro de la pantalla
-  useEffect(() => {
-    if (!conversacion || conversacion.ephemeral) return;
-    if (!isActive) flushReadState();
-  }, [isActive, conversacion?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSendMessage = async (mensaje, tipoMensaje = 'texto') => {
     if (!socket || !conversacion) return;

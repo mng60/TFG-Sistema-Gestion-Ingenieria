@@ -122,7 +122,15 @@ const getMensajes = async (req, res) => {
       parseInt(offset)
     );
 
-    await Conversacion.markAsRead(conversacionId, userId, tipoUsuario);
+    const updatedRead = await Conversacion.markAsRead(conversacionId, userId, tipoUsuario);
+
+    if (!updatedRead) {
+      console.warn('[chat/getMensajes] markAsRead no actualizó ninguna fila', {
+        conversacionId,
+        userId,
+        tipoUsuario
+      });
+    }
 
     res.json({
       success: true,
