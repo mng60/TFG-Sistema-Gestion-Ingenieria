@@ -1427,7 +1427,8 @@
 /* ==================== MOBILE TWO-SCREEN LAYOUT ==================== */
 .chat-layout-mobile {
   position: relative;
-  height: calc(100dvh - var(--bottom-nav-height) - var(--safe-bottom));
+  margin-top: var(--statusbar-space);
+  height: calc(100dvh - var(--bottom-nav-height) - var(--safe-bottom) - var(--statusbar-space));
   overflow: hidden;
   background: #f0f2f5;
 }

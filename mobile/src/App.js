@@ -25,19 +25,20 @@ function StatusBarManager() {
   const location = useLocation();
 
   useEffect(() => {
+    const isLogin = location.pathname === '/login';
+
+    document.body.classList.toggle('screen-login', isLogin);
+    document.body.classList.toggle('screen-app', !isLogin);
+
     const applyStatusBar = async () => {
       if (!Capacitor.isNativePlatform()) return;
 
-      const isLogin = location.pathname === '/login';
-
       try {
-        if (isLogin) {
-          await StatusBar.setOverlaysWebView({ overlay: true });
-          await StatusBar.setStyle({ style: Style.Dark });
-        } else {
-          await StatusBar.setOverlaysWebView({ overlay: false });
-          await StatusBar.setStyle({ style: Style.Light });
-        }
+        await StatusBar.show();
+
+        await StatusBar.setStyle({
+          style: isLogin ? Style.Dark : Style.Light
+        });
       } catch (e) {
         console.error('Error configurando StatusBar:', e);
       }
