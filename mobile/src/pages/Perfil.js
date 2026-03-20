@@ -5,31 +5,14 @@ import MobileLayout from '../components/layout/MobileLayout';
 import api from '../services/api';
 import { getAvatarInitial } from '../utils/format';
 import { Camera, Save, Lock, LogOut, ChevronDown, ChevronUp } from 'lucide-react';
+import '../styles/Perfil.css';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || `http://${window.location.hostname}:5000`;
 
-const card = {
-  background: 'white', borderRadius: 16, padding: '20px',
-  marginBottom: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
-};
-
-const inputStyle = {
-  width: '100%', padding: '11px 14px', borderRadius: 10, border: '1.5px solid #e0e0e0',
-  fontSize: '0.95rem', fontFamily: 'inherit', boxSizing: 'border-box',
-  outline: 'none', background: 'white'
-};
-
-const inputDisabled = { ...inputStyle, background: '#f8f9fa', color: '#7f8c8d' };
-
-const labelStyle = {
-  fontSize: '0.75rem', fontWeight: 600, color: '#7f8c8d',
-  textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 5, display: 'block'
-};
-
 function FieldGroup({ label, children }) {
   return (
-    <div style={{ marginBottom: 14 }}>
-      <label style={labelStyle}>{label}</label>
+    <div className="perfil-field">
+      <label className="perfil-label">{label}</label>
       {children}
     </div>
   );
@@ -115,21 +98,17 @@ function Perfil() {
 
   return (
     <MobileLayout>
-      <div style={{ padding: '16px', maxWidth: 480, margin: '0 auto' }}>
+      <div className="perfil-page">
 
         {/* Toast */}
         {toast && (
-          <div style={{
-            padding: '12px 16px', borderRadius: 10, marginBottom: 14, fontWeight: 600, fontSize: '0.9rem',
-            background: toast.type === 'success' ? '#d4edda' : '#f8d7da',
-            color: toast.type === 'success' ? '#155724' : '#721c24'
-          }}>
+          <div className={`perfil-toast perfil-toast--${toast.type}`}>
             {toast.msg}
           </div>
         )}
 
         {/* Avatar + nombre */}
-        <div style={{ ...card, textAlign: 'center', paddingTop: 28, paddingBottom: 24 }}>
+        <div className="perfil-card perfil-card--hero">
           <div style={{ position: 'relative', width: 88, height: 88, margin: '0 auto 16px' }}>
             <div style={{
               width: 88, height: 88, borderRadius: '50%', overflow: 'hidden',
@@ -168,62 +147,44 @@ function Perfil() {
         </div>
 
         {/* Información personal */}
-        <div style={card}>
-          <h3 style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: 16, color: '#2c3e50' }}>
-            Información personal
-          </h3>
+        <div className="perfil-card">
+          <h3 className="perfil-title">Información personal</h3>
           <FieldGroup label="Nombre *">
             <input
-              style={inputStyle}
+              className="perfil-input"
               value={form.nombre}
               onChange={e => setForm({ ...form, nombre: e.target.value })}
             />
           </FieldGroup>
           <FieldGroup label="Teléfono">
             <input
-              style={inputStyle}
+              className="perfil-input"
               value={form.telefono}
               onChange={e => setForm({ ...form, telefono: e.target.value })}
               placeholder="+34 600 000 000"
             />
           </FieldGroup>
           <FieldGroup label="Email de acceso">
-            <input style={inputDisabled} value={empleado?.email || ''} disabled />
+            <input className="perfil-input perfil-input--disabled" value={empleado?.email || ''} disabled />
           </FieldGroup>
           <FieldGroup label="Email personal (notificaciones) *">
             <input
-              style={inputStyle}
+              className="perfil-input"
               type="email"
               value={form.email_personal}
               onChange={e => setForm({ ...form, email_personal: e.target.value })}
               placeholder="personal@gmail.com"
             />
           </FieldGroup>
-          <button
-            onClick={handleSaveInfo}
-            disabled={savingInfo}
-            style={{
-              width: '100%', padding: '13px', borderRadius: 12, border: 'none',
-              background: 'linear-gradient(135deg, #4DB6A8, #3A9089)',
-              color: 'white', fontSize: '0.95rem', fontWeight: 600, cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-              opacity: savingInfo ? 0.7 : 1
-            }}
-          >
+          <button onClick={handleSaveInfo} disabled={savingInfo} className="perfil-btn">
             <Save size={16} /> {savingInfo ? 'Guardando...' : 'Guardar cambios'}
           </button>
         </div>
 
         {/* Cambiar contraseña — colapsable */}
-        <div style={card}>
-          <button
-            onClick={() => setShowPass(!showPass)}
-            style={{
-              width: '100%', background: 'none', border: 'none', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 0
-            }}
-          >
-            <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#2c3e50', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div className="perfil-card">
+          <button onClick={() => setShowPass(!showPass)} className="perfil-pass-toggle">
+            <h3 className="perfil-pass-title">
               <Lock size={16} color="#4DB6A8" /> Cambiar contraseña
             </h3>
             {showPass ? <ChevronUp size={18} color="#7f8c8d" /> : <ChevronDown size={18} color="#7f8c8d" />}
@@ -232,28 +193,18 @@ function Perfil() {
           {showPass && (
             <div style={{ marginTop: 16 }}>
               <FieldGroup label="Contraseña actual *">
-                <input style={inputStyle} type="password" value={passForm.currentPassword}
+                <input className="perfil-input" type="password" value={passForm.currentPassword}
                   onChange={e => setPassForm({ ...passForm, currentPassword: e.target.value })} />
               </FieldGroup>
               <FieldGroup label="Nueva contraseña *">
-                <input style={inputStyle} type="password" value={passForm.newPassword}
+                <input className="perfil-input" type="password" value={passForm.newPassword}
                   onChange={e => setPassForm({ ...passForm, newPassword: e.target.value })} placeholder="Mínimo 6 caracteres" />
               </FieldGroup>
               <FieldGroup label="Confirmar contraseña *">
-                <input style={inputStyle} type="password" value={passForm.confirmPassword}
+                <input className="perfil-input" type="password" value={passForm.confirmPassword}
                   onChange={e => setPassForm({ ...passForm, confirmPassword: e.target.value })} />
               </FieldGroup>
-              <button
-                onClick={handleSavePass}
-                disabled={savingPass}
-                style={{
-                  width: '100%', padding: '13px', borderRadius: 12, border: 'none',
-                  background: 'linear-gradient(135deg, #4DB6A8, #3A9089)',
-                  color: 'white', fontSize: '0.95rem', fontWeight: 600, cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                  opacity: savingPass ? 0.7 : 1
-                }}
-              >
+              <button onClick={handleSavePass} disabled={savingPass} className="perfil-btn">
                 <Lock size={16} /> {savingPass ? 'Cambiando...' : 'Cambiar contraseña'}
               </button>
             </div>
@@ -262,25 +213,13 @@ function Perfil() {
 
         {/* Nota admin */}
         {isAdmin() && (
-          <div style={{
-            background: '#f0f4ff', borderRadius: 12, padding: '12px 16px',
-            marginBottom: 12, fontSize: '0.82rem', color: '#3498db',
-            border: '1px solid #dbeafe'
-          }}>
+          <div className="perfil-admin-note">
             💡 Para gestión completa usa el portal web de administración.
           </div>
         )}
 
         {/* Cerrar sesión */}
-        <button
-          onClick={handleLogout}
-          style={{
-            width: '100%', padding: '14px', background: '#fee2e2',
-            color: '#dc2626', border: 'none', borderRadius: 12,
-            fontSize: '0.95rem', fontWeight: 600, cursor: 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
-          }}
-        >
+        <button onClick={handleLogout} className="perfil-btn-logout">
           <LogOut size={18} /> Cerrar Sesión
         </button>
 

@@ -103,6 +103,10 @@ function Login() {
                     placeholder="empleado@empresa.com"
                     required
                     autoComplete="email"
+                    autoCorrect="off"
+                    autoCapitalize="none"
+                    spellCheck={false}
+                    inputMode="email"
                     disabled={loading}
                   />
                 </div>
@@ -122,6 +126,9 @@ function Login() {
                       placeholder="••••••••"
                       required
                       autoComplete="current-password"
+                      autoCorrect="off"
+                      autoCapitalize="none"
+                      spellCheck={false}
                       disabled={loading}
                     />
                     <button
