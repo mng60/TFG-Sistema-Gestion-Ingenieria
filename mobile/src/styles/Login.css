@@ -163,6 +163,18 @@
   cursor: not-allowed;
 }
 
+/* Neutralizar fondo blanco de autofill de Android/Chrome */
+.mobile-login-group input:-webkit-autofill,
+.mobile-login-group input:-webkit-autofill:hover,
+.mobile-login-group input:-webkit-autofill:focus,
+.mobile-pwd-wrap input:-webkit-autofill,
+.mobile-pwd-wrap input:-webkit-autofill:hover,
+.mobile-pwd-wrap input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #0F0F0F inset !important;
+  -webkit-text-fill-color: white !important;
+  caret-color: white;
+}
+
 /* Password input with eye toggle */
 .mobile-pwd-wrap {
   position: relative;

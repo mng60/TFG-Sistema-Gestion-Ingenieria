@@ -67,6 +67,23 @@ a {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 2px; }
 
+/* Franja encima del contenido en pantallas de app (no login) */
+body.screen-app::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(var(--statusbar-space) + 2px);
+  background: var(--color-bg);
+  z-index: 1100;
+  pointer-events: none;
+}
+
+body.screen-login::before {
+  content: none;
+}
+
 /* Badges de estado */
 .badge {
   display: inline-block;
