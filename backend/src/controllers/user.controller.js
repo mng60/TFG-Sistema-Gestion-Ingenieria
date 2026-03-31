@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
+const { sendBienvenidaEmpleado } = require('../utils/emailService');
 
 // Obtener todos los usuarios (solo admin)
 const getAllUsers = async (req, res) => {
@@ -74,6 +75,14 @@ const createUser = async (req, res) => {
       rol: rol || 'empleado',
       telefono
     });
+
+    sendBienvenidaEmpleado({
+      to: email,
+      nombre,
+      password,
+      rol: rol || 'empleado',
+      adminUrl: process.env.ADMIN_URL || null
+    }).catch(() => {});
 
     res.status(201).json({
       success: true,

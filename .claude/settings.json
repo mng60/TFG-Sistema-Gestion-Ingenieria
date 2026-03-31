@@ -5,7 +5,8 @@
       "Bash(do rm -rf \"$dir\")",
       "Read(//c/Users/migue/.claude/projects/c--Users-migue-Documents-4o-TFG-Visual-TFG-Sistema-Gestion-Ingenieria/memory/**)",
       "Bash(/dev/null cat:*)",
-      "Read(//c/Program Files/PostgreSQL/**)"
+      "Read(//c/Program Files/PostgreSQL/**)",
+      "Bash(ls -la /c/Users/migue/Documents/4o/TFG-Visual/TFG-Sistema-Gestion-Ingenieria/backend/*.js)"
     ],
     "additionalDirectories": [
       "c:\\Users\\migue\\.claude\\projects\\c--Users-migue-Documents-4o-TFG-Visual-TFG-Sistema-Gestion-Ingenieria\\memory"

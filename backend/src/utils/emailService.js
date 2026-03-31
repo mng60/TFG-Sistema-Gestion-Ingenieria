@@ -58,7 +58,12 @@ function baseLayout(contenido) {
         <h1>BlueArc Ingeniería</h1>
         <p>Sistema de Gestión de Proyectos</p>
       </div>
-      <div class="body">${contenido}</div>
+      <div class="body">
+        ${contenido}
+        <div style="text-align:center;margin-top:24px;">
+          <img src="https://raw.githubusercontent.com/mng60/TFG-Sistema-Gestion-Ingenieria/main/docs/logos/logo.png" alt="BlueArc Ingeniería" style="height:52px;" />
+        </div>
+      </div>
       <div class="footer">
         Este es un mensaje automático, por favor no respondas a este correo.<br/>
         © ${new Date().getFullYear()} BlueArc Ingeniería
@@ -164,11 +169,49 @@ async function sendBienvenidaPortal({ to, nombreEmpresa, emailLogin, password, p
   await sendMail({ to, subject, html });
 }
 
+// 7. Confirmación de contacto web → destinatario: usuario externo
+async function sendConfirmacionContacto({ to, nombre }) {
+  const subject = 'Hemos recibido tu mensaje — BlueArc Ingeniería';
+  const html = baseLayout(`
+    <h2>Mensaje recibido</h2>
+    <p>Hola <strong>${nombre}</strong>,</p>
+    <p>Hemos recibido tu mensaje correctamente. Nuestro equipo lo revisará y se pondrá en contacto contigo a la mayor brevedad posible.</p>
+    <div class="highlight">
+      <strong>¿Qué ocurre ahora?</strong><br/>
+      Un miembro de BlueArc Ingeniería revisará tu consulta y te responderá por este mismo correo en un plazo de 1-2 días laborables.
+    </div>
+    <p>Gracias por contactar con nosotros.</p>
+  `);
+  await sendMail({ to, subject, html });
+}
+
+// 8. Bienvenida a empleado/admin recién creado → destinatario: empleado (email)
+async function sendBienvenidaEmpleado({ to, nombre, password, adminUrl, rol }) {
+  const esAdmin = rol === 'admin';
+  const subject = esAdmin
+    ? 'Acceso de administrador creado — BlueArc Ingeniería'
+    : 'Bienvenido al equipo — BlueArc Ingeniería';
+  const html = baseLayout(`
+    <h2>${esAdmin ? 'Cuenta de administrador creada' : 'Bienvenido/a al sistema de gestión'}</h2>
+    <p>Hola <strong>${nombre}</strong>,</p>
+    <p>Se ha creado tu cuenta${esAdmin ? ' con permisos de <strong>administrador</strong>' : ''} en el <strong>Panel de Gestión</strong> de BlueArc Ingeniería.</p>
+    <div class="highlight">
+      <strong>Email de acceso:</strong> ${to}<br/>
+      <strong>Contraseña temporal:</strong> <span style="font-size:1.1rem;letter-spacing:0.08em;">${password}</span>
+    </div>
+    <p>Por seguridad, te recomendamos cambiar la contraseña desde tu perfil tras el primer acceso.</p>
+    ${adminUrl ? `<a class="btn" href="${adminUrl}">Acceder al panel</a>` : ''}
+  `);
+  await sendMail({ to, subject, html });
+}
+
 module.exports = {
   sendPasswordReset,
   sendNuevoPresupuesto,
   sendPresupuestoAceptado,
   sendPresupuestoRechazado,
   sendProyectoCompletado,
-  sendBienvenidaPortal
+  sendBienvenidaPortal,
+  sendConfirmacionContacto,
+  sendBienvenidaEmpleado
 };

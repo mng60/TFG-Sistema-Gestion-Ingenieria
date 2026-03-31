@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const Ticket = require('../models/Ticket');
 const { pool } = require('../config/database');
-const { sendPasswordReset } = require('../utils/emailService');
+const { sendPasswordReset, sendConfirmacionContacto } = require('../utils/emailService');
 
 const MAX_INTENTOS = 5;
 const LOCK_MINUTOS = 15;
@@ -122,6 +122,7 @@ const crearTicketContacto = async (req, res) => {
       telefono,
       mensaje
     });
+    sendConfirmacionContacto({ to: email, nombre }).catch(() => {});
     res.json({ success: true, message: 'Mensaje recibido. Nos pondremos en contacto contigo en breve.' });
   } catch (error) {
     console.error('Error en crearTicketContacto:', error);
