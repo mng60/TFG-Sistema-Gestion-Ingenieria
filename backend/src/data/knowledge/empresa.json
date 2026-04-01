@@ -1,0 +1,26 @@
+[
+  {
+    "id": "empresa_descripcion",
+    "titulo": "Sobre BlueArc Ingeniería",
+    "contenido": "BlueArc Ingeniería es una empresa especializada en ingeniería eléctrica ubicada en la Región de Murcia. Ofrecemos servicios de instalaciones eléctricas en baja y media tensión, proyectos fotovoltaicos, legalización de instalaciones y mantenimiento eléctrico. Trabajamos con clientes residenciales, comerciales e industriales.",
+    "keywords": ["empresa", "quiénes", "somos", "bluearc", "ingeniería", "murcia", "qué hacéis", "dedicáis"]
+  },
+  {
+    "id": "empresa_zona",
+    "titulo": "Zona de actuación",
+    "contenido": "BlueArc Ingeniería trabaja principalmente en la Región de Murcia: Murcia capital, Cartagena, Lorca, Molina de Segura, Alcantarilla, Totana, Mazarrón, San Javier, Águilas y toda la región. Para proyectos fuera de la zona habitual, consultamos sin compromiso.",
+    "keywords": ["zona", "donde", "trabajan", "murcia", "cartagena", "lorca", "molina", "alcantarilla", "cobertura", "actuación", "desplazamiento"]
+  },
+  {
+    "id": "empresa_contacto",
+    "titulo": "Contacto y horario",
+    "contenido": "Puedes contactar con BlueArc Ingeniería a través del formulario de contacto en nuestra web, por email en info@bluearc-energy.com o por teléfono en el +34 900 123 456. Atendemos de lunes a viernes de 8:00 a 18:00. También puedes solicitar una visita técnica gratuita sin compromiso.",
+    "keywords": ["contacto", "teléfono", "email", "correo", "llamar", "horario", "atención", "contactar", "hablar", "visita", "cita"]
+  },
+  {
+    "id": "empresa_proceso",
+    "titulo": "Cómo trabajamos",
+    "contenido": "Nuestro proceso: primero realizamos una visita técnica gratuita para evaluar el trabajo. Luego preparamos un presupuesto detallado en menos de 48 horas. Una vez aprobado, ejecutamos el proyecto con materiales de primera calidad. Finalmente tramitamos toda la documentación y legalizaciones necesarias ante la Consejería de Industria de la Región de Murcia.",
+    "keywords": ["proceso", "cómo", "funciona", "trabajan", "visita", "pasos", "tramite", "documentacion", "como trabajais"]
+  }
+]

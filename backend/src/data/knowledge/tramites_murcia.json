@@ -1,0 +1,52 @@
+[
+  {
+    "id": "murcia_registro_bt_0019",
+    "categoria": "tramites",
+    "ambito": "murcia",
+    "titulo": "Registro de instalaciones electricas de baja tension en Murcia",
+    "contenido": "En la Region de Murcia, la puesta en servicio y registro de instalaciones electricas de baja tension se tramita mediante el procedimiento 0019 de la sede electronica de la CARM. La documentacion concreta depende del tipo de instalacion e intervencion, pero puede incluir certificado, declaracion responsable, memoria tecnica de diseno o proyecto, segun proceda.",
+    "keywords": ["murcia", "registro baja tension", "procedimiento 0019", "carm", "sede", "certificado iebt", "memoria tecnica"],
+    "fuente_url": "https://sede.carm.es/web/pagina?IDCONTENIDO=19&IDTIPO=240&RASTRO=c%24m40288",
+    "fecha_revision": "2026-03-31"
+  },
+  {
+    "id": "murcia_autoconsumo_tramitacion",
+    "categoria": "tramites",
+    "ambito": "murcia",
+    "titulo": "Tramitacion de autoconsumo en Murcia",
+    "contenido": "En Murcia, la tramitacion del autoconsumo depende de la potencia, de si la instalacion es con o sin excedentes y de si cumple los requisitos para compensacion. La guia regional distingue los tramites con distribuidora, el codigo CAU y los registros administrativos que proceden. Por eso la tramitacion exacta debe revisarse antes de ejecutar o legalizar la instalacion.",
+    "keywords": ["murcia", "autoconsumo", "tramitacion", "cau", "excedentes", "compensacion", "registro autoconsumo", "distribuidora"],
+    "fuente_url": "https://sede.carm.es/documentos/19/151001%20Informaci%C3%B3n%20sobre%20tramitaci%C3%B3n%20autoconsumo%20en%20Murcia%20v39-RD%20244-2019.pdf",
+    "fecha_revision": "2026-03-31"
+  },
+  {
+    "id": "murcia_autoconsumo_15kw",
+    "categoria": "tramites",
+    "ambito": "murcia",
+    "titulo": "Autoconsumo con excedentes de hasta 15 kW en suelo urbanizado",
+    "contenido": "Para instalaciones de autoconsumo con excedentes de hasta 15 kW situadas en suelo urbanizado, la tramitacion puede ser mas sencilla que en otros casos, pero no significa que no haya que revisar requisitos tecnicos ni registros. En Murcia conviene comprobar expresamente la guia regional y la situacion concreta con la distribuidora antes de tramitar.",
+    "keywords": ["15 kw", "suelo urbanizado", "autoconsumo murcia", "excedentes", "permiso acceso", "conexion", "distribuidora"],
+    "fuente_url": "https://sede.carm.es/documentos/19/151001%20Informaci%C3%B3n%20sobre%20tramitaci%C3%B3n%20autoconsumo%20en%20Murcia%20v39-RD%20244-2019.pdf",
+    "fecha_revision": "2026-03-31"
+  },
+  {
+    "id": "murcia_cau",
+    "categoria": "tramites",
+    "ambito": "murcia",
+    "titulo": "Que es el CAU en autoconsumo",
+    "contenido": "El CAU es un codigo relacionado con la tramitacion de instalaciones de autoconsumo y aparece en la relacion con la distribuidora y con los registros aplicables. En Murcia, la propia guia de autoconsumo explica en que tramites interviene y cuando debe solicitarse. Para el cliente final, lo importante es que BlueArc puede orientar sobre la gestion documental necesaria en cada caso.",
+    "keywords": ["cau", "codigo autoconsumo", "distribuidora", "murcia", "autoconsumo", "tramites"],
+    "fuente_url": "https://sede.carm.es/documentos/19/151001%20Informaci%C3%B3n%20sobre%20tramitaci%C3%B3n%20autoconsumo%20en%20Murcia%20v39-RD%20244-2019.pdf",
+    "fecha_revision": "2026-03-31"
+  },
+  {
+    "id": "murcia_ayudas_autoconsumo",
+    "categoria": "tramites",
+    "ambito": "murcia",
+    "titulo": "Ayudas de autoconsumo en Murcia",
+    "contenido": "La Region de Murcia ha publicado convocatorias de ayudas para instalaciones de autoconsumo y almacenamiento, pero su disponibilidad, cuantia y plazo dependen de cada convocatoria. La informacion de ayudas debe revisarse en tiempo real antes de prometer importes o porcentajes concretos. El asistente puede orientar, pero no debe afirmar una ayuda como vigente si no ha sido revisada.",
+    "keywords": ["ayudas murcia", "subvencion autoconsumo", "almacenamiento", "placas solares", "convocatoria", "carm"],
+    "fuente_url": "https://sede.carm.es/web/pagina?IDCONTENIDO=3683&IDTIPO=240&RASTRO=c%24m40229",
+    "fecha_revision": "2026-03-31"
+  }
+]

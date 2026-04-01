@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import {
   BriefcaseBusiness,
+  CalendarClock,
   CheckCheck,
   Clock,
   Globe,
@@ -57,6 +58,15 @@ function getTipoBadge(ticket) {
       color: '#0369a1',
       label: 'Presupuesto',
       icon: <TicketCheck size={12} />
+    };
+  }
+
+  if (tipo === 'solicitud_cambio_fecha') {
+    return {
+      bg: '#fff7e6',
+      color: '#b45309',
+      label: 'Cambio de fecha',
+      icon: <CalendarClock size={12} />
     };
   }
 

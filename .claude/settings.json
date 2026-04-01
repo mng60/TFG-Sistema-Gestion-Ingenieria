@@ -6,7 +6,13 @@
       "Read(//c/Users/migue/.claude/projects/c--Users-migue-Documents-4o-TFG-Visual-TFG-Sistema-Gestion-Ingenieria/memory/**)",
       "Bash(/dev/null cat:*)",
       "Read(//c/Program Files/PostgreSQL/**)",
-      "Bash(ls -la /c/Users/migue/Documents/4o/TFG-Visual/TFG-Sistema-Gestion-Ingenieria/backend/*.js)"
+      "Bash(ls -la /c/Users/migue/Documents/4o/TFG-Visual/TFG-Sistema-Gestion-Ingenieria/backend/*.js)",
+      "WebSearch",
+      "WebFetch(domain:www.habitissimo.es)",
+      "WebFetch(domain:www.cronoshare.com)",
+      "WebFetch(domain:mantenimientodeinstalacioneselectricas.es)",
+      "WebFetch(domain:solarchain.es)",
+      "WebFetch(domain:autosolar.es)"
     ],
     "additionalDirectories": [
       "c:\\Users\\migue\\.claude\\projects\\c--Users-migue-Documents-4o-TFG-Visual-TFG-Sistema-Gestion-Ingenieria\\memory"

@@ -1,0 +1,105 @@
+/* Reutiliza todos los estilos de Chatbot.css (.chatbot-fab, .chatbot-window, etc.)
+   Este fichero solo añade los estilos exclusivos del AsistenteIA */
+@import './Chatbot.css';
+
+/* ── Botón cerrar en header ── */
+.asistente-header-close {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.asistente-header-close:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* ── Área de input ── */
+.asistente-input-area {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px 16px;
+  border-top: 1px solid #e4e8ea;
+  background: white;
+}
+
+.asistente-input {
+  flex: 1;
+  border: 1.5px solid #d0d7db;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.88rem;
+  font-family: inherit;
+  outline: none;
+  color: #2c3e50;
+  transition: border-color 0.15s;
+}
+
+.asistente-input:focus {
+  border-color: #4DB6A8;
+}
+
+.asistente-input:disabled {
+  background: #f8f9fa;
+  color: #95a5a6;
+}
+
+.asistente-send-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #4DB6A8, #3A9089);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.asistente-send-btn:hover:not(:disabled) {
+  opacity: 0.88;
+  transform: scale(1.05);
+}
+
+.asistente-send-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ── Indicador de escritura (puntos animados) ── */
+.asistente-typing {
+  display: flex !important;
+  align-items: center;
+  gap: 5px;
+  padding: 14px 18px !important;
+  min-width: 56px;
+}
+
+.asistente-typing span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4DB6A8;
+  animation: asistente-bounce 1.2s infinite ease-in-out;
+}
+
+.asistente-typing span:nth-child(2) { animation-delay: 0.2s; }
+.asistente-typing span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes asistente-bounce {
+  0%, 80%, 100% { transform: scale(0.7); opacity: 0.5; }
+  40%           { transform: scale(1);   opacity: 1;   }
+}

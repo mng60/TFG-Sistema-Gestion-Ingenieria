@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Building2, Cpu, House, Ruler, SunMedium, Zap } from 'lucide-react';
 import LandingNav from '../components/LandingNav';
+import AsistenteIA from '../components/AsistenteIA';
 import '../styles/Landing.css';
 import '../styles/SobreNosotros.css';
 
@@ -152,6 +153,8 @@ function SobreNosotros() {
           </button>
         </div>
       </footer>
+
+      <AsistenteIA />
     </div>
   );
 }

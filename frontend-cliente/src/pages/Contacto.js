@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LandingNav from '../components/LandingNav';
+import AsistenteIA from '../components/AsistenteIA';
 import '../styles/Landing.css';
 import '../styles/Contacto.css';
 
@@ -155,6 +156,8 @@ function Contacto() {
           </button>
         </div>
       </footer>
+
+      <AsistenteIA />
     </div>
   );
 }

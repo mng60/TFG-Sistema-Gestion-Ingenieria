@@ -1,0 +1,44 @@
+[
+  {
+    "id": "servicio_baja_tension",
+    "titulo": "Instalaciones eléctricas en baja tensión",
+    "contenido": "Realizamos instalaciones eléctricas completas en baja tensión para viviendas, locales comerciales, oficinas e industrias. Incluye diseño del cuadro eléctrico, cableado, puntos de luz, enchufes, circuitos especiales y conexión a la red. Cumplimos el Reglamento Electrotécnico de Baja Tensión (REBT) y las ITC-BT.",
+    "keywords": ["instalación", "eléctrica", "baja tensión", "vivienda", "casa", "piso", "local", "comercial", "oficina", "electricidad", "cableado", "circuito"]
+  },
+  {
+    "id": "servicio_industrial",
+    "titulo": "Instalaciones industriales",
+    "contenido": "Diseño e instalación de sistemas eléctricos para naves industriales, fábricas y talleres. Incluye cuadros de distribución, líneas de fuerza trifásicas, alumbrado industrial, SAIs, grupos electrógenos y sistemas de protección contra sobrecargas y cortocircuitos.",
+    "keywords": ["industrial", "nave", "fábrica", "taller", "trifásico", "fuerza", "industria", "potencia", "motor", "maquinaria", "grupo electrógeno"]
+  },
+  {
+    "id": "servicio_fotovoltaica",
+    "titulo": "Instalaciones fotovoltaicas y energía solar",
+    "contenido": "Diseñamos, instalamos y legalizamos sistemas fotovoltaicos para autoconsumo en hogares y empresas. Realizamos el estudio energético previo, selección de paneles e inversores, instalación completa y todos los trámites con la distribuidora y la administración según el RD 244/2019. También instalamos sistemas con baterías de acumulación.",
+    "keywords": ["solar", "fotovoltaica", "placas", "paneles", "autoconsumo", "energía", "renovable", "batería", "inversor", "sol", "fotovoltaico", "autoconsumo"]
+  },
+  {
+    "id": "servicio_legalizacion",
+    "titulo": "Legalización y certificados eléctricos (CIE)",
+    "contenido": "Tramitamos el Certificado de Instalación Eléctrica (CIE), también llamado boletín eléctrico. Es obligatorio para dar de alta la luz, aumentar la potencia contratada, legalizar instalaciones antiguas o tras una reforma. Gestionamos todos los trámites ante la distribuidora y la Consejería de Industria de la Región de Murcia.",
+    "keywords": ["legalización", "certificado", "CIE", "boletín", "eléctrico", "alta", "potencia", "trámite", "legalizar", "registro", "autorización", "inspección"]
+  },
+  {
+    "id": "servicio_mantenimiento",
+    "titulo": "Mantenimiento eléctrico",
+    "contenido": "Ofrecemos contratos de mantenimiento preventivo y correctivo para instalaciones eléctricas. El mantenimiento preventivo incluye revisiones periódicas, medición de resistencias de aislamiento, comprobación de protecciones y termografía. También realizamos reparaciones de urgencia en toda la Región de Murcia.",
+    "keywords": ["mantenimiento", "revisión", "preventivo", "correctivo", "avería", "reparación", "urgencia", "contrato", "periódico", "inspección"]
+  },
+  {
+    "id": "servicio_domotica",
+    "titulo": "Domótica e instalaciones inteligentes",
+    "contenido": "Instalamos sistemas de automatización del hogar y la empresa: control de iluminación, climatización, persianas, alarmas y seguridad desde el móvil. Trabajamos con KNX, Zigbee, sistemas WiFi y soluciones compatibles con Alexa y Google Home.",
+    "keywords": ["domótica", "inteligente", "automatización", "smart", "home", "iluminación", "control", "móvil", "app", "alexa", "google", "persianas", "alarma"]
+  },
+  {
+    "id": "servicio_iluminacion",
+    "titulo": "Iluminación y eficiencia energética",
+    "contenido": "Proyectos de iluminación eficiente con tecnología LED para viviendas, locales, naves y espacios exteriores. Realizamos auditorías energéticas que permiten reducir el consumo eléctrico entre un 30% y un 60%. Gestionamos las ayudas y subvenciones disponibles para proyectos de eficiencia energética.",
+    "keywords": ["iluminación", "led", "eficiencia", "energética", "ahorro", "consumo", "auditoría", "subvención", "ayuda", "luz", "exterior"]
+  }
+]

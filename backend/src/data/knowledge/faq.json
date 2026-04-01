@@ -1,0 +1,75 @@
+[
+  {
+    "id": "faq_plazo_general",
+    "categoria": "faq",
+    "ambito": "bluearc",
+    "titulo": "Plazos orientativos de ejecucion",
+    "contenido": "Los plazos dependen del tipo de trabajo y de la tramitacion necesaria. Como orientacion, un cambio de cuadro puede resolverse en 1 o 2 dias, una instalacion completa en vivienda suele requerir 1 a 2 semanas y un proyecto industrial puede extenderse varias semanas o meses. En autoconsumo, a la obra hay que sumar la parte administrativa y de distribuidora cuando aplique.",
+    "keywords": ["plazo", "tiempo", "cuanto tarda", "duracion", "dias", "semanas", "meses", "ejecucion"],
+    "fecha_revision": "2026-03-31"
+  },
+  {
+    "id": "faq_garantia",
+    "categoria": "faq",
+    "ambito": "bluearc",
+    "titulo": "Garantias de mano de obra y materiales",
+    "contenido": "BlueArc ofrece garantia sobre la mano de obra y emplea materiales con garantia del fabricante. La duracion concreta puede variar segun el equipo instalado y el tipo de actuacion. En instalaciones solares, paneles e inversores suelen tener garantias especificas del fabricante que se detallan en el presupuesto o la ficha tecnica.",
+    "keywords": ["garantia", "averia", "fallo", "materiales", "mano de obra", "paneles", "inversor", "defecto"],
+    "fecha_revision": "2026-03-31"
+  },
+  {
+    "id": "faq_empresa_instaladora",
+    "categoria": "faq",
+    "ambito": "bluearc",
+    "titulo": "Empresa instaladora habilitada",
+    "contenido": "Para emitir certificados, tramitar legalizaciones y ejecutar instalaciones dentro del ambito reglamentario, debe intervenir una empresa instaladora habilitada en baja tension. BlueArc trabaja dentro de ese marco y adapta la tramitacion al tipo de instalacion y al procedimiento aplicable en Murcia.",
+    "keywords": ["instalador autorizado", "empresa habilitada", "certificado", "cie", "boletin", "legalizacion", "quien puede hacerlo"],
+    "fecha_revision": "2026-03-31"
+  },
+  {
+    "id": "faq_subvenciones_variable",
+    "categoria": "faq",
+    "ambito": "murcia",
+    "titulo": "Subvenciones y ayudas: informacion sujeta a convocatoria",
+    "contenido": "Las ayudas para autoconsumo y eficiencia energetica cambian con las convocatorias y presupuestos disponibles. En Murcia han existido programas vinculados al autoconsumo y al almacenamiento, pero su disponibilidad y cuantia deben verificarse en cada momento. BlueArc puede orientar al cliente y revisar si hay lineas abiertas en el momento de preparar el proyecto.",
+    "keywords": ["subvenciones", "ayudas", "murcia", "autoconsumo", "next generation", "idae", "eficiencia energetica", "convocatoria"],
+    "fuente_url": "https://sede.carm.es/web/pagina?IDCONTENIDO=3683&IDTIPO=240&RASTRO=c%24m40229",
+    "fecha_revision": "2026-03-31"
+  },
+  {
+    "id": "faq_urgencias",
+    "categoria": "faq",
+    "ambito": "bluearc",
+    "titulo": "Averias y urgencias electricas",
+    "contenido": "Si hay una averia urgente, BlueArc puede atender incidencias electricas y priorizar intervenciones de seguridad. En casos con olor a quemado, humo, chisporroteos o riesgo para personas, lo correcto es cortar suministro si puede hacerse con seguridad y contactar de inmediato con un profesional. No es recomendable manipular el cuadro o conductores activos sin personal cualificado.",
+    "keywords": ["urgencia", "averia", "sin luz", "chispa", "olor a quemado", "cuadro", "emergencia electrica", "peligro"],
+    "fecha_revision": "2026-03-31"
+  },
+  {
+    "id": "faq_portal_cliente",
+    "categoria": "faq",
+    "ambito": "bluearc",
+    "titulo": "Acceso al portal de clientes",
+    "contenido": "Los clientes pueden disponer de un portal privado para revisar el estado del proyecto, presupuestos, documentos y comunicaciones. El acceso se facilita cuando el proyecto o servicio lo requiere. Si un cliente aun no tiene acceso, puede solicitarlo por los canales de contacto de BlueArc.",
+    "keywords": ["portal cliente", "login", "area cliente", "acceso", "documentos", "presupuestos", "seguimiento"],
+    "fecha_revision": "2026-03-31"
+  },
+  {
+    "id": "faq_murcia_ventaja_solar",
+    "categoria": "faq",
+    "ambito": "murcia",
+    "titulo": "Por que Murcia suele ser favorable para autoconsumo solar",
+    "contenido": "Murcia tiene buenas condiciones de irradiacion solar y eso suele favorecer la rentabilidad del autoconsumo fotovoltaico. Aun asi, la produccion real depende de orientacion, sombras, inclinacion, potencia instalada y perfil de consumo. Por eso BlueArc realiza estudio previo antes de dar una propuesta tecnica o economica.",
+    "keywords": ["murcia", "solar", "rentabilidad", "autoconsumo", "irradiacion", "placas", "amortizacion", "produccion"],
+    "fecha_revision": "2026-03-31"
+  },
+  {
+    "id": "faq_fuera_de_murcia",
+    "categoria": "faq",
+    "ambito": "bluearc",
+    "titulo": "Consultas fuera de la Region de Murcia",
+    "contenido": "La base de conocimiento del asistente esta priorizada para normativa y tramitacion aplicable en la Region de Murcia. Si BlueArc amplia actividad a otras comunidades, la informacion regional debera actualizarse o ampliarse con nuevas fuentes locales. Para consultas fuera de Murcia, la respuesta automatica debe tomarse solo como orientacion general y no como criterio definitivo de tramitacion.",
+    "keywords": ["fuera de murcia", "otra comunidad", "espana", "otra region", "otra provincia", "expansion", "tramites fuera"],
+    "fecha_revision": "2026-03-31"
+  }
+]

@@ -77,6 +77,7 @@ app.use('/api/chat', require('./src/routes/chat.routes'));
 app.use('/api/tickets', require('./src/routes/ticket.routes'));
 app.use('/api/dashboard', require('./src/routes/dashboard.routes'));
 app.use('/api/proyectos/:id/actualizaciones', require('./src/routes/actualizacion.routes'));
+app.use('/api/asistente', require('./src/routes/asistente.routes'));
 
 // Manejo de errores 404
 app.use((req, res) => {

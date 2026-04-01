@@ -1,0 +1,98 @@
+[
+  {
+    "id": "precio_proceso_presupuesto",
+    "categoria": "precios",
+    "ambito": "bluearc",
+    "titulo": "Como se prepara un presupuesto en BlueArc",
+    "contenido": "BlueArc parte de una visita tecnica o de la informacion minima necesaria para valorar el trabajo. Despues prepara un presupuesto orientativo o detallado segun el caso. Los importes del asistente deben interpretarse como rangos aproximados y no como oferta cerrada, ya que el precio final depende de mediciones, materiales, dificultad de montaje y tramitacion asociada.",
+    "keywords": ["presupuesto", "como pedir presupuesto", "precio", "visita tecnica", "oferta", "coste", "valoracion"],
+    "respuesta_orientativa": "Puedo darte una orientacion inicial, pero cualquier precio que te diga aqui debe entenderse como baremo aproximado y sin IVA, no como oferta cerrada.",
+    "pregunta_ajuste": "Si me dices que trabajo quieres hacer y el alcance aproximado, te lo acoto bastante mejor.",
+    "fecha_revision": "2026-03-31",
+    "requiere_verificacion_humana": true
+  },
+  {
+    "id": "precio_vivienda",
+    "categoria": "precios",
+    "ambito": "bluearc",
+    "titulo": "Precio orientativo de instalacion electrica en vivienda",
+    "contenido": "En vivienda, el precio de una instalacion o reforma electrica depende de superficie, numero de circuitos, estado previo, rozas, cuadro electrico y legalizacion necesaria. Como orientacion comercial, una actuacion sencilla puede estar en el rango bajo de unos pocos miles de euros y una reforma integral en viviendas mayores o con mayor complejidad puede subir de forma notable. Siempre debe confirmarse con visita tecnica y medicion real.",
+    "keywords": ["precio vivienda", "instalacion electrica vivienda", "reforma electrica", "casa", "piso", "cuanto cuesta"],
+    "respuesta_orientativa": "Como baremo inicial en vivienda, una actuacion sencilla suele quedarse en el tramo bajo de unos pocos miles de euros, mientras que una reforma integral en una vivienda grande o compleja sube bastante mas.",
+    "pregunta_ajuste": "Si me dices los m2 aproximados y si seria una reforma parcial o integral, te lo afino mejor.",
+    "fecha_revision": "2026-03-31",
+    "requiere_verificacion_humana": true
+  },
+  {
+    "id": "precio_cuadro_electrico",
+    "categoria": "precios",
+    "ambito": "bluearc",
+    "titulo": "Precio orientativo de cuadro electrico",
+    "contenido": "El coste de renovar un cuadro electrico depende del numero de circuitos, calidad de protecciones, necesidad de adaptar cableado y si debe emitirse CIE. Como orientacion, una renovacion sencilla suele ser bastante mas economica que una reforma con ampliacion de circuitos o legalizacion completa. El asistente debe presentar estos importes solo como referencia comercial de partida.",
+    "keywords": ["precio cuadro electrico", "cambiar cuadro", "magnetotermicos", "diferencial", "cuanto cuesta cuadro"],
+    "respuesta_orientativa": "Como baremo inicial, un cambio sencillo de cuadro suele ser bastante mas economico que una reforma con ampliacion de circuitos o legalizacion completa.",
+    "pregunta_ajuste": "Si me dices si es solo sustitucion del cuadro o si tambien hay que adaptar cableado, CIE o circuitos, te lo ajusto mejor.",
+    "fecha_revision": "2026-03-31",
+    "requiere_verificacion_humana": true
+  },
+  {
+    "id": "precio_solar_residencial",
+    "categoria": "precios",
+    "ambito": "bluearc",
+    "titulo": "Precio orientativo de instalacion solar residencial",
+    "contenido": "Una instalacion solar residencial se valora por potencia, tipo de cubierta, estructura, inversor, posibles baterias y tramitacion. Como referencia, las instalaciones pequenas y medias de autoconsumo domestico suelen moverse en un rango de varios miles de euros. Si incorpora baterias, legalizacion compleja o adecuaciones de cubierta, el coste aumenta. El precio final debe darse tras estudio de consumo y visita tecnica.",
+    "keywords": ["precio placas solares", "precio fotovoltaica", "solar residencial", "autoconsumo vivienda", "baterias", "cuanto cuesta solar"],
+    "respuesta_orientativa": "Como baremo inicial en una vivienda, una instalacion solar suele moverse en el tramo de varios miles de euros y sube si anades baterias o hay una cubierta mas compleja.",
+    "pregunta_ajuste": "Si me dices m2 utiles, tipo de cubierta y si iria con o sin baterias, te doy un rango mas util.",
+    "fecha_revision": "2026-03-31",
+    "requiere_verificacion_humana": true
+  },
+  {
+    "id": "precio_solar_empresa",
+    "categoria": "precios",
+    "ambito": "bluearc",
+    "titulo": "Precio orientativo de solar para empresa o nave",
+    "contenido": "En instalaciones solares para empresa o nave, el precio depende sobre todo de la potencia, la estructura, el perfil de consumo, el punto de conexion y las necesidades de ingenieria y legalizacion. A mayor potencia, el coste por kW instalado suele mejorar, pero el proyecto requiere analisis tecnico previo. El asistente solo debe dar una orientacion general y recomendar presupuesto especifico.",
+    "keywords": ["precio solar empresa", "fotovoltaica industrial", "nave", "empresa", "potencia", "cuanto cuesta placas empresa"],
+    "respuesta_orientativa": "En empresa o nave te puedo dar solo un baremo inicial, porque el coste depende mucho de potencia, estructura y perfil de consumo. Cuanta mas potencia util se instala, mejor suele salir el coste por kW, pero aqui si conviene afinar bien el caso.",
+    "pregunta_ajuste": "Si me dices consumo aproximado, tipo de cubierta y si buscas cubrir parte o casi todo el consumo, te oriento bastante mejor.",
+    "fecha_revision": "2026-03-31",
+    "requiere_verificacion_humana": true
+  },
+  {
+    "id": "precio_cie",
+    "categoria": "precios",
+    "ambito": "bluearc",
+    "titulo": "Precio orientativo del CIE o boletin electrico",
+    "contenido": "El coste del CIE depende de si solo se certifica una instalacion ya conforme o si antes hay que corregir defectos, adaptar cuadro, revisar derivaciones o rehacer parte de la instalacion. Por eso conviene diferenciar entre precio de tramitacion y precio de adecuacion de la instalacion. La valoracion definitiva debe hacerse caso por caso.",
+    "keywords": ["precio cie", "precio boletin electrico", "cuanto cuesta boletin", "certificado electrico", "legalizacion precio"],
+    "respuesta_orientativa": "Con el CIE conviene separar una cosa de otra: no cuesta lo mismo tramitar un boletin de una instalacion ya correcta que tener que corregir defectos antes de certificar.",
+    "pregunta_ajuste": "Si me dices si la instalacion ya esta al dia o si habria que revisar cuadro, derivaciones o defectos, te lo explico mucho mejor.",
+    "fecha_revision": "2026-03-31",
+    "requiere_verificacion_humana": true
+  },
+  {
+    "id": "precio_local_comercial",
+    "categoria": "precios",
+    "ambito": "bluearc",
+    "titulo": "Precio orientativo en local comercial",
+    "contenido": "En locales comerciales el coste depende mucho del uso del local, la superficie, la potencia prevista, alumbrado de emergencia, climatizacion, cocina, camaras u otros receptores especiales. Por eso el precio por metro cuadrado solo sirve como referencia muy aproximada y nunca sustituye la visita tecnica ni la definicion del alcance.",
+    "keywords": ["precio local comercial", "instalacion electrica local", "tienda", "bar", "restaurante", "oficina", "m2"],
+    "respuesta_orientativa": "En un local comercial te puedo dar un baremo muy general, pero cambia bastante segun el uso: una oficina sencilla no se parece en coste a un bar, una tienda o un local con cocina y camaras.",
+    "pregunta_ajuste": "Si me dices los m2 y el tipo de actividad del local, te oriento mucho mejor.",
+    "fecha_revision": "2026-03-31",
+    "requiere_verificacion_humana": true
+  },
+  {
+    "id": "precio_mantenimiento",
+    "categoria": "precios",
+    "ambito": "bluearc",
+    "titulo": "Contratos de mantenimiento y averias",
+    "contenido": "Los contratos de mantenimiento y las actuaciones por averia se valoran segun tipo de instalacion, frecuencia de revision, disponibilidad, criticidad del servicio y alcance de las comprobaciones. El asistente puede explicar la diferencia entre mantenimiento preventivo y correctivo, pero el importe debe confirmarse con una propuesta adaptada al cliente.",
+    "keywords": ["precio mantenimiento", "contrato mantenimiento", "averias", "preventivo", "correctivo", "urgencias", "hora electricista"],
+    "respuesta_orientativa": "En mantenimiento y averias el baremo cambia mucho segun si hablas de una actuacion puntual, una urgencia o un contrato preventivo. Aun asi, si me cuentas el tipo de instalacion y la frecuencia que buscarias, te doy una orientacion bastante mas clara.",
+    "pregunta_ajuste": "Si es para vivienda, local o nave y buscas algo puntual o un mantenimiento periodico, te lo acoto mejor.",
+    "fecha_revision": "2026-03-31",
+    "requiere_verificacion_humana": true
+  }
+]

@@ -1,4 +1,5 @@
 const ProyectoActualizacion = require('../models/ProyectoActualizacion');
+const Ticket = require('../models/Ticket');
 
 const getActualizaciones = async (req, res) => {
   try {
@@ -28,6 +29,29 @@ const createActualizacion = async (req, res) => {
       sugiere_cambio_fecha,
       fecha_sugerida
     });
+
+    if (sugiere_cambio_fecha) {
+      const fechaTexto = fecha_sugerida
+        ? new Date(fecha_sugerida).toLocaleDateString('es-ES')
+        : 'no especificada';
+      const lineas = [
+        `Solicitud de cambio de fecha de entrega del proyecto.`,
+        ``,
+        `Empleado: ${req.user.nombre}`,
+        `Nueva fecha sugerida: ${fechaTexto}`
+      ];
+      if (realizado) lineas.push(``, `Realizado: ${realizado}`);
+      if (pendiente) lineas.push(`Pendiente: ${pendiente}`);
+
+      Ticket.create({
+        tipo: 'solicitud_cambio_fecha',
+        tipo_usuario: 'empleado',
+        email: req.user.email,
+        nombre: req.user.nombre,
+        mensaje: lineas.join('\n'),
+        proyecto_id: id
+      }).catch((err) => console.error('Error creando ticket cambio fecha:', err.message));
+    }
 
     res.json({ success: true, actualizacion });
   } catch (error) {
