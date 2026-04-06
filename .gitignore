@@ -140,3 +140,7 @@ vite.config.ts.timestamp-*
 
 # Archivos subidos
 uploads/
+
+# Configuracion local de asistentes
+.claude/
+.codex/
