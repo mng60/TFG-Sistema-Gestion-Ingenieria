@@ -53,7 +53,7 @@ function esPreguntaSobreTema(texto) {
 
 function esPreguntaConversacional(pregunta) {
   const texto = normalizarTextoPlano(pregunta).trim();
-  return /puedo hacerte otra pregunta|te puedo hacer otra pregunta|otra pregunta|sigues ahi|estas ahi|puedes ayudarme|me puedes ayudar|puedes ayudar|me ayudas|gracias|muchas gracias|vale|perfecto|ok|genial|adios|hasta luego|chao|nos vemos|me voy|hola/.test(texto);
+  return /puedo hacerte otra pregunta|te puedo hacer otra pregunta|otra pregunta|sigues ahi|estas ahi|puedes ayudarme|me puedes ayudar|puedes ayudar|me ayudas|gracias|muchas gracias|vale|perfecto|ok|genial|adios|hasta luego|chao|nos vemos|me voy|^hola|^hey|^ey\b|^buenas|^buenos dias|^buenas tardes|^buenas noches/.test(texto);
 }
 
 function construirRespuestaConversacional(pregunta) {
@@ -71,7 +71,7 @@ function construirRespuestaConversacional(pregunta) {
     return 'Claro. Cuentame tu duda y te ayudo en lo que pueda.';
   }
 
-  if (/hola/.test(texto)) {
+  if (/^hola|^hey|^hola caracola|^bon dia|^bona tarda|^ey\b|^buenas|^buenos dias|^buenas tardes|^buenas noches/.test(texto)) {
     return 'Hola. Cuentame en que puedo ayudarte y lo vemos.';
   }
 
@@ -218,7 +218,7 @@ function guardarEnCache(clave, respuesta) {
 
 const SYSTEM_PROMPT = `Eres el asistente virtual de BlueArc Ingenieria, empresa de ingenieria electrica de la Region de Murcia.
 Ayudas con dudas sobre servicios electricos, precios orientativos y normativa tecnica.
-Responde siempre en espanol, con tono cercano, directo y profesional, como si fuera un tecnico de confianza explicando algo a un cliente.
+Responde siempre en el mismo idioma en que te escriba el usuario, con tono cercano, directo y profesional, como si fuera un tecnico de confianza explicando algo a un cliente.
 Responde en un maximo de 2 frases claras. No uses listas, guiones ni titulos.
 Basa la respuesta unicamente en el contexto proporcionado.
 Si te falta algun dato importante para responder bien, pidelo con naturalidad: por ejemplo, "si me dices..." o "si me cuentas...".

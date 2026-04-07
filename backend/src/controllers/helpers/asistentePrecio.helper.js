@@ -58,10 +58,7 @@ function obtenerTemaActivo({ preguntaActual, preguntaAnalizada, historialUsuario
   const idAnalizada = getTemaIdDesdeTexto(analizada);
   if (idAnalizada) return idAnalizada;
 
-  const entradaPrecio = resultados.find((r) => r.entrada && r.entrada.categoria === 'precios')?.entrada;
-  if (entradaPrecio?.id) return entradaPrecio.id;
-
-  return knowledgeBase.find((entrada) => entrada && entrada.categoria === 'precios')?.id || null;
+  return null;
 }
 
 function obtenerEntradaPorTema({ temaId, resultados = [], knowledgeBase = [] }) {
@@ -106,7 +103,7 @@ function construirRespuestaCuadro(textoActual) {
   }
 
   if (adaptarMas) {
-    return 'Si ademas hay que adaptar cableado, ampliar circuitos o emitir CIE, el trabajo ya sube claramente respecto a un simple cambio de cuadro, siempre sin IVA. En ese caso conviene separar la parte de cuadro de la parte de adecuacion para orientar mejor el coste.';
+    return 'Cuando hay que cambiar el cuadro y ademas adaptar cableado, ampliar circuitos o emitir CIE, el trabajo sube claramente respecto a una sustitucion sencilla, siempre sin IVA. Conviene separar la parte del cuadro de la parte de adecuacion para orientar mejor el coste total.';
   }
 
   return 'Como baremo inicial, un cambio sencillo de cuadro suele ser bastante mas economico que una reforma con ampliacion de circuitos o legalizacion completa. Si me dices si es solo sustitucion del cuadro o si tambien hay que adaptar cableado, CIE o circuitos, te lo ajusto mejor.';
