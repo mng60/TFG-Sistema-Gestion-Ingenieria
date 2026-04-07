@@ -6,8 +6,9 @@ const REE_BASE = 'https://apidatos.ree.es/es/datos/mercados/precios-mercados-tie
 
 const fetchPrecioEnergia = async () => {
   try {
-    const hoy = new Date();
-    const fecha = hoy.toISOString().split('T')[0];
+    // Fecha local Madrid (no UTC) para que el cron nocturno cargue el día correcto
+    const madridDate = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Madrid' }));
+    const fecha = `${madridDate.getFullYear()}-${String(madridDate.getMonth() + 1).padStart(2, '0')}-${String(madridDate.getDate()).padStart(2, '0')}`;
     const url = `${REE_BASE}?time_trunc=hour&geo_trunc=electric_system&geo_limit=peninsular&geo_ids=8741&start_date=${fecha}T00:00&end_date=${fecha}T23:59`;
 
     const res = await fetch(url, { signal: AbortSignal.timeout(20000) });
@@ -23,7 +24,8 @@ const fetchPrecioEnergia = async () => {
 
     const valores = pvpc.attributes.values
       .map((v) => ({
-        hora: new Date(v.datetime).getHours(),
+        // Hora local Madrid: la API REE da datetimes con offset local, pero por seguridad forzamos la zona
+        hora: new Date(new Date(v.datetime).toLocaleString('en-US', { timeZone: 'Europe/Madrid' })).getHours(),
         precio: Math.round((v.value / 1000) * 100000) / 100000 // €/MWh → €/kWh, 5 decimales
       }))
       .filter((v) => !isNaN(v.precio) && v.precio >= 0)
@@ -36,14 +38,24 @@ const fetchPrecioEnergia = async () => {
     const minEntry = valores.reduce((a, b) => (a.precio <= b.precio ? a : b));
     const maxEntry = valores.reduce((a, b) => (a.precio >= b.precio ? a : b));
 
-    // Renovables: buscar por title
+    // Renovables: buscar por title — logear IDs disponibles para diagnóstico
+    console.log('[PrecioEnergia] IDs en included:', included.map((e) => `${e.id}|${e.type}|${e.attributes?.title}`).join(' / '));
     const renovables = included.find((e) =>
       (e.attributes?.title || '').toLowerCase().includes('renov') ||
-      e.type === 'Renovable'
+      (e.attributes?.title || '').toLowerCase().includes('renovable') ||
+      e.type === 'Renovable' ||
+      e.type === 'Renovables'
     );
-    const renovablesPct = renovables?.attributes?.values?.[0]?.percentage != null
-      ? Math.round(renovables.attributes.values[0].percentage * 100)
-      : null;
+    // La API REE puede devolver el % directamente o como valor entre 0-1
+    let renovablesPct = null;
+    if (renovables?.attributes?.values?.length) {
+      const v0 = renovables.attributes.values[0];
+      if (v0.percentage != null) {
+        renovablesPct = Math.round(v0.percentage <= 1 ? v0.percentage * 100 : v0.percentage);
+      } else if (v0.value != null) {
+        renovablesPct = Math.round(v0.value <= 1 ? v0.value * 100 : v0.value);
+      }
+    }
 
     const datos = {
       fecha,
