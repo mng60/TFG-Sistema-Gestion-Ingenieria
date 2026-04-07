@@ -37,9 +37,23 @@ function esPreguntaPrecio(texto) {
   return /cuanto|cuesta|coste|precio|presupuesto|vale|tarifa/.test(normalizarTextoPlano(texto));
 }
 
+function esPreguntaSobreTema(texto) {
+  const t = normalizarTextoPlano(texto);
+  const tieneTema =
+    /solar|fotovoltaic|placas|paneles|autoconsumo/.test(t) ||
+    /cuadro electrico|cambiar el cuadro|cuadro de luz|magnetotermic|diferencial/.test(t) ||
+    /\bcie\b|boletin electrico|certificado electrico|legalizacion electrica/.test(t) ||
+    /instalacion electrica|reforma electrica|cableado electrico/.test(t) ||
+    /mantenimiento electrico|averia electrica|urgencia electrica/.test(t) ||
+    /nave industrial|instalacion (en|para) (nave|empresa|local|negocio)/.test(t);
+  const tieneIntencion =
+    /instalar|colocar|poner|montar|necesito|quiero|quisiera|queremos|me interesa|nos interesa/.test(t);
+  return tieneTema && tieneIntencion;
+}
+
 function esPreguntaConversacional(pregunta) {
   const texto = normalizarTextoPlano(pregunta).trim();
-  return /puedo hacerte otra pregunta|te puedo hacer otra pregunta|otra pregunta|sigues ahi|estas ahi|puedes ayudarme|me ayudas|gracias|muchas gracias|vale|perfecto|ok|genial|adios|hasta luego|chao|nos vemos|me voy/.test(texto);
+  return /puedo hacerte otra pregunta|te puedo hacer otra pregunta|otra pregunta|sigues ahi|estas ahi|puedes ayudarme|me puedes ayudar|puedes ayudar|me ayudas|gracias|muchas gracias|vale|perfecto|ok|genial|adios|hasta luego|chao|nos vemos|me voy|hola/.test(texto);
 }
 
 function construirRespuestaConversacional(pregunta) {
@@ -53,8 +67,12 @@ function construirRespuestaConversacional(pregunta) {
     return 'Si, sigo aqui. Dime y lo vemos.';
   }
 
-  if (/puedes ayudarme|me ayudas/.test(texto)) {
+  if (/puedes ayudarme|me puedes ayudar|puedes ayudar|me ayudas/.test(texto)) {
     return 'Claro. Cuentame tu duda y te ayudo en lo que pueda.';
+  }
+
+  if (/hola/.test(texto)) {
+    return 'Hola. Cuentame en que puedo ayudarte y lo vemos.';
   }
 
   if (/gracias|muchas gracias/.test(texto)) {
@@ -95,7 +113,7 @@ function obtenerMensajesUsuarioRecientes(historial = [], limite = 5) {
 
 function esSeguimientoDePrecio(pregunta, historial = []) {
   const texto = normalizarTextoPlano(pregunta);
-  const pareceSeguimiento = /m2|metros|cubierta|terraza|tejado|techo|plana|inclinada|zonas comunes|comunes|baterias|sin baterias|con baterias|repartir|viviendas|seria|serian|solo para|parcial|integral|cuadro|local|nave|vivienda|casa|piso|oficina|bar|tienda|boletin|cie|ambas opciones|las dos opciones|ambos casos|con y sin|precio de ambas|precio de los dos|dos opciones|baremo|alguna recomendacion|que me recomiendas|que opcion recomiendas|que harias|y esa opcion|esa opcion|esa otra|antigua|vieja|funciona|defectos|arreglar|corregir|adaptar cableado|merece la pena|recomendarias/.test(texto);
+  const pareceSeguimiento = /m2|metros|cubierta|terraza|tejado|techo|plana|inclinada|zonas comunes|comunes|baterias|sin baterias|con baterias|repartir|viviendas|seria|serian|solo para|parcial|integral|cuadro|local|nave|vivienda|casa|piso|oficina|bar|tienda|boletin|cie|ambas opciones|las dos opciones|ambos casos|con y sin|precio de ambas|precio de los dos|dos opciones|baremo|alguna recomendacion|que me recomiendas|que opcion recomiendas|que harias|y esa opcion|esa opcion|esa otra|antigua|vieja|funciona|defectos|arreglar|corregir|adaptar cableado|merece la pena|recomendarias|sustituir|sin tocar|solo el cuadro|solo cambiar|sin cableado|sin cie/.test(texto);
   if (!pareceSeguimiento) return false;
 
   const mensajesUsuario = obtenerMensajesUsuarioRecientes(historial, 4);
@@ -251,6 +269,7 @@ const preguntar = async (req, res) => {
     const debeResolverComoPrecio =
       esPreguntaPrecio(preguntaAnalizada) ||
       esSeguimientoPrecio ||
+      esPreguntaSobreTema(preguntaAnalizada) ||
       /alguna recomendacion|que me recomiendas|que opcion recomiendas|que harias|merece.*la pena|merecer.*la pena|recomendarias/.test(normalizarTextoPlano(preguntaAnalizada));
 
     if (!debeResolverComoPrecio && esConsultaNormativa(pregunta, preguntaAnalizada)) {

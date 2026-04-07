@@ -204,7 +204,10 @@ function construirRespuestaSolarDesdeContexto(contexto) {
     quiereAmbasOpciones,
     cubiertaInclinada,
     cubiertaPlana,
-    preguntaQueEsCubierta
+    preguntaQueEsCubierta,
+    confirmaConBaterias,
+    confirmaSinBaterias,
+    esConfirmacion
   } = contexto;
 
   if (!/^precio_solar/.test(temaId || '')) return null;
@@ -229,6 +232,18 @@ function construirRespuestaSolarDesdeContexto(contexto) {
         return `Con unos ${superficieM2} m2 utiles para zonas comunes ya puedo darte un baremo muy inicial de entre ${formatearEuros(precioMin)} y ${formatearEuros(precioMax)} sin IVA. Si me confirmas si iria sin baterias o con baterias, te lo ajusto un poco mas porque ese dato cambia bastante la inversion.`;
       }
 
+      if (confirmaConBaterias && !confirmaSinBaterias) {
+        const precioConMin = redondearCentenas(superficieM2 * 140 + 5000);
+        const precioConMax = redondearCentenas(superficieM2 * 180 + 10000);
+        return `Para ${superficieM2} m2 utiles en zonas comunes con baterias, el baremo inicial estaria entre unos ${formatearEuros(precioConMin)} y ${formatearEuros(precioConMax)} sin IVA. La capacidad de almacenamiento puede abrirlo bastante; si me dices los kWh que te planteas, te lo afino mejor.`;
+      }
+
+      if (confirmaSinBaterias && !confirmaConBaterias) {
+        const precioSinMin = redondearCentenas(superficieM2 * 140);
+        const precioSinMax = redondearCentenas(superficieM2 * 180);
+        return `Para ${superficieM2} m2 utiles en zonas comunes sin baterias, el baremo inicial estaria entre unos ${formatearEuros(precioSinMin)} y ${formatearEuros(precioSinMax)} sin IVA.`;
+      }
+
       return 'En un caso de autoconsumo para zonas comunes, lo normal es afinar el baremo cuando tengamos claro si entrarian baterias o no y como seria la cubierta real. Si quieres, dame esos dos datos y te lo concreto mejor.';
     }
 
@@ -244,6 +259,19 @@ function construirRespuestaSolarDesdeContexto(contexto) {
   }
 
   if (mencionaViviendaIndividual && !superficieM2) {
+    if (esConfirmacion && (cubiertaInclinada || cubiertaPlana || mencionaBaterias)) {
+      let resumen = '';
+      if (cubiertaInclinada && confirmaConBaterias) resumen = 'Con cubierta inclinada y baterias';
+      else if (cubiertaInclinada && confirmaSinBaterias) resumen = 'Con cubierta inclinada y sin baterias';
+      else if (cubiertaPlana && confirmaConBaterias) resumen = 'Con cubierta plana y baterias';
+      else if (cubiertaPlana && confirmaSinBaterias) resumen = 'Con cubierta plana y sin baterias';
+      else if (cubiertaInclinada) resumen = 'Con cubierta inclinada';
+      else if (cubiertaPlana) resumen = 'Con cubierta plana';
+      else if (confirmaConBaterias) resumen = 'Con baterias';
+      else if (confirmaSinBaterias) resumen = 'Sin baterias';
+      return `${resumen ? resumen + ', anotado.' : 'Anotado.'} Solo me faltaria la superficie util en m2 para darte el baremo, siempre orientativo y sin IVA.`;
+    }
+
     if (cubiertaInclinada || cubiertaPlana || mencionaBaterias) {
       return 'Para una vivienda como la que comentas ya solo me faltaria la superficie util aproximada en m2 para darte un baremo inicial mas util, siempre orientativo y sin IVA.';
     }
@@ -270,7 +298,36 @@ function construirRespuestaSolarDesdeContexto(contexto) {
       cierre = ' Al ser una cubierta plana, el montaje suele quedar algo mas contenido que en una inclinada.';
     }
 
+    if (!quiereAmbasOpciones && confirmaConBaterias && !confirmaSinBaterias) {
+      return `Para una vivienda con unos ${superficieM2} m2 utiles y con baterias, yo tomaria como baremo inicial unos ${formatearEuros(precioConMin)} a ${formatearEuros(precioConMax)} sin IVA.${cierre}`;
+    }
+
+    if (!quiereAmbasOpciones && confirmaSinBaterias && !confirmaConBaterias) {
+      return `Para una vivienda con unos ${superficieM2} m2 utiles sin baterias, yo tomaria como baremo inicial unos ${formatearEuros(precioSinMin)} a ${formatearEuros(precioSinMax)} sin IVA.${cierre}`;
+    }
+
     return `Para una vivienda con unos ${superficieM2} m2 utiles, yo tomaria como baremo inicial unos ${formatearEuros(precioSinMin)} a ${formatearEuros(precioSinMax)} sin baterias y una franja mas abierta de unos ${formatearEuros(precioConMin)} a ${formatearEuros(precioConMax)} con baterias, siempre sin IVA.${cierre}`;
+  }
+
+  if (temaId === 'precio_solar_empresa') {
+    if (!superficieM2) {
+      return 'Para una nave o instalacion empresarial te puedo orientar mejor si me das la superficie util aproximada en m2 y si quereis baterias o no. En empresa la potencia contratada y la tramitacion pesan bastante mas que en una vivienda.';
+    }
+    const factorMin = 90;
+    const factorMax = 150;
+    const extraBateriaMin = 8000;
+    const extraBateriaMax = 20000;
+    const precioSinMin = redondearCentenas(superficieM2 * factorMin);
+    const precioSinMax = redondearCentenas(superficieM2 * factorMax);
+    const precioConMin = redondearCentenas(precioSinMin + extraBateriaMin);
+    const precioConMax = redondearCentenas(precioSinMax + extraBateriaMax);
+    if (!quiereAmbasOpciones && confirmaConBaterias && !confirmaSinBaterias) {
+      return `Para una nave o empresa de unos ${superficieM2} m2 con baterias, el baremo inicial estaria entre unos ${formatearEuros(precioConMin)} y ${formatearEuros(precioConMax)} sin IVA. En instalaciones industriales la tramitacion y la potencia contratada pueden mover bastante el precio final.`;
+    }
+    if (!quiereAmbasOpciones && confirmaSinBaterias && !confirmaConBaterias) {
+      return `Para una nave o empresa de unos ${superficieM2} m2 sin baterias, el baremo inicial estaria entre unos ${formatearEuros(precioSinMin)} y ${formatearEuros(precioSinMax)} sin IVA. En instalaciones industriales la tramitacion y la potencia contratada pueden mover bastante el precio final.`;
+    }
+    return `Para una nave o empresa de unos ${superficieM2} m2, el baremo inicial estaria entre unos ${formatearEuros(precioSinMin)} a ${formatearEuros(precioSinMax)} sin baterias y unos ${formatearEuros(precioConMin)} a ${formatearEuros(precioConMax)} con baterias, siempre sin IVA. En instalaciones industriales la tramitacion y la potencia contratada pueden mover bastante el precio final.`;
   }
 
   if (esPreguntaRecomendacion(textoActual) || /recomiendas|que harias|merece la pena/.test(textoActual)) {
@@ -278,7 +335,7 @@ function construirRespuestaSolarDesdeContexto(contexto) {
   }
 
   if (superficieM2) {
-    return `Con unos ${superficieM2} m2 ya se puede preparar una orientacion mejor, pero para darte un rango util me faltaria saber el tipo de cubierta, si habria baterias y si buscas cubrir una vivienda, un local o varias viviendas. Si me das esos datos, te doy una orientacion mas razonable, siempre como rango aproximado y sin IVA.`;
+    return `Con unos ${superficieM2} m2 ya se puede preparar una orientacion mejor, pero para darte un rango util me faltaria saber el tipo de cubierta y si habria baterias. Si me das esos datos, te doy una orientacion mas razonable, siempre como rango aproximado y sin IVA.`;
   }
 
   return 'Puedo orientarte mejor si me das la superficie util, el tipo de cubierta y si quieres baterias o no. En instalaciones solares el coste depende sobre todo de la potencia, la estructura y la tramitacion, asi que los importes deben entenderse como orientativos y sin IVA.';
@@ -346,6 +403,11 @@ function construirRespuestaPrecio(params) {
     incluye(textoActual, [/repartir|vecinos|autoconsumo colectivo/])
   );
   const mencionaBaterias = incluye(textoCompleto, [/baterias|sin baterias|con baterias/]);
+  const confirmaConActual = incluye(textoActual, [/con baterias|lleva baterias|quiero baterias|poner baterias|queremos baterias/]);
+  const confirmaSinActual = incluye(textoActual, [/sin baterias/]);
+  const confirmaConBaterias = confirmaConActual || (!confirmaSinActual && incluye(textoCompleto, [/con baterias|lleva baterias|quiero baterias|poner baterias|queremos baterias/]));
+  const confirmaSinBaterias = confirmaSinActual || (!confirmaConActual && incluye(textoCompleto, [/sin baterias/]));
+  const esConfirmacion = historialUsuario.length > 0;
   const quiereAmbasOpciones = pideComparativaOpciones(textoActual) || incluye(textoActual, [/no se si poner baterias|no lo se aun|no lo se todavia/]);
   const cubiertaInclinada = incluye(textoActual, [/inclina(da|do)|tejado inclina/]) || incluye(textoCompleto, [/inclina(da|do)|tejado inclina/]);
   const cubiertaPlana = incluye(textoActual, [/plana|tejado plano|cubierta plana/]) || incluye(textoCompleto, [/plana|tejado plano|cubierta plana/]);
@@ -392,7 +454,10 @@ function construirRespuestaPrecio(params) {
       quiereAmbasOpciones,
       cubiertaInclinada,
       cubiertaPlana,
-      preguntaQueEsCubierta
+      preguntaQueEsCubierta,
+      confirmaConBaterias,
+      confirmaSinBaterias,
+      esConfirmacion
     });
   }
 
