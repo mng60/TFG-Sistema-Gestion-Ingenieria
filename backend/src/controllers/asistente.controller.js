@@ -2,10 +2,12 @@ const path = require('path');
 const fs = require('fs');
 const { ask, isAvailable } = require('../services/ai.service');
 const {
-  construirRespuestaPrecio,
-  esTemaPrecioActualEnergia,
-  RESPUESTA_PRECIO_ACTUAL_ENERGIA
+  construirRespuestaPrecio
 } = require('./helpers/asistentePrecio.helper');
+const {
+  esConsultaEnergiaActual,
+  construirRespuestaEnergia
+} = require('./helpers/asistenteEnergia.helper');
 const {
   esConsultaNormativa,
   construirRespuestaNormativa
@@ -254,9 +256,10 @@ const preguntar = async (req, res) => {
       return res.json({ success: true, respuesta: respuestaConversacional });
     }
 
-    if (esTemaPrecioActualEnergia(pregunta)) {
-      if (clave) guardarEnCache(clave, RESPUESTA_PRECIO_ACTUAL_ENERGIA);
-      return res.json({ success: true, respuesta: RESPUESTA_PRECIO_ACTUAL_ENERGIA });
+    if (esConsultaEnergiaActual(pregunta)) {
+      const respuestaEnergia = await construirRespuestaEnergia(pregunta);
+      // No cacheamos: el precio cambia cada hora
+      return res.json({ success: true, respuesta: respuestaEnergia });
     }
 
     const resultados = buscarContexto(preguntaAnalizada);

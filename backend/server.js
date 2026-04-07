@@ -7,6 +7,7 @@ const { Server } = require('socket.io');
 const { testConnection } = require('./src/config/database');
 const { initializeSocket } = require('./src/config/socket');
 const { startCleanupJob } = require('./src/jobs/cleanupChats');
+const { startPrecioEnergiaJob } = require('./src/jobs/precioEnergia.job');
 require('dotenv').config();
 
 const app = express();
@@ -99,6 +100,8 @@ const startServer = async () => {
 
   // Arrancar job de limpieza de chats expirados
   startCleanupJob();
+  // Arrancar job de precio de energía (PVPC diario desde REE)
+  startPrecioEnergiaJob();
 
   server.listen(PORT, () => {
     console.log(`🚀 Servidor backend corriendo en http://localhost:${PORT}`);
