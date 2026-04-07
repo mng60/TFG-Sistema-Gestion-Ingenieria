@@ -25,7 +25,7 @@ function getTemaIdDesdeTexto(texto) {
   if (incluye(texto, [/cie|boletin|certificado electrico|legalizacion/])) return 'precio_cie';
   if (incluye(texto, [/local|tienda|bar|restaurante|oficina/])) return 'precio_local_comercial';
   if (incluye(texto, [/mantenimiento|averia|urgencia|preventivo|correctivo/])) return 'precio_mantenimiento';
-  if (incluye(texto, [/\bmi casa\b|\bmi vivienda\b|\bmi piso\b|\bvivienda habitual\b|\bcasa unifamiliar\b|\bvivienda unifamiliar\b|\bhogar\b|reforma electrica/])) return 'precio_vivienda';
+  if (incluye(texto, [/\bmi casa\b|\bmi vivienda\b|\bmi piso\b|\bvivienda habitual\b|\bcasa unifamiliar\b|\bvivienda unifamiliar\b|\bhogar\b|\bcasa\b|reforma electrica/])) return 'precio_vivienda';
   return null;
 }
 
@@ -243,6 +243,14 @@ function construirRespuestaSolarDesdeContexto(contexto) {
     return 'En un caso de autoconsumo colectivo como este, lo normal es afinar el baremo cuando tengamos claro si seria para zonas comunes, para reparto entre viviendas y si entrarian baterias o no. Si quieres, dame esos dos datos y te lo concreto mejor.';
   }
 
+  if (mencionaViviendaIndividual && !superficieM2) {
+    if (cubiertaInclinada || cubiertaPlana || mencionaBaterias) {
+      return 'Para una vivienda como la que comentas ya solo me faltaria la superficie util aproximada en m2 para darte un baremo inicial mas util, siempre orientativo y sin IVA.';
+    }
+
+    return 'Puedo orientarte mejor si me das la superficie util aproximada en m2 y me confirmas si la cubierta es plana o inclinada y si quieres baterias o no. En vivienda esos tres datos cambian bastante el baremo.';
+  }
+
   if (mencionaViviendaIndividual && superficieM2) {
     const factorMin = cubiertaInclinada ? 130 : cubiertaPlana ? 115 : 120;
     const factorMax = cubiertaInclinada ? 180 : cubiertaPlana ? 165 : 170;
@@ -253,18 +261,16 @@ function construirRespuestaSolarDesdeContexto(contexto) {
     const precioConMin = redondearCentenas(precioSinMin + extraBateriaMin);
     const precioConMax = redondearCentenas(precioSinMax + extraBateriaMax);
 
-    if (/inclinada|plana|cubierta/.test(textoActual) || quiereAmbasOpciones || !mencionaBaterias) {
-      let cierre = '';
-      if (preguntaQueEsCubierta) {
-        cierre = ' Y cuando te hablo de cubierta me refiero al tipo de tejado o superficie donde iria la instalacion, por ejemplo si es plana o inclinada, porque eso tambien influye en el montaje.';
-      } else if (cubiertaInclinada) {
-        cierre = ' Al ser una cubierta inclinada, el baremo lo he movido un poco al alza respecto a una plana.';
-      } else if (cubiertaPlana) {
-        cierre = ' Al ser una cubierta plana, el montaje suele quedar algo mas contenido que en una inclinada.';
-      }
-
-      return `Para una vivienda con unos ${superficieM2} m2 utiles, yo tomaria como baremo inicial unos ${formatearEuros(precioSinMin)} a ${formatearEuros(precioSinMax)} sin baterias y una franja mas abierta de unos ${formatearEuros(precioConMin)} a ${formatearEuros(precioConMax)} con baterias, siempre sin IVA.${cierre}`;
+    let cierre = '';
+    if (preguntaQueEsCubierta) {
+      cierre = ' Y cuando te hablo de cubierta me refiero al tipo de tejado o superficie donde iria la instalacion, por ejemplo si es plana o inclinada, porque eso tambien influye en el montaje.';
+    } else if (cubiertaInclinada) {
+      cierre = ' Al ser una cubierta inclinada, el baremo lo he movido un poco al alza respecto a una plana.';
+    } else if (cubiertaPlana) {
+      cierre = ' Al ser una cubierta plana, el montaje suele quedar algo mas contenido que en una inclinada.';
     }
+
+    return `Para una vivienda con unos ${superficieM2} m2 utiles, yo tomaria como baremo inicial unos ${formatearEuros(precioSinMin)} a ${formatearEuros(precioSinMax)} sin baterias y una franja mas abierta de unos ${formatearEuros(precioConMin)} a ${formatearEuros(precioConMax)} con baterias, siempre sin IVA.${cierre}`;
   }
 
   if (esPreguntaRecomendacion(textoActual) || /recomiendas|que harias|merece la pena/.test(textoActual)) {
@@ -323,9 +329,12 @@ function construirRespuestaPrecio(params) {
   const temaId = obtenerTemaActivo({ preguntaActual, preguntaAnalizada, historialUsuario, resultados, knowledgeBase });
   const entrada = obtenerEntradaPorTema({ temaId, resultados, knowledgeBase });
 
-  const mencionaViviendaIndividual = incluye(textoActual, [/mi casa|mi vivienda|mi piso|para mi casa|para mi vivienda|vivienda habitual|vivienda unifamiliar|casa unifamiliar/]) ||
-    incluye(textoCompleto, [/mi casa|mi vivienda|mi piso|para mi casa|para mi vivienda|vivienda habitual|vivienda unifamiliar|casa unifamiliar/]);
-  const esCasoColectivo = !mencionaViviendaIndividual && incluye(textoCompleto, [/edificio|comunidad|vecinos|bloque|terraza|cubierta|planta|pisos/]);
+  const mencionaViviendaIndividual = incluye(textoActual, [/mi casa|mi vivienda|mi piso|para mi casa|para mi vivienda|vivienda habitual|vivienda unifamiliar|casa unifamiliar|\bcasa\b/]) ||
+    incluye(textoCompleto, [/mi casa|mi vivienda|mi piso|para mi casa|para mi vivienda|vivienda habitual|vivienda unifamiliar|casa unifamiliar|\bcasa\b/]);
+  const esCasoColectivo = !mencionaViviendaIndividual && (
+    incluye(textoCompleto, [/edificio|comunidad|vecinos|bloque|autoconsumo colectivo|zonas comunes|repartir entre viviendas|reparto entre viviendas/]) ||
+    /\b\d+\s*plantas?\b/.test(textoCompleto)
+  );
   // niegaReparto y mencionaReparto usan solo textoActual para no contaminar
   // la intención actual con mensajes anteriores del compound histórico
   const niegaReparto = incluye(textoActual, [/no para repartir|no repartir|solo para zonas comunes|solo zonas comunes/]);
@@ -338,8 +347,8 @@ function construirRespuestaPrecio(params) {
   );
   const mencionaBaterias = incluye(textoCompleto, [/baterias|sin baterias|con baterias/]);
   const quiereAmbasOpciones = pideComparativaOpciones(textoActual) || incluye(textoActual, [/no se si poner baterias|no lo se aun|no lo se todavia/]);
-  const cubiertaInclinada = incluye(textoActual, [/inclinada|tejado inclinado|cubierta inclinada/]);
-  const cubiertaPlana = incluye(textoActual, [/plana|tejado plano|cubierta plana/]);
+  const cubiertaInclinada = incluye(textoActual, [/inclina(da|do)|tejado inclina/]) || incluye(textoCompleto, [/inclina(da|do)|tejado inclina/]);
+  const cubiertaPlana = incluye(textoActual, [/plana|tejado plano|cubierta plana/]) || incluye(textoCompleto, [/plana|tejado plano|cubierta plana/]);
   const preguntaQueEsCubierta = incluye(textoActual, [/que es la cubierta|que es cubierta|a que te refieres con cubierta|que significa cubierta/]);
 
   if (esPreguntaRecomendacion(preguntaActual)) {
