@@ -93,8 +93,8 @@ async function construirRespuestaEnergia(pregunta) {
   // ── Detectar intención ──────────────────────────────────────────────
   const esAhora = /precio.*ahora|ahora.*precio|cuanto.*ahora|cuanto.*cuesta.*ahora|en este momento|a cuanto esta ahora|right now|current.*price|electricity.*now/.test(t);
   const esFranjaActual = /franja.*ahora|que franja|estamos.*franja|periodo.*ahora|franja.*estamos/.test(t);
-  const esBarata = /franja.*barata|hora.*barata|cuando.*barata|horas baratas|mas barato.*luz|mejor hora.*poner|cuando.*poner.*lavadora|poner.*lavadora|hora.*lavadora|cuando.*consumir|evitar.*consumir|menos.*consumir|mejor hora para|cheapest|off.peak|when.*cheap/.test(t);
-  const esCara = /franja.*cara|hora.*cara|cuando.*cara|horas caras|mas cara.*luz|franja punta|peak hour|peak time/.test(t);
+  const esBarata = /franja.*barata|hora.*barata|cuando.*barata|horas baratas|mas barato.*luz|mejor hora.*poner|cuando.*poner.*lavadora|poner.*lavadora|hora.*lavadora|cuando.*consumir|menos.*consumir|mejor hora para|cheapest|off.peak|when.*cheap/.test(t);
+  const esCara = /franja.*cara|hora.*cara|cuando.*cara|horas caras|mas cara.*luz|franja punta|peak hour|peak time|evitar.*consumir|cuando.*no.*consumir/.test(t);
   const esRenovables = /renovables|mix.*energetico|cuanta.*renovable/.test(t);
 
   // ── Sin datos frescos: respuesta con franja calculable ──────────────

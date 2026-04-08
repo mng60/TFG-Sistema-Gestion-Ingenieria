@@ -39,6 +39,13 @@ function esPreguntaPrecio(texto) {
   return /cuanto|cuesta|coste|precio|presupuesto|vale|tarifa/.test(normalizarTextoPlano(texto));
 }
 
+// Heurística ligera: si ≥2 palabras inglesas comunes → inglés
+function esEnIngles(texto) {
+  const t = texto.toLowerCase();
+  const marcadores = ['what', 'when', 'how', 'which', 'where', 'electricity', 'price', 'cheapest', 'peak', 'tariff', 'today', 'right now', 'current', 'off-peak'];
+  return marcadores.filter((m) => t.includes(m)).length >= 2;
+}
+
 function esPreguntaSobreTema(texto) {
   const t = normalizarTextoPlano(texto);
   const tieneTema =
@@ -258,6 +265,16 @@ const preguntar = async (req, res) => {
 
     if (esConsultaEnergiaActual(pregunta)) {
       const respuestaEnergia = await construirRespuestaEnergia(pregunta);
+      // Si la pregunta parece inglés, traducir vía LLM manteniendo números y unidades
+      if (esEnIngles(pregunta)) {
+        try {
+          const traducida = await ask(
+            'You are a translator. Translate the following Spanish text to English. Keep all numbers, units (€/kWh, h) and time values exactly as they are. Output only the translated text, nothing else.',
+            respuestaEnergia
+          );
+          return res.json({ success: true, respuesta: traducida });
+        } catch (_) { /* si falla la traducción, devolver en español */ }
+      }
       // No cacheamos: el precio cambia cada hora
       return res.json({ success: true, respuesta: respuestaEnergia });
     }
