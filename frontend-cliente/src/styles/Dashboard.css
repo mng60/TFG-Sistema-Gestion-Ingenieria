@@ -3,126 +3,139 @@
   width: 100%;
 }
 
+/* ── Cabecera (box blanco) ── */
 .page-header {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-bottom: 28px;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  border: 1px solid #f0f0f0;
+  margin-bottom: 24px;
 }
 
 .page-header h1 {
-  font-size: 1.7rem;
-  font-weight: 700;
-  color: #2c3e50;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 4px;
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.page-subheader {
+  font-size: 0.9rem;
+  color: #9ca3af;
   margin: 0;
 }
 
 .count-badge {
-  background: #e3f2fd;
-  color: #3498db;
+  background: rgba(45, 212, 191, 0.12);
+  color: #0D9488;
   font-size: 0.85rem;
   font-weight: 600;
-  padding: 4px 12px;
+  padding: 5px 14px;
   border-radius: 20px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-/* Cuadrícula de proyectos */
-.proyectos-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
-}
-
-.proyecto-card {
-  background: white;
-  border-radius: 12px;
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  text-decoration: none;
-  color: inherit;
+/* ── Lista de cards ── */
+.proyectos-list {
   display: flex;
   flex-direction: column;
-  transition: box-shadow 0.2s, transform 0.2s;
-  overflow: hidden;
+  gap: 16px;
+}
+
+/* Card a ancho completo */
+.proyecto-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  background: white;
+  border-radius: 16px;
+  border: 1.5px solid #e8ecf0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 24px;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.25s, transform 0.25s, border-color 0.25s;
 }
 
 .proyecto-card:hover {
-  box-shadow: 0 6px 20px rgba(26,35,126,0.12);
+  box-shadow: 0 8px 28px rgba(13, 148, 136, 0.13);
   transform: translateY(-2px);
+  border-color: #2DD4BF;
 }
 
-.proyecto-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 18px 18px 12px;
-}
-
-.proyecto-card-header h3 {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 700;
-  color: #212121;
-  line-height: 1.3;
-}
-
+/* Contenido izquierdo */
 .proyecto-card-body {
-  padding: 0 18px 14px;
   flex: 1;
+  min-width: 0;
+}
+
+.proyecto-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 8px;
+  line-height: 1.3;
+  transition: color 0.25s;
+}
+
+.proyecto-card:hover .proyecto-title {
+  color: #0D9488;
 }
 
 .proyecto-desc {
   font-size: 0.88rem;
-  color: #757575;
-  margin: 0 0 12px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  color: #6b7280;
+  margin: 0 0 14px;
+  line-height: 1.5;
 }
 
 .proyecto-meta {
   display: flex;
-  flex-direction: column;
-  gap: 5px;
+  flex-wrap: wrap;
+  gap: 16px;
 }
 
 .proyecto-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-size: 0.85rem;
-  color: #555;
+  color: #9ca3af;
 }
 
-.proyecto-card-footer {
-  padding: 12px 18px;
-  border-top: 1px solid #f0f0f0;
-  display: flex;
-  justify-content: flex-end;
-}
-
+/* Acción derecha */
 .ver-detalle {
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   font-weight: 600;
-  color: #3498db;
-}
-
-/* Badges de estado */
-.badge {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-size: 0.78rem;
-  font-weight: 600;
+  color: #0D9488;
   white-space: nowrap;
+  flex-shrink: 0;
+  padding-top: 2px;
+  transition: color 0.2s;
 }
 
+.proyecto-card:hover .ver-detalle {
+  color: #0F766E;
+}
+
+/* ── Badges de estado (uso general) ── */
+.badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 600; white-space: nowrap; }
 .badge-planificacion { background: #e8eaf6; color: #3949ab; }
-.badge-en_progreso   { background: #e3f2fd; color: #3498db; }
+.badge-en_progreso   { background: #ccfbf1; color: #0D9488; }
 .badge-pausado       { background: #fff8e1; color: #f57f17; }
 .badge-completado    { background: #e8f5e9; color: #2e7d32; }
 .badge-cancelado     { background: #fce4ec; color: #c62828; }
 
-/* Loading y empty */
+/* ── Loading y empty ── */
 .loading-container {
   display: flex;
   flex-direction: column;
@@ -137,7 +150,7 @@
   width: 36px;
   height: 36px;
   border: 3px solid #e0e0e0;
-  border-top-color: #3498db;
+  border-top-color: #0D9488;
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
@@ -149,21 +162,22 @@
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  color: #666;
-}
-
-.empty-state .empty-icon {
-  font-size: 3rem;
-  margin-bottom: 14px;
+  color: #6b7280;
 }
 
 .empty-state h3 {
   margin: 0 0 8px;
-  color: #333;
+  color: #374151;
+  font-size: 1.1rem;
 }
 
 @media (max-width: 600px) {
-  .proyectos-grid {
-    grid-template-columns: 1fr;
+  .proyecto-card {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .ver-detalle {
+    align-self: flex-end;
   }
 }

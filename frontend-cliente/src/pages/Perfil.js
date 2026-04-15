@@ -115,10 +115,17 @@ function Perfil() {
   return (
     <div style={{ padding: '30px 24px', maxWidth: 1100, margin: '0 auto' }}>
 
-      {/* Header */}
-      <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: '1.8rem', fontWeight: 700, color: '#2c3e50', margin: 0 }}>Mi Perfil</h1>
-        <p style={{ color: '#7f8c8d', margin: '4px 0 0' }}>{cliente?.email}</p>
+      {/* Header (box blanco, igual que Solicitar Proyecto) */}
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 16,
+        padding: '20px 24px', background: 'white', borderRadius: 12,
+        boxShadow: '0 2px 8px rgba(0,0,0,0.07)', border: '1px solid #f0f0f0',
+        marginBottom: 24
+      }}>
+        <div>
+          <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#111827', margin: '0 0 4px', fontFamily: "'Montserrat', sans-serif", letterSpacing: '-0.02em' }}>Mi Perfil</h1>
+          <p style={{ color: '#9ca3af', margin: 0, fontSize: '0.9rem' }}>{cliente?.email}</p>
+        </div>
       </div>
 
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}

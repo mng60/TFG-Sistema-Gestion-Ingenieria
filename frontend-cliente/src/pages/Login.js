@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Zap } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import '../styles/LoginSplit.css';
 
@@ -21,13 +21,18 @@ function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  // PRNG determinista con sin() — sin Math.random(), siempre igual, sin patrón visible
+  const sr = (seed) => { const x = Math.sin(seed * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+
   const particlesRef = useRef(
-    Array.from({ length: 16 }, (_, i) => ({
+    Array.from({ length: 32 }, (_, i) => ({
       id: i,
-      left: (i * 6 + 4) % 96,
-      delay: (i * 0.55) % 8,
-      duration: 6 + (i % 5),
-      size: 2 + (i % 3)
+      left:     sr(i)        * 92 + 2,
+      top:      sr(i + 50)   * 92 + 2,
+      delay:    sr(i + 100)  * 6,
+      duration: sr(i + 150)  * 8  + 7,
+      size:     sr(i + 200)  * 8  + 4,
+      opacity:  sr(i + 250)  * 0.25 + 0.15
     }))
   );
 
@@ -86,19 +91,21 @@ function Login() {
         <div className="login-split-form-inner">
           {!showOlvide ? (
             <>
-              <h1 className="login-split-title login-split-title--dark login-split-title--oneline">INICIO DE SESIÓN</h1>
-              <p className="login-split-subtitle">Accede a tus proyectos y documentación</p>
+              <div className="login-split-heading">
+                <h1 className="login-split-title login-split-title--dark">Bienvenido</h1>
+                <p className="login-split-subtitle">Ingresa tus credenciales para acceder</p>
+              </div>
 
               <form onSubmit={handleSubmit} className="login-split-form-fields">
                 {error && <div className="login-split-error">{error}</div>}
 
                 <div className="login-split-group">
-                  <label>Email</label>
+                  <label>Correo electrónico</label>
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="tu@empresa.com"
+                    placeholder="nombre@empresa.com"
                     required
                     disabled={loading}
                   />
@@ -106,8 +113,8 @@ function Login() {
 
                 <div className="login-split-group">
                   <label>
-                    Contrasena
-                    {capsLock && <span className="caps-warning">↑ Mayusculas activas</span>}
+                    Contraseña
+                    {capsLock && <span className="caps-warning">↑ Mayúsculas activas</span>}
                   </label>
                   <div className="login-pwd-wrap">
                     <input
@@ -116,7 +123,7 @@ function Login() {
                       onChange={(e) => setPassword(e.target.value)}
                       onKeyDown={(e) => setCapsLock(e.getModifierState('CapsLock'))}
                       onKeyUp={(e) => setCapsLock(e.getModifierState('CapsLock'))}
-                      placeholder="••••••••"
+                      placeholder="Introduce tu contraseña"
                       required
                       disabled={loading}
                     />
@@ -125,22 +132,21 @@ function Login() {
                       className="login-pwd-eye"
                       onClick={() => setShowPwd((v) => !v)}
                       tabIndex={-1}
-                      aria-label={showPwd ? 'Ocultar contrasena' : 'Mostrar contrasena'}
+                      aria-label={showPwd ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                     >
-                      {showPwd ? <EyeOff size={22} /> : <Eye size={22} />}
+                      {showPwd ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
                   </div>
                 </div>
 
                 <button type="submit" className="login-split-btn login-split-btn--teal" disabled={loading}>
-                  {loading ? 'INICIANDO SESION...' : 'ACCEDER AL PORTAL →'}
+                  {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
                 </button>
               </form>
 
               <div className="login-split-footer-links">
-                <p className="login-help-text">¿Problemas? Contacta con tu gestor de proyecto</p>
                 <button onClick={() => setShowOlvide(true)} className="login-split-link login-split-link--teal">
-                  ¿Olvidaste tu contrasena?
+                  ¿Olvidaste tu contraseña?
                 </button>
               </div>
             </>
@@ -194,44 +200,53 @@ function Login() {
       </div>
 
       <div className="login-split-visual login-split-visual--teal">
+        {/* Grid pattern */}
+        <svg className="login-visual-grid" aria-hidden="true">
+          <defs>
+            <pattern id="lv-grid" width="60" height="60" patternUnits="userSpaceOnUse">
+              <path d="M 60 0 L 0 0 0 60" fill="none" stroke="white" strokeWidth="0.5" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#lv-grid)" />
+        </svg>
+
+        {/* Floating particles */}
         <div className="login-visual-particles">
           {particlesRef.current.map((p) => (
             <span
               key={p.id}
               className="login-particle"
               style={{
-                left: `${p.left}%`,
-                width: `${p.size}px`,
-                height: `${p.size}px`,
-                animationDelay: `${p.delay}s`,
-                animationDuration: `${p.duration}s`
+                '--p-left':     `${p.left}%`,
+                '--p-top':      `${p.top}%`,
+                '--p-size':     `${p.size}px`,
+                '--p-opacity':   p.opacity,
+                '--p-delay':    `${p.delay}s`,
+                '--p-duration': `${p.duration}s`
               }}
             />
           ))}
         </div>
 
-        <svg className="login-visual-circuit" viewBox="0 0 500 600" fill="none">
-          <path d="M0 180 L100 180 L100 90 L280 90" stroke="rgba(255,255,255,0.18)" strokeWidth="1.4" />
-          <path d="M0 320 L140 320 L140 220 L380 220 L380 320 L500 320" stroke="rgba(255,255,255,0.12)" strokeWidth="1.4" />
-          <path d="M200 0 L200 140 L320 140 L320 380" stroke="rgba(255,255,255,0.14)" strokeWidth="1.4" />
-          <path d="M420 500 L420 280 L490 280 L490 600" stroke="rgba(255,255,255,0.09)" strokeWidth="1.4" />
-          <path d="M60 520 L60 420 L220 420 L220 520 L420 520" stroke="rgba(255,255,255,0.09)" strokeWidth="1.4" />
-          <circle cx="100" cy="180" r="4" fill="rgba(255,255,255,0.34)" />
-          <circle cx="280" cy="90" r="4" fill="rgba(255,255,255,0.34)" />
-          <circle cx="140" cy="320" r="4" fill="rgba(255,255,255,0.3)" />
-          <circle cx="380" cy="220" r="4" fill="rgba(255,255,255,0.3)" />
-          <circle cx="320" cy="380" r="6" fill="rgba(255,255,255,0.24)" />
-        </svg>
+        {/* Pulsing anchor dots */}
+        <span className="login-particle-pulse login-pulse--1" />
+        <span className="login-particle-pulse login-pulse--2" />
+        <span className="login-particle-pulse login-pulse--3" />
+
+        {/* Ripple rings */}
+        <div className="login-ripple-wrap">
+          <span className="login-ripple" />
+          <span className="login-ripple" />
+        </div>
 
         <div className="login-visual-content login-visual-content--cliente">
-          <div className="login-visual-badge login-visual-badge--white">PORTAL CLIENTES</div>
-          <h2>
-            BLUE<span>ARC</span>
-            <br />
-            ENERGY
-          </h2>
-          <p>Seguimiento en tiempo real de tus proyectos de ingenieria electrica</p>
-          <div className="login-visual-est">EST. 2018</div>
+          <div className="login-visual-badge login-visual-badge--white">
+            <Zap size={16} />
+            PORTAL CLIENTES
+          </div>
+          <h2 className="login-visual-h2">BLUE<span>ARC</span></h2>
+          <h2 className="login-visual-h2 login-visual-h2--mb">ENERGY</h2>
+          <p>Seguimiento en tiempo real de tus proyectos</p>
         </div>
       </div>
     </div>
