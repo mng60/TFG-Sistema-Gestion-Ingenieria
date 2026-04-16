@@ -104,7 +104,7 @@ function ProyectoInfo({
         <div className="section-header">
           <h2>Empleados Asignados ({empleadosProyecto.length})</h2>
           {isAdmin && (
-            <button className="btn-secondary" onClick={() => setShowAsignarModal(true)}>
+            <button className="btn-primary" onClick={() => setShowAsignarModal(true)}>
               <Plus size={16}/> Asignar Empleado
             </button>
           )}

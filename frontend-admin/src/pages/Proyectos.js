@@ -395,7 +395,7 @@ function Proyectos() {
                               <Pencil size={14} />
                             </button>
                             <button
-                              className="btn-sm btn-warning"
+                              className="btn-sm btn-success"
                               onClick={() => abrirModalAsignar(proyecto)}
                               title="Asignar empleado"
                             >
