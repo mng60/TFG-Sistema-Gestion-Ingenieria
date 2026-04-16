@@ -1435,6 +1435,11 @@
   color-scheme: light;
 }
 
+/* Con teclado abierto: nav oculto, chat ocupa el espacio completo */
+body.keyboard-open .chat-layout-mobile {
+  height: calc(100dvh - var(--statusbar-space));
+}
+
 .chat-list-screen {
   position: absolute;
   inset: 0;

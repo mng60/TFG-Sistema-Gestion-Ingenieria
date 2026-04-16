@@ -21,6 +21,22 @@ function PublicRoute({ children }) {
   return !isAuthenticated ? children : <Navigate to="/proyectos" />;
 }
 
+function KeyboardManager() {
+  useEffect(() => {
+    if (!window.visualViewport) return;
+
+    const handleResize = () => {
+      const keyboardOpen = window.visualViewport.height < window.innerHeight - 100;
+      document.body.classList.toggle('keyboard-open', keyboardOpen);
+    };
+
+    window.visualViewport.addEventListener('resize', handleResize);
+    return () => window.visualViewport.removeEventListener('resize', handleResize);
+  }, []);
+
+  return null;
+}
+
 function StatusBarManager() {
   const location = useLocation();
 
@@ -64,6 +80,7 @@ function App() {
       ) : (
         <Router>
           <StatusBarManager />
+          <KeyboardManager />
 
           <Routes>
             <Route path="/" element={<Navigate to="/login" />} />
