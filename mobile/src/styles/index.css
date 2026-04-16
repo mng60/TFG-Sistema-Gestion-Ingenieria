@@ -80,6 +80,11 @@ body.screen-app::before {
   pointer-events: none;
 }
 
+/* Chat mantiene tema claro — overlay superior debe coincidir con su fondo */
+body.screen-chat::before {
+  background: #f8f9fa;
+}
+
 body.screen-login::before {
   content: none;
 }

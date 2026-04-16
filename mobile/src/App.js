@@ -26,9 +26,11 @@ function StatusBarManager() {
 
   useEffect(() => {
     const isLogin = location.pathname === '/login';
+    const isChat = location.pathname === '/chat';
 
     document.body.classList.toggle('screen-login', isLogin);
     document.body.classList.toggle('screen-app', !isLogin);
+    document.body.classList.toggle('screen-chat', isChat);
 
     const applyStatusBar = async () => {
       if (!Capacitor.isNativePlatform()) return;
@@ -36,8 +38,10 @@ function StatusBarManager() {
       try {
         await StatusBar.show();
 
+        // Chat tiene fondo claro → iconos oscuros (Style.Light)
+        // Login y resto de app tienen fondo oscuro → iconos blancos (Style.Dark)
         await StatusBar.setStyle({
-          style: isLogin ? Style.Dark : Style.Light
+          style: isChat ? Style.Light : Style.Dark
         });
       } catch (e) {
         console.error('Error configurando StatusBar:', e);
