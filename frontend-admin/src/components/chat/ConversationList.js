@@ -80,7 +80,7 @@ function ConversationList({
 
       {/* Buscador */}
       <div className="conversation-search">
-        <Search size={16} color="black" className="search-icon" />
+        <Search size={16} color="rgba(255,255,255,0.5)" className="search-icon" />
         <input
           type="text"
           placeholder="Buscar chat..."

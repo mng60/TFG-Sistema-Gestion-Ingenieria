@@ -52,11 +52,39 @@
   padding: 0 24px;
 }
 
+/* Wrapper con glow radial (igual que sidebar admin y login desktop) */
+.mobile-login-logo-wrap {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-login-logo-wrap::before {
+  content: '';
+  position: absolute;
+  inset: -18px;
+  background: radial-gradient(circle, rgba(45, 212, 191, 0.55) 0%, rgba(77, 182, 168, 0.2) 45%, transparent 70%);
+  border-radius: 50%;
+  z-index: 0;
+  animation: mobileLogoGlow 2.5s ease-in-out infinite;
+}
+
+@keyframes mobileLogoGlow {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50%       { opacity: 1;   transform: scale(1.12); }
+}
+
 .mobile-login-logo {
   width: 72px;
   height: 72px;
   object-fit: contain;
-  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.24));
+  position: relative;
+  z-index: 1;
+  border-radius: 50%;
+  clip-path: circle(50%);
 }
 
 .mobile-login-brand-name {

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AdminLayout from '../components/Layout/AdminLayout';
 import { useEmpleadoAuth } from '../context/EmpleadoAuthContext';
 import proyectoService from '../services/proyectoService';
 import {
@@ -91,12 +90,10 @@ function AdminDashboard() {
 
   if (loading) {
     return (
-      <AdminLayout>
-        <div className="loading-container">
-          <div className="spinner"></div>
-          <p>Cargando...</p>
-        </div>
-      </AdminLayout>
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p>Cargando...</p>
+      </div>
     );
   }
 
@@ -176,23 +173,29 @@ function AdminDashboard() {
     );
   };
 
+  // Separar KPI de facturación del resto (para renderizarlo como card grande)
+  const kpisRegulares = kpis.filter((k) => !k.wide);
+  const kpiFacturacion = kpis.find((k) => k.wide);
+
   return (
-    <AdminLayout>
+    <>
+      {/* Header */}
       <div className="dash-header">
         <div>
-          <h1 className="dash-title">Dashboard</h1>
-          <p className="dash-sub">Bienvenido, <strong>{empleado?.nombre}</strong></p>
+          <p className="dash-greeting">Bienvenido de nuevo</p>
+          <h1 className="dash-title">{empleado?.nombre || 'Dashboard'}</h1>
         </div>
         <span className={`dash-role-badge ${admin ? 'dash-role-badge--admin' : ''}`}>
           {admin ? 'Administrador' : 'Empleado'}
         </span>
       </div>
 
-      <div className={`dash-kpis ${admin ? 'dash-kpis--admin' : ''}`}>
-        {kpis.map((kpi, index) => (
+      {/* KPI cards regulares */}
+      <div className="dash-kpis">
+        {kpisRegulares.map((kpi, index) => (
           <div
             key={index}
-            className={`dash-kpi${kpi.onClick ? ' dash-kpi--clickable' : ''}${kpi.wide ? ' dash-kpi--wide' : ''}`}
+            className={`dash-kpi${kpi.onClick ? ' dash-kpi--clickable' : ''}`}
             onClick={kpi.onClick}
             style={{ '--kpi-color': kpi.color }}
           >
@@ -205,6 +208,19 @@ function AdminDashboard() {
           </div>
         ))}
       </div>
+
+      {/* Card grande de facturación (solo admin) */}
+      {kpiFacturacion && (
+        <div className="dash-facturacion" style={{ '--kpi-color': kpiFacturacion.color }}>
+          <div className="dash-facturacion-info">
+            <p className="dash-facturacion-label">{kpiFacturacion.label}</p>
+            <p className="dash-facturacion-value">{kpiFacturacion.value}</p>
+          </div>
+          <div className="dash-facturacion-icon">
+            {kpiFacturacion.icon}
+          </div>
+        </div>
+      )}
 
       {admin ? (
         <div className="dash-overview-grid">
@@ -321,7 +337,7 @@ function AdminDashboard() {
           {renderRecentProjects()}
         </section>
       )}
-    </AdminLayout>
+    </>
   );
 }
 

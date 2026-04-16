@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useEmpleadoAuth } from '../context/EmpleadoAuthContext';
-import AdminLayout from '../components/Layout/AdminLayout';
 import usuarioService from '../services/usuarioService';
 import Toast from '../components/Toast';
 import ConfirmModal from '../components/ConfirmModal';
@@ -155,17 +154,15 @@ function Usuarios() {
 
   if (loading) {
     return (
-      <AdminLayout>
-        <div className="loading-container">
-          <div className="spinner"></div>
-          <p>Cargando usuarios...</p>
-        </div>
-      </AdminLayout>
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p>Cargando usuarios...</p>
+      </div>
     );
   }
 
   return (
-    <AdminLayout>
+    <>
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
       <header className="page-header">
@@ -179,7 +176,7 @@ function Usuarios() {
       </header>
 
       <div className="filters-bar">
-        <Search size={16} color="black" className="search-icon" />
+        <Search size={16} color="rgba(255,255,255,0.5)" className="search-icon" />
         <input
           type="text"
           placeholder="Buscar por nombre o email..."
@@ -376,7 +373,7 @@ function Usuarios() {
           onClose={() => setConfirmModal(null)}
         />
       )}
-    </AdminLayout>
+    </>
   );
 }
 

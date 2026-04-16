@@ -290,15 +290,34 @@
   cursor: pointer;
   font-weight: 600;
   font-size: 0.88rem;
-  transition: all 0.22s ease;
+  transition: max-height 0.3s ease, opacity 0.25s ease, padding 0.3s ease, margin 0.3s ease;
   white-space: nowrap;
   overflow: hidden;
+  /* Colapsado por defecto — sin espacio */
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
+  padding-top: 0;
+  padding-bottom: 0;
+  margin: 0;
+  border: none;
 }
 
 .logout-btn:hover {
   background: #e74c3c;
   border-color: #e74c3c;
   color: white;
+}
+
+/* Mostrar logout al pasar sobre el sidebar (desktop) */
+@media (min-width: 769px) {
+  .cliente-sidebar:hover .logout-btn {
+    max-height: 50px;
+    opacity: 1;
+    pointer-events: auto;
+    padding: 10px 6px;
+    border: 1px solid rgba(231, 76, 60, 0.35);
+  }
 }
 
 /* ══════════════════════════════════════════
@@ -435,6 +454,15 @@
   .cliente-sidebar.open .sidebar-txt {
     opacity: 1;
     max-width: 180px;
+  }
+
+  /* En móvil, mostrar logout cuando el sidebar está abierto */
+  .cliente-sidebar.open .logout-btn {
+    max-height: 50px;
+    opacity: 1;
+    pointer-events: auto;
+    padding: 10px 6px;
+    border: 1px solid rgba(231, 76, 60, 0.35);
   }
 
   .sidebar-close {

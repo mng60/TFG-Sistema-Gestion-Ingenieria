@@ -1,5 +1,4 @@
 import React, { useState, useRef } from 'react';
-import AdminLayout from '../components/Layout/AdminLayout';
 import { useEmpleadoAuth } from '../context/EmpleadoAuthContext';
 import axios from 'axios';
 import { Camera, Save, Lock, User } from 'lucide-react';
@@ -91,11 +90,9 @@ function Perfil() {
   const avatarSrc = empleado?.foto_url ? `${BACKEND_URL}${empleado.foto_url}` : null;
 
   return (
-    <AdminLayout>
-      <div className="gestion-container">
+    <div className="gestion-container perfil-page">
         <div className="gestion-header">
           <h1>Mi Perfil</h1>
-          <p style={{ color: '#7f8c8d', margin: 0 }}>{empleado?.email}</p>
         </div>
 
         {toast && (
@@ -112,7 +109,7 @@ function Perfil() {
         <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: 24, alignItems: 'start' }}>
 
           {/* Foto de perfil */}
-          <div className="card" style={{ padding: 32, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+          <div style={{ padding: 32, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, background: '#0d1b2a', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12 }}>
             <div style={{ position: 'relative', width: 120, height: 120 }}>
               <div style={{
                 width: 120, height: 120, borderRadius: '50%', overflow: 'hidden',
@@ -141,7 +138,7 @@ function Perfil() {
               <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFotoChange} />
             </div>
             <div style={{ textAlign: 'center' }}>
-              <p style={{ fontWeight: 700, fontSize: '1.1rem', margin: 0 }}>{empleado?.nombre}</p>
+              <p style={{ fontWeight: 700, fontSize: '1.1rem', margin: 0, color: '#e2e8f0' }}>{empleado?.nombre}</p>
               <span style={{
                 display: 'inline-block', marginTop: 6, padding: '3px 12px', borderRadius: 20, fontSize: '0.8rem', fontWeight: 600,
                 background: empleado?.rol === 'admin' ? '#8e44ad' : '#3498db', color: 'white'
@@ -149,15 +146,15 @@ function Perfil() {
                 {empleado?.rol === 'admin' ? 'Administrador' : 'Empleado'}
               </span>
             </div>
-            {uploadingFoto && <p style={{ color: '#7f8c8d', fontSize: '0.85rem' }}>Subiendo foto...</p>}
+            {uploadingFoto && <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.85rem' }}>Subiendo foto...</p>}
           </div>
 
           {/* Formularios */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
             {/* Información personal */}
-            <div className="card" style={{ padding: 28 }}>
-              <h2 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ padding: 28, background: '#0d1b2a', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12 }}>
+              <h2 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8, color: '#e2e8f0' }}>
                 <User size={18} color="#4DB6A8" /> Información personal
               </h2>
               <form onSubmit={handleSaveInfo}>
@@ -196,8 +193,8 @@ function Perfil() {
             </div>
 
             {/* Cambiar contraseña */}
-            <div className="card" style={{ padding: 28 }}>
-              <h2 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ padding: 28, background: '#0d1b2a', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12 }}>
+              <h2 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8, color: '#e2e8f0' }}>
                 <Lock size={18} color="#4DB6A8" /> Cambiar contraseña
               </h2>
               <form onSubmit={handleSavePass}>
@@ -224,7 +221,6 @@ function Perfil() {
           </div>
         </div>
       </div>
-    </AdminLayout>
   );
 }
 

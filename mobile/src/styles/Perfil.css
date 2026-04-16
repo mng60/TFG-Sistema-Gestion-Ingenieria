@@ -6,11 +6,12 @@
 }
 
 .perfil-card {
-  background: white;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
   border-radius: 16px;
   padding: 20px;
   margin-bottom: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
 }
 
 .perfil-card--hero {
@@ -23,7 +24,7 @@
   font-size: 0.95rem;
   font-weight: 700;
   margin-bottom: 16px;
-  color: #2c3e50;
+  color: var(--color-text);
 }
 
 .perfil-field {
@@ -33,7 +34,7 @@
 .perfil-label {
   font-size: 0.75rem;
   font-weight: 600;
-  color: #7f8c8d;
+  color: var(--color-muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   margin-bottom: 5px;
@@ -44,17 +45,29 @@
   width: 100%;
   padding: 11px 14px;
   border-radius: 10px;
-  border: 1.5px solid #e0e0e0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   font-size: 0.95rem;
   font-family: inherit;
   box-sizing: border-box;
   outline: none;
-  background: white;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-text);
+  transition: border-color 0.2s;
+}
+
+.perfil-input:focus {
+  border-color: rgba(77, 182, 168, 0.5);
+  box-shadow: 0 0 0 3px rgba(77, 182, 168, 0.1);
+}
+
+.perfil-input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
 }
 
 .perfil-input--disabled {
-  background: #f8f9fa;
-  color: #7f8c8d;
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.05);
 }
 
 .perfil-btn {
@@ -80,9 +93,9 @@
 .perfil-btn-logout {
   width: 100%;
   padding: 14px;
-  background: #fee2e2;
-  color: #dc2626;
-  border: none;
+  background: rgba(231, 76, 60, 0.12);
+  color: #f87171;
+  border: 1px solid rgba(231, 76, 60, 0.25);
   border-radius: 12px;
   font-size: 0.95rem;
   font-weight: 600;
@@ -107,7 +120,7 @@
 .perfil-pass-title {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #2c3e50;
+  color: var(--color-text);
   margin: 0;
   display: flex;
   align-items: center;
@@ -115,13 +128,13 @@
 }
 
 .perfil-admin-note {
-  background: #f0f4ff;
+  background: rgba(52, 152, 219, 0.1);
   border-radius: 12px;
   padding: 12px 16px;
   margin-bottom: 12px;
   font-size: 0.82rem;
-  color: #3498db;
-  border: 1px solid #dbeafe;
+  color: #60a5fa;
+  border: 1px solid rgba(52, 152, 219, 0.2);
 }
 
 .perfil-toast {
@@ -133,11 +146,13 @@
 }
 
 .perfil-toast--success {
-  background: #d4edda;
-  color: #155724;
+  background: rgba(39, 174, 96, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(39, 174, 96, 0.25);
 }
 
 .perfil-toast--error {
-  background: #f8d7da;
-  color: #721c24;
+  background: rgba(231, 76, 60, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(231, 76, 60, 0.25);
 }

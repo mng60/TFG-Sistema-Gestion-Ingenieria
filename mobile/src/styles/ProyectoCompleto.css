@@ -4,13 +4,13 @@
 
 .project-hero {
   background:
-    radial-gradient(circle at top right, rgba(77, 182, 168, 0.18), transparent 42%),
-    linear-gradient(145deg, #ffffff, #f4fbfa);
-  border: 1px solid rgba(77, 182, 168, 0.14);
+    radial-gradient(circle at top right, rgba(77, 182, 168, 0.12), transparent 42%),
+    linear-gradient(145deg, #0d1b2a, #0a1520);
+  border: 1px solid rgba(77, 182, 168, 0.15);
   border-radius: 20px;
   padding: 14px;
   margin-bottom: 16px;
-  box-shadow: 0 10px 24px rgba(25, 52, 66, 0.08);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
 }
 
 .proyecto-detail-header {
@@ -38,8 +38,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #425466;
-  background: #eef1f4;
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.08);
   box-shadow: none;
 }
 
@@ -88,8 +88,8 @@
   align-items: center;
   justify-content: center;
   padding: 10px 12px;
-  border: 1px solid rgba(77, 182, 168, 0.12);
-  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.06);
   border-radius: 14px;
   font-size: 0.8rem;
   font-weight: 600;
@@ -113,7 +113,8 @@
 }
 
 .info-section {
-  background: white;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
   border-radius: 14px;
   padding: 16px;
   margin-bottom: 12px;
@@ -163,14 +164,14 @@
 }
 
 .doc-card {
-  background: white;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 14px 16px;
   margin-bottom: 10px;
   display: flex;
   align-items: center;
   gap: 12px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
 .doc-icon {
@@ -241,24 +242,24 @@
 }
 
 .toggle-publico.publico {
-  background: #dbeafe;
-  color: #1d4ed8;
+  background: rgba(52, 152, 219, 0.15);
+  color: #60a5fa;
 }
 
 .toggle-publico.privado {
-  background: #f3f4f6;
-  color: #6b7280;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .empleado-card-m {
-  background: white;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 14px 16px;
   margin-bottom: 10px;
   display: flex;
   align-items: center;
   gap: 12px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
 .empleado-avatar-m {
@@ -293,9 +294,9 @@
 }
 
 .btn-desasignar-m {
-  background: #fee2e2;
-  color: #dc2626;
-  border: none;
+  background: rgba(231, 76, 60, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(231, 76, 60, 0.25);
   border-radius: 8px;
   padding: 7px 10px;
   font-size: 0.9rem;
@@ -332,7 +333,7 @@
 }
 
 .empleado-picker-item.selected {
-  background: #edf8f7;
+  background: rgba(77, 182, 168, 0.12);
   border-radius: 8px;
   padding: 12px 8px;
 }

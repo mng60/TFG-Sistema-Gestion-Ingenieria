@@ -78,7 +78,9 @@ function Login() {
         </div>
 
         <div className="mobile-login-brand">
-          <img src="/logo.png" alt="BlueArc Energy" className="mobile-login-logo" />
+          <div className="mobile-login-logo-wrap">
+            <img src="/logo.png" alt="BlueArc Energy" className="mobile-login-logo" />
+          </div>
           <h2 className="mobile-login-brand-name">BlueArc</h2>
           <p className="mobile-login-brand-sub">Sistema de Gestion de Ingenieria</p>
         </div>

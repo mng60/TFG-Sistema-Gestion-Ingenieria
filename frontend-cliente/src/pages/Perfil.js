@@ -123,8 +123,7 @@ function Perfil() {
         marginBottom: 24
       }}>
         <div>
-          <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#111827', margin: '0 0 4px', fontFamily: "'Montserrat', sans-serif", letterSpacing: '-0.02em' }}>Mi Perfil</h1>
-          <p style={{ color: '#9ca3af', margin: 0, fontSize: '0.9rem' }}>{cliente?.email}</p>
+          <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#111827', margin: 0, fontFamily: "'Montserrat', sans-serif", letterSpacing: '-0.02em' }}>Mi Perfil</h1>
         </div>
       </div>
 

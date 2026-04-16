@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useEmpleadoAuth } from '../context/EmpleadoAuthContext';
-import AdminLayout from '../components/Layout/AdminLayout';
 import proyectoService from '../services/proyectoService';
 import clienteService from '../services/clienteService';
 import Toast from '../components/Toast';
@@ -249,17 +248,15 @@ function Proyectos() {
 
   if (loading) {
     return (
-      <AdminLayout>
-        <div className="loading-container">
-          <div className="spinner"></div>
-          <p>Cargando proyectos...</p>
-        </div>
-      </AdminLayout>
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p>Cargando proyectos...</p>
+      </div>
     );
   }
 
   return (
-    <AdminLayout>
+    <>
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
       <header className="page-header">
@@ -302,7 +299,7 @@ function Proyectos() {
       </header>
 
       <div className="filters-bar">
-        <Search size={16} color="black" className="search-icon" />
+        <Search size={16} color="rgba(255,255,255,0.5)" className="search-icon" />
         <input
           type="text"
           placeholder="Buscar por nombre, cliente, ubicación o responsable..."
@@ -613,7 +610,7 @@ function Proyectos() {
           onClose={() => setConfirmModal(null)}
         />
       )}
-    </AdminLayout>
+    </>
   );
 }
 

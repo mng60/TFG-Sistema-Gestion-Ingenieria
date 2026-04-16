@@ -3,11 +3,11 @@
 :root {
   --color-primary: #4DB6A8;
   --color-primary-dark: #3A9089;
-  --color-bg: #f5f7fa;
-  --color-card: #ffffff;
-  --color-text: #2c3e50;
-  --color-muted: #7f8c8d;
-  --color-border: #e9ecef;
+  --color-bg: #06060a;
+  --color-card: #0d1b2a;
+  --color-text: #e2e8f0;
+  --color-muted: rgba(255, 255, 255, 0.45);
+  --color-border: rgba(255, 255, 255, 0.08);
   --color-success: #27ae60;
   --color-warning: #f39c12;
   --color-danger: #e74c3c;
@@ -94,19 +94,19 @@ body.screen-login::before {
   text-transform: capitalize;
 }
 
-.badge-planificacion { background: #f3e8ff; color: #7c3aed; }
-.badge-pendiente { background: #ffeaa7; color: #d68910; }
-.badge-en_progreso { background: #dbeafe; color: #1d4ed8; }
-.badge-pausado { background: #fef3c7; color: #d97706; }
-.badge-completado { background: #dcfce7; color: #16a34a; }
-.badge-cancelado { background: #fee2e2; color: #dc2626; }
-.badge-alta { background: #fee2e2; color: #dc2626; }
-.badge-urgente { background: #fce7f3; color: #be185d; font-weight: 700; }
-.badge-media { background: #fef9c3; color: #ca8a04; }
-.badge-baja { background: #dcfce7; color: #16a34a; }
-.badge-publico { background: #dbeafe; color: #1d4ed8; }
-.badge-privado { background: #f3f4f6; color: #6b7280; }
-.badge-tipo { background: #edf8f7; color: #4DB6A8; }
+.badge-planificacion { background: rgba(124, 58, 237, 0.18); color: #a78bfa; }
+.badge-pendiente     { background: rgba(234, 179, 8, 0.18); color: #fbbf24; }
+.badge-en_progreso   { background: rgba(52, 152, 219, 0.18); color: #60a5fa; }
+.badge-pausado       { background: rgba(217, 119, 6, 0.18); color: #fbbf24; }
+.badge-completado    { background: rgba(39, 174, 96, 0.18); color: #4ade80; }
+.badge-cancelado     { background: rgba(231, 76, 60, 0.18); color: #f87171; }
+.badge-alta          { background: rgba(231, 76, 60, 0.18); color: #f87171; }
+.badge-urgente       { background: rgba(190, 24, 93, 0.18); color: #f472b6; font-weight: 700; }
+.badge-media         { background: rgba(202, 138, 4, 0.18); color: #fbbf24; }
+.badge-baja          { background: rgba(39, 174, 96, 0.18); color: #4ade80; }
+.badge-publico       { background: rgba(52, 152, 219, 0.18); color: #60a5fa; }
+.badge-privado       { background: rgba(255, 255, 255, 0.08); color: rgba(255,255,255,0.5); }
+.badge-tipo          { background: rgba(77, 182, 168, 0.18); color: #4DB6A8; }
 
 /* Spinner */
 .spinner {

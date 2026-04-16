@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEmpleadoAuth } from '../context/EmpleadoAuthContext';
-import AdminLayout from '../components/Layout/AdminLayout';
 import proyectoService from '../services/proyectoService';
 import presupuestoService from '../services/presupuestoService';
 import clienteService from '../services/clienteService';
@@ -136,30 +135,26 @@ function ProyectoCompleto() {
 
   if (loading) {
     return (
-      <AdminLayout>
-        <div className="loading-container">
-          <div className="spinner"></div>
-          <p>Cargando proyecto...</p>
-        </div>
-      </AdminLayout>
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p>Cargando proyecto...</p>
+      </div>
     );
   }
 
   if (!proyecto) {
     return (
-      <AdminLayout>
-        <div className="loading-container">
-          <p>Proyecto no encontrado</p>
-          <button className="btn-primary" onClick={() => navigate('/proyectos')}>
-            Volver a Proyectos
-          </button>
-        </div>
-      </AdminLayout>
+      <div className="loading-container">
+        <p>Proyecto no encontrado</p>
+        <button className="btn-primary" onClick={() => navigate('/proyectos')}>
+          Volver a Proyectos
+        </button>
+      </div>
     );
   }
 
   return (
-    <AdminLayout>
+    <>
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
       <header className="proyecto-header">
@@ -253,7 +248,7 @@ function ProyectoCompleto() {
           onClose={() => setConfirmModal(null)}
         />
       )}
-    </AdminLayout>
+    </>
   );
 }
 

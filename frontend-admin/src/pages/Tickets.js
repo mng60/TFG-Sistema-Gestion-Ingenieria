@@ -12,7 +12,6 @@ import {
   TicketCheck,
   UserRound
 } from 'lucide-react';
-import AdminLayout from '../components/Layout/AdminLayout';
 import { useEmpleadoAuth } from '../context/EmpleadoAuthContext';
 import ConfirmModal from '../components/ConfirmModal';
 import '../styles/GestionPages.css';
@@ -477,7 +476,7 @@ function Tickets() {
   );
 
   return (
-    <AdminLayout>
+    <>
       {toast && (
         <div
           style={{
@@ -584,7 +583,7 @@ function Tickets() {
           onClose={() => setConfirmModal(null)}
         />
       )}
-    </AdminLayout>
+    </>
   );
 }
 

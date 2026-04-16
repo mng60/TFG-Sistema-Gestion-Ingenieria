@@ -1,6 +1,7 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { EmpleadoAuthProvider, useEmpleadoAuth } from './context/EmpleadoAuthContext';
+import AdminLayout from './components/Layout/AdminLayout';
 import EmpleadoLogin from './pages/EmpleadoLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import Proyectos from './pages/Proyectos';
@@ -12,16 +13,17 @@ import Perfil from './pages/Perfil';
 import Tickets from './pages/Tickets';
 import './styles/App.css';
 
-// Rutas protegidas para empleados
-function EmpleadoProtectedRoute({ children }) {
-  const { isAuthenticated } = useEmpleadoAuth();
-  return isAuthenticated ? children : <Navigate to="/login" />;
-}
-
 // Rutas públicas de empleados
 function EmpleadoPublicRoute({ children }) {
   const { isAuthenticated } = useEmpleadoAuth();
   return !isAuthenticated ? children : <Navigate to="/dashboard" />;
+}
+
+// Layout persistente — AdminLayout se monta una sola vez para todas las rutas protegidas
+function AdminLayoutRoute() {
+  const { isAuthenticated } = useEmpleadoAuth();
+  if (!isAuthenticated) return <Navigate to="/login" />;
+  return <AdminLayout><Outlet /></AdminLayout>;
 }
 
 function App() {
@@ -30,60 +32,24 @@ function App() {
       <EmpleadoAuthProvider>
         <Routes>
           <Route path="/" element={<Navigate to="/login" />} />
-          
+
           <Route path="/login" element={
             <EmpleadoPublicRoute>
               <EmpleadoLogin />
             </EmpleadoPublicRoute>
           } />
-          
-          <Route path="/dashboard" element={
-            <EmpleadoProtectedRoute>
-              <AdminDashboard />
-            </EmpleadoProtectedRoute>
-          } />
 
-          <Route path="/clientes" element={
-            <EmpleadoProtectedRoute>
-              <Clientes />
-            </EmpleadoProtectedRoute>
-          } />
-
-          <Route path="/proyectos" element={
-            <EmpleadoProtectedRoute>
-              <Proyectos />
-            </EmpleadoProtectedRoute>
-          } />
-
-          <Route path="/proyectos/:id" element={
-            <EmpleadoProtectedRoute>
-              <ProyectoCompleto />
-            </EmpleadoProtectedRoute>
-          } />
-
-          <Route path="/usuarios" element={
-            <EmpleadoProtectedRoute>
-              <Usuarios />
-            </EmpleadoProtectedRoute>
-          } />
-
-          <Route path="/chat" element={
-            <EmpleadoProtectedRoute>
-              <Chat />
-            </EmpleadoProtectedRoute>
-          } />
-
-          <Route path="/perfil" element={
-            <EmpleadoProtectedRoute>
-              <Perfil />
-            </EmpleadoProtectedRoute>
-          } />
-
-          <Route path="/tickets" element={
-            <EmpleadoProtectedRoute>
-              <Tickets />
-            </EmpleadoProtectedRoute>
-          } />
+          {/* Layout persistente — sidebar y topbar no se remontan al navegar */}
+          <Route element={<AdminLayoutRoute />}>
+            <Route path="/dashboard" element={<AdminDashboard />} />
+            <Route path="/clientes" element={<Clientes />} />
+            <Route path="/proyectos" element={<Proyectos />} />
+            <Route path="/proyectos/:id" element={<ProyectoCompleto />} />
+            <Route path="/usuarios" element={<Usuarios />} />
+            <Route path="/chat" element={<Chat />} />
+            <Route path="/perfil" element={<Perfil />} />
+            <Route path="/tickets" element={<Tickets />} />
+          </Route>
 
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
