@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Capacitor } from '@capacitor/core';
+import { App as CapacitorApp } from '@capacitor/app';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import SplashScreen from './components/SplashScreen';
@@ -90,6 +92,64 @@ function StatusBarManager() {
   return null;
 }
 
+function BackButtonManager() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+
+    let isNavigating = false;
+
+    const registerBackButton = async () => {
+      return CapacitorApp.addListener('backButton', ({ canGoBack }) => {
+        if (isNavigating) return;
+
+        if (canGoBack) {
+          isNavigating = true;
+          window.history.back();
+          setTimeout(() => {
+            isNavigating = false;
+          }, 200);
+          return;
+        }
+
+        if (location.pathname.startsWith('/proyectos/')) {
+          isNavigating = true;
+          navigate('/proyectos');
+          setTimeout(() => {
+            isNavigating = false;
+          }, 200);
+          return;
+        }
+
+        if (location.pathname === '/chat') {
+          isNavigating = true;
+          navigate('/proyectos');
+          setTimeout(() => {
+            isNavigating = false;
+          }, 200);
+          return;
+        }
+
+        CapacitorApp.minimizeApp();
+      });
+    };
+
+    let listenerHandle;
+
+    registerBackButton().then((handle) => {
+      listenerHandle = handle;
+    });
+
+    return () => {
+      listenerHandle?.remove();
+    };
+  }, [location.pathname, navigate]);
+
+  return null;
+}
+
 function App() {
   const [splashDone, setSplashDone] = useState(false);
 
@@ -100,6 +160,7 @@ function App() {
       ) : (
         <Router>
           <StatusBarManager />
+          <BackButtonManager />
           <KeyboardManager />
 
           <Routes>

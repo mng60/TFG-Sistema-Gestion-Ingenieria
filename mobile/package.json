@@ -5,6 +5,7 @@
   "private": true,
   "dependencies": {
     "@capacitor/android": "^8.2.0",
+    "@capacitor/app": "^8.1.0",
     "@capacitor/cli": "^8.2.0",
     "@capacitor/core": "^8.2.0",
     "@capacitor/status-bar": "^8.0.1",
