@@ -23,15 +23,17 @@ function PublicRoute({ children }) {
 
 function KeyboardManager() {
   useEffect(() => {
-    if (!window.visualViewport) return;
+    // Con adjustResize, window.innerHeight se encoge cuando aparece el teclado.
+    // Guardamos la altura inicial y comparamos contra ella.
+    const initialHeight = window.innerHeight;
 
     const handleResize = () => {
-      const keyboardOpen = window.visualViewport.height < window.innerHeight - 100;
+      const keyboardOpen = window.innerHeight < initialHeight - 100;
       document.body.classList.toggle('keyboard-open', keyboardOpen);
     };
 
-    window.visualViewport.addEventListener('resize', handleResize);
-    return () => window.visualViewport.removeEventListener('resize', handleResize);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   return null;

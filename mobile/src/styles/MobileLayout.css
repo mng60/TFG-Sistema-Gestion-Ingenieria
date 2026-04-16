@@ -74,9 +74,20 @@
   position: relative;
 }
 
+/* En chat, el scroll lo gestiona .chat-messages internamente — evitar que
+   .mobile-main haga scroll y arrastre el header cuando aparece el teclado */
+body.screen-chat .mobile-main {
+  overflow-y: hidden;
+}
+
 /* Ocultar bottom nav cuando el teclado está abierto */
 body.keyboard-open .bottom-nav {
   display: none;
+}
+
+/* Eliminar el padding reservado para el nav cuando está oculto */
+body.keyboard-open .mobile-main.no-padding {
+  padding-bottom: 0;
 }
 
 .bottom-nav-badge {
