@@ -11,13 +11,37 @@ function ChatLayout() {
   const [conversaciones, setConversaciones] = useState([]);
   const [conversacionActiva, setConversacionActiva] = useState(null);
   const conversacionActivaIdRef = useRef(null);
+  const activeViewRef = useRef('list');
   const [showNuevoModal, setShowNuevoModal] = useState(false);
   const [toast, setToast] = useState(null);
   // Mobile: 'list' | 'window'
   const [activeView, setActiveView] = useState('list');
 
   useEffect(() => {
+    activeViewRef.current = activeView;
+  }, [activeView]);
+
+  useEffect(() => {
     cargarConversaciones();
+  }, []);
+
+  useEffect(() => {
+    window.history.replaceState(
+      {
+        ...(window.history.state || {}),
+        chatView: 'list'
+      },
+      ''
+    );
+
+    const handlePopState = () => {
+      if (activeViewRef.current === 'window') {
+        setActiveView('list');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
   useEffect(() => {
@@ -61,12 +85,37 @@ function ChatLayout() {
   };
 
   const handleSelectConversacion = useCallback((conv) => {
+    if (activeViewRef.current !== 'window') {
+      window.history.pushState(
+        {
+          ...(window.history.state || {}),
+          chatView: 'window',
+          conversacionId: conv?.id || null
+        },
+        ''
+      );
+    } else {
+      window.history.replaceState(
+        {
+          ...(window.history.state || {}),
+          chatView: 'window',
+          conversacionId: conv?.id || null
+        },
+        ''
+      );
+    }
+
     conversacionActivaIdRef.current = conv?.id || null;
     setConversacionActiva(conv);
     setActiveView('window');
   }, []);
 
   const handleBack = () => {
+    if (activeViewRef.current === 'window') {
+      window.history.back();
+      return;
+    }
+
     setActiveView('list');
   };
 
@@ -85,6 +134,17 @@ function ChatLayout() {
   };
 
   const handleOpenDirectChat = useCallback((participant) => {
+    if (activeViewRef.current !== 'window') {
+      window.history.pushState(
+        {
+          ...(window.history.state || {}),
+          chatView: 'window',
+          conversacionId: null
+        },
+        ''
+      );
+    }
+
     const tipoConv = participant.tipo_usuario === 'cliente' ? 'empleado_cliente' : 'empleado_empleado';
     const existing = conversaciones.find(c =>
       c.tipo === tipoConv &&

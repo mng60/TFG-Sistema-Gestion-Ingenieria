@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Users, Calendar, MapPin } from 'lucide-react';
 import '../../styles/Proyectos.css';
 import { formatearFechaCorta } from '../../utils/format';
@@ -14,11 +14,14 @@ const ESTADO_LABELS = {
 
 function ProyectoCard({ proyecto }) {
   const navigate = useNavigate();
+  const location = useLocation();
 
   return (
     <div
       className={`proyecto-card estado-${proyecto.estado}`}
-      onClick={() => navigate(`/proyectos/${proyecto.id}`)}
+      onClick={() => navigate(`/proyectos/${proyecto.id}`, {
+        state: { from: `${location.pathname}${location.search}` }
+      })}
     >
       <div className="proyecto-card-header">
         <span className="proyecto-card-nombre">{proyecto.nombre}</span>

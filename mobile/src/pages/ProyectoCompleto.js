@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import MobileLayout from '../components/layout/MobileLayout';
@@ -15,6 +15,7 @@ import '../styles/ProyectoCompleto.css';
 function ProyectoCompleto() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { isAdmin, empleado } = useAuth();
 
   const [proyecto, setProyecto] = useState(null);
@@ -82,6 +83,20 @@ function ProyectoCompleto() {
     setToast({ message, type });
   };
 
+  const handleBack = useCallback(() => {
+    if (location.state?.from) {
+      navigate(location.state.from);
+      return;
+    }
+
+    if (window.history.length > 1) {
+      navigate(-1);
+      return;
+    }
+
+    navigate('/proyectos');
+  }, [location.state, navigate]);
+
   if (loading) {
     return (
       <MobileLayout>
@@ -104,7 +119,7 @@ function ProyectoCompleto() {
           <div className="proyecto-detail-header">
             <button
               className="btn-back btn-back-chip"
-              onClick={() => navigate('/proyectos')}
+              onClick={handleBack}
               aria-label="Volver a proyectos"
             >
               <ArrowLeft size={18} />
