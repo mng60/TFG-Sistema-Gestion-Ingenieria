@@ -129,11 +129,8 @@ function ProyectoActualizaciones({ proyectoId, actualizaciones, isAdmin, onReloa
 
   return (
     <div className="tab-panel actualizaciones-panel">
-      <div className="act-header">
-        <div className="act-header-left">
-          <h2>Registro de Avance</h2>
-          <p>Historial de actualizaciones del proyecto</p>
-        </div>
+      <div className="section-header act-header">
+        <h2>Registro de Avance</h2>
 
         <div className="act-header-actions">
           {!isAdmin && (
@@ -191,7 +188,7 @@ function ProyectoActualizaciones({ proyectoId, actualizaciones, isAdmin, onReloa
             </label>
 
             {formData.sugiere_cambio_fecha && (
-              <div className="form-group" style={{ marginTop: 8 }}>
+              <div className="form-group act-fecha-group">
                 <label>Nueva fecha sugerida</label>
                 <input
                   type="date"
@@ -202,7 +199,7 @@ function ProyectoActualizaciones({ proyectoId, actualizaciones, isAdmin, onReloa
               </div>
             )}
 
-            <button type="submit" className="btn-primary" disabled={submitting} style={{ marginTop: 12 }}>
+            <button type="submit" className="btn-primary act-submit-btn" disabled={submitting}>
               {submitting ? 'Guardando...' : 'Guardar actualizacion'}
             </button>
           </div>

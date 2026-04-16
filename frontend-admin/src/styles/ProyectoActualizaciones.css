@@ -4,32 +4,11 @@
   gap: 20px;
 }
 
+/* act-header extiende section-header con flex-wrap y gap adicionales */
 .act-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   flex-wrap: wrap;
   gap: 18px;
   margin-bottom: 4px;
-}
-
-.act-header-left {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.act-header-left h2 {
-  margin: 0;
-  font-size: 1.3rem;
-  color: #2c3e50;
-  font-weight: 700;
-}
-
-.act-header-left p {
-  margin: 0;
-  font-size: 0.92rem;
-  color: #7f8c8d;
 }
 
 .act-header-actions {
@@ -48,6 +27,14 @@
   gap: 8px;
 }
 
+.act-fecha-group {
+  margin-top: 8px;
+}
+
+.act-submit-btn {
+  margin-top: 12px;
+}
+
 .act-empty-message {
   padding: 56px 20px;
   color: #95a5a6;
@@ -56,8 +43,8 @@
 
 /* Form */
 .act-form {
-  background: #f8f9fa;
-  border: 1px solid #e8e8e8;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
   padding: 20px;
   display: flex;
@@ -86,43 +73,55 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #555;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .act-form .form-group textarea,
 .act-form .form-group input[type="date"] {
-  border: 1.5px solid #ddd;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   padding: 10px 12px;
   font-size: 0.9rem;
   font-family: inherit;
   resize: vertical;
-  background: white;
+  background: rgba(255, 255, 255, 0.06);
+  color: #e2e8f0;
   transition: border-color 0.2s;
+}
+
+.act-form .form-group textarea::placeholder,
+.act-form .form-group input[type="date"]::placeholder {
+  color: rgba(255, 255, 255, 0.25);
 }
 
 .act-form .form-group textarea:focus,
 .act-form .form-group input[type="date"]:focus {
   outline: none;
-  border-color: #4DB6A8;
+  border-color: rgba(77, 182, 168, 0.5);
+  box-shadow: 0 0 0 3px rgba(77, 182, 168, 0.1);
 }
 
 .act-solicitud-textarea {
   width: 100%;
-  border: 1.5px solid #ddd;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   padding: 12px 14px;
   font-size: 0.95rem;
   font-family: inherit;
   resize: vertical;
-  background: white;
+  background: rgba(255, 255, 255, 0.06);
+  color: #e2e8f0;
   transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.act-solicitud-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.25);
 }
 
 .act-solicitud-textarea:focus {
   outline: none;
-  border-color: #4DB6A8;
-  box-shadow: 0 0 0 3px rgba(77, 182, 168, 0.15);
+  border-color: rgba(77, 182, 168, 0.5);
+  box-shadow: 0 0 0 3px rgba(77, 182, 168, 0.1);
 }
 
 .act-form-footer {
@@ -136,7 +135,7 @@
   align-items: center;
   gap: 8px;
   font-size: 0.88rem;
-  color: #2c3e50;
+  color: rgba(255, 255, 255, 0.65);
   cursor: pointer;
   font-weight: 500;
 }
@@ -157,8 +156,8 @@
 .act-item {
   display: flex;
   gap: 12px;
-  background: white;
-  border: 1px solid #eee;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 10px;
   padding: 14px 16px;
   position: relative;
@@ -204,25 +203,25 @@
 .act-autor {
   font-weight: 700;
   font-size: 0.9rem;
-  color: #2c3e50;
+  color: #e2e8f0;
 }
 
 .act-fecha {
   font-size: 0.8rem;
-  color: #95a5a6;
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .act-badge-fecha {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: #fff3cd;
-  color: #856404;
+  background: rgba(234, 179, 8, 0.18);
+  color: #fbbf24;
   font-size: 0.75rem;
   font-weight: 600;
   padding: 2px 8px;
   border-radius: 20px;
-  border: 1px solid #ffc107;
+  border: 1px solid rgba(234, 179, 8, 0.3);
 }
 
 .act-bloque {
@@ -241,19 +240,19 @@
 }
 
 .act-bloque-label.realizado {
-  background: #d4edda;
-  color: #155724;
+  background: rgba(39, 174, 96, 0.18);
+  color: #4ade80;
 }
 
 .act-bloque-label.pendiente {
-  background: #fff3cd;
-  color: #856404;
+  background: rgba(234, 179, 8, 0.18);
+  color: #fbbf24;
 }
 
 .act-bloque p {
   margin: 0;
   font-size: 0.88rem;
-  color: #4a4a4a;
+  color: #c5d0dc;
   line-height: 1.5;
   white-space: pre-wrap;
 }
@@ -270,5 +269,5 @@
 }
 
 .act-delete-btn:hover {
-  background: #fdecea;
+  background: rgba(231, 76, 60, 0.15);
 }

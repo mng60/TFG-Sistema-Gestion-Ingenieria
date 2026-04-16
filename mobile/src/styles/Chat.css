@@ -1428,7 +1428,7 @@
 .chat-layout-mobile {
   position: relative;
   margin-top: var(--statusbar-space);
-  height: calc(var(--app-height) - var(--bottom-nav-height) - var(--safe-bottom) - var(--statusbar-space));
+  height: calc(var(--app-height) - var(--bottom-nav-height) - var(--safe-bottom-effective) - var(--statusbar-space));
   min-height: 0;
   overflow: hidden;
   background: #f0f2f5;

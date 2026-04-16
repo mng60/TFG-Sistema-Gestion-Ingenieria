@@ -80,7 +80,7 @@ function ProyectoPresupuestos({
                 <tr key={presupuesto.id}>
                   <td>
                     <strong>{presupuesto.numero_presupuesto}</strong>
-                    <div style={{ fontSize: '0.8rem', color: '#7f8c8d' }}>
+                    <div className="presupuesto-version">
                       v{presupuesto.version}
                     </div>
                   </td>

@@ -11,11 +11,11 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: calc(16px + var(--statusbar-space)) 16px calc(var(--bottom-nav-height) + var(--safe-bottom) + 16px);
+  padding: calc(16px + var(--statusbar-space)) 16px calc(var(--bottom-nav-height) + var(--safe-bottom-effective) + 16px);
 }
 
 .mobile-main.no-padding {
-  padding: 0 0 calc(var(--bottom-nav-height) + var(--safe-bottom));
+  padding: 0 0 calc(var(--bottom-nav-height) + var(--safe-bottom-effective));
 }
 
 /* ---- Bottom Navigation Bar ---- */
@@ -24,8 +24,8 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: calc(var(--bottom-nav-height) + var(--safe-bottom));
-  padding-bottom: var(--safe-bottom);
+  height: calc(var(--bottom-nav-height) + var(--safe-bottom-effective));
+  padding-bottom: var(--safe-bottom-effective);
   background: #1B3A4B;
   display: flex;
   align-items: stretch;

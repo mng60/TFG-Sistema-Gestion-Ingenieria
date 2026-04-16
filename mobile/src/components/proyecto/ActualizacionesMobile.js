@@ -56,136 +56,110 @@ function ActualizacionesMobile({ proyectoId, actualizaciones, isAdmin, empleadoI
     }
   };
 
-
   return (
-    <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-      {/* Botones */}
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+    <div className="actualizaciones-mobile">
+      <div className="actualizaciones-actions">
         <button
-          onClick={() => setShowForm(f => !f)}
-          style={{
-            flex: 1, padding: '10px 14px', borderRadius: 8, border: 'none', cursor: 'pointer',
-            background: showForm ? '#e0e0e0' : '#4DB6A8', color: showForm ? '#333' : 'white',
-            fontWeight: 700, fontSize: '0.88rem'
-          }}
+          onClick={() => setShowForm((prev) => !prev)}
+          className={`btn-asignar ${showForm ? 'btn-cancel-update' : ''}`}
         >
           {showForm ? 'Cancelar' : '+ Nueva actualización'}
         </button>
+
         {!isAdmin && (
-          <button
-            onClick={handleSolicitud}
-            style={{
-              padding: '10px 14px', borderRadius: 8, border: 'none', cursor: 'pointer',
-              background: '#e67e22', color: 'white', fontWeight: 700, fontSize: '0.88rem'
-            }}
-          >
+          <button onClick={handleSolicitud} className="btn-warning-chip">
             Solicitar presupuesto
           </button>
         )}
       </div>
 
-      {/* Formulario */}
       {showForm && (
-        <form onSubmit={handleSubmit} style={{ background: '#f8f9fa', borderRadius: 10, padding: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <label style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: '#555' }}>Realizado</label>
+        <form onSubmit={handleSubmit} className="actualizacion-form">
+          <div className="form-group">
+            <label>Realizado</label>
             <textarea
               value={formData.realizado}
-              onChange={e => setFormData(p => ({ ...p, realizado: e.target.value }))}
+              onChange={(e) => setFormData((prev) => ({ ...prev, realizado: e.target.value }))}
               rows={3}
               placeholder="¿Qué se ha completado?"
-              style={{ border: '1.5px solid #ddd', borderRadius: 8, padding: '8px 10px', fontSize: '0.9rem', resize: 'vertical', fontFamily: 'inherit' }}
             />
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <label style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: '#555' }}>Pendiente</label>
+
+          <div className="form-group">
+            <label>Pendiente</label>
             <textarea
               value={formData.pendiente}
-              onChange={e => setFormData(p => ({ ...p, pendiente: e.target.value }))}
+              onChange={(e) => setFormData((prev) => ({ ...prev, pendiente: e.target.value }))}
               rows={3}
               placeholder="¿Qué queda por hacer?"
-              style={{ border: '1.5px solid #ddd', borderRadius: 8, padding: '8px 10px', fontSize: '0.9rem', resize: 'vertical', fontFamily: 'inherit' }}
             />
           </div>
-          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.88rem', color: '#2c3e50' }}>
+
+          <label className="actualizacion-checkbox">
             <input
               type="checkbox"
               checked={formData.sugiere_cambio_fecha}
-              onChange={e => setFormData(p => ({ ...p, sugiere_cambio_fecha: e.target.checked }))}
-              style={{ width: 16, height: 16, accentColor: '#4DB6A8' }}
+              onChange={(e) => setFormData((prev) => ({ ...prev, sugiere_cambio_fecha: e.target.checked }))}
             />
             Sugerir cambio de fecha de entrega
           </label>
+
           {formData.sugiere_cambio_fecha && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <label style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: '#555' }}>Nueva fecha sugerida</label>
+            <div className="form-group">
+              <label>Nueva fecha sugerida</label>
               <input
                 type="date"
                 value={formData.fecha_sugerida}
-                onChange={e => setFormData(p => ({ ...p, fecha_sugerida: e.target.value }))}
-                style={{ border: '1.5px solid #ddd', borderRadius: 8, padding: '8px 10px', fontSize: '0.9rem' }}
+                onChange={(e) => setFormData((prev) => ({ ...prev, fecha_sugerida: e.target.value }))}
               />
             </div>
           )}
-          <button
-            type="submit"
-            disabled={submitting}
-            style={{
-              padding: '12px', borderRadius: 8, border: 'none', cursor: 'pointer',
-              background: '#4DB6A8', color: 'white', fontWeight: 700, fontSize: '0.95rem'
-            }}
-          >
+
+          <button type="submit" disabled={submitting} className="btn-primary btn-save-update">
             {submitting ? 'Guardando...' : 'Guardar actualización'}
           </button>
         </form>
       )}
 
-      {/* Lista */}
       {actualizaciones.length === 0 ? (
-        <p style={{ textAlign: 'center', color: '#aaa', padding: '32px 0', fontSize: '0.9rem' }}>
-          No hay actualizaciones registradas aún.
-        </p>
+        <div className="empty-state">
+          <p>No hay actualizaciones registradas aún.</p>
+        </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {actualizaciones.map(act => (
-            <div key={act.id} style={{
-              background: 'white', border: '1px solid #eee', borderRadius: 10,
-              padding: '12px 14px', position: 'relative'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                <div>
-                  <span style={{ fontWeight: 700, fontSize: '0.9rem', color: '#2c3e50' }}>{act.empleado_nombre}</span>
-                  <span style={{ fontSize: '0.75rem', color: '#95a5a6', marginLeft: 8 }}>{formatearFechaHora(act.created_at)}</span>
+        <div className="actualizaciones-list">
+          {actualizaciones.map((act) => (
+            <div key={act.id} className="actualizacion-card">
+              <div className="actualizacion-card-header">
+                <div className="actualizacion-card-author">
+                  <strong>{act.empleado_nombre}</strong>
+                  <span>{formatearFechaHora(act.created_at)}</span>
                 </div>
+
                 {(isAdmin || act.empleado_id === empleadoId) && (
-                  <button
-                    onClick={() => handleDelete(act.id)}
-                    style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#e74c3c', padding: 4, display: 'flex', alignItems: 'center' }}
-                    title="Eliminar"
-                  >
+                  <button onClick={() => handleDelete(act.id)} className="btn-delete-update" title="Eliminar">
                     <Trash2 size={16} />
                   </button>
                 )}
               </div>
+
               {act.sugiere_cambio_fecha && (
-                <div style={{ background: '#fff3cd', color: '#856404', fontSize: '0.75rem', fontWeight: 600, padding: '3px 8px', borderRadius: 20, display: 'inline-flex', alignItems: 'center', gap: 4, marginBottom: 8 }}>
-                  <Calendar size={12} /> Sugiere fecha: {formatearFecha(act.fecha_sugerida)}
+                <div className="actualizacion-date-chip">
+                  <Calendar size={12} />
+                  <span>Sugiere fecha: {formatearFecha(act.fecha_sugerida)}</span>
                 </div>
               )}
+
               {act.realizado && (
-                <div style={{ marginBottom: 6 }}>
-                  <span style={{ background: '#d4edda', color: '#155724', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', padding: '2px 8px', borderRadius: 20 }}>
-                    Realizado
-                  </span>
-                  <p style={{ margin: '4px 0 0', fontSize: '0.86rem', color: '#444', lineHeight: 1.5 }}>{act.realizado}</p>
+                <div className="actualizacion-block">
+                  <span className="actualizacion-tag actualizacion-tag-done">Realizado</span>
+                  <p>{act.realizado}</p>
                 </div>
               )}
+
               {act.pendiente && (
-                <div>
-                  <span style={{ background: '#fff3cd', color: '#856404', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', padding: '2px 8px', borderRadius: 20 }}>
-                    Pendiente
-                  </span>
-                  <p style={{ margin: '4px 0 0', fontSize: '0.86rem', color: '#444', lineHeight: 1.5 }}>{act.pendiente}</p>
+                <div className="actualizacion-block">
+                  <span className="actualizacion-tag actualizacion-tag-pending">Pendiente</span>
+                  <p>{act.pendiente}</p>
                 </div>
               )}
             </div>

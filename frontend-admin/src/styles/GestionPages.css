@@ -43,9 +43,9 @@
 }
 
 .btn-secondary {
-  background: #95a5a6;
-  color: white;
-  border: none;
+  background: rgba(231, 76, 60, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(231, 76, 60, 0.3);
   padding: 12px 24px;
   border-radius: 8px;
   font-weight: 600;
@@ -58,7 +58,8 @@
 }
 
 .btn-secondary:hover {
-  background: #7f8c8d;
+  background: rgba(231, 76, 60, 0.25);
+  border-color: rgba(231, 76, 60, 0.5);
 }
 
 /* Barra de filtros */
@@ -183,13 +184,13 @@
 }
 
 .badge-active {
-  background: #d4edda;
-  color: #155724;
+  background: rgba(39, 174, 96, 0.18);
+  color: #4ade80;
 }
 
 .badge-inactive {
-  background: #f8d7da;
-  color: #721c24;
+  background: rgba(231, 76, 60, 0.18);
+  color: #f87171;
 }
 
 /* Botones de acción */
@@ -274,7 +275,7 @@
 }
 
 .form-group label {
-  color: #2c3e50;
+  color: rgba(255, 255, 255, 0.65);
   font-weight: 600;
   font-size: 0.95rem;
 }
@@ -283,19 +284,38 @@
 .form-group select,
 .form-group textarea {
   padding: 12px 16px;
-  border: 2px solid #e0e0e0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   font-size: 1rem;
   transition: all 0.3s ease;
   font-family: inherit;
+  background: rgba(255, 255, 255, 0.06);
+  color: #e2e8f0;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.form-group select option {
+  background: #0d1b2a;
+  color: #e2e8f0;
 }
 
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #4DB6A8;
-  box-shadow: 0 0 0 3px rgba(77, 182, 168, 0.15);
+  border-color: rgba(77, 182, 168, 0.5);
+  box-shadow: 0 0 0 3px rgba(77, 182, 168, 0.1);
+}
+
+.form-group input:disabled,
+.form-group select:disabled {
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.06);
 }
 
 .form-group textarea {
@@ -352,23 +372,24 @@
 
 /* Badges de Prioridad */
 .badge-baja {
-  background: #d4edda;
-  color: #155724;
+  background: rgba(39, 174, 96, 0.18);
+  color: #4ade80;
 }
 
 .badge-media {
-  background: #d1ecf1;
-  color: #0c5460;
+  background: rgba(52, 152, 219, 0.18);
+  color: #60a5fa;
 }
 
 .badge-alta {
-  background: #fff3cd;
-  color: #856404;
+  background: rgba(234, 179, 8, 0.18);
+  color: #fbbf24;
 }
 
 .badge-urgente {
-  background: #f8d7da;
-  color: #721c24;
+  background: rgba(190, 24, 93, 0.18);
+  color: #f472b6;
+  font-weight: 700;
 }
 
 /* Proyecto clickeable */
@@ -379,7 +400,7 @@
 }
 
 .proyecto-nombre-clickable:hover {
-  background: #f8f9fa;
+  background: rgba(77, 182, 168, 0.08);
   color: #4DB6A8;
 }
 
@@ -398,8 +419,8 @@
 }
 
 .badge-empleado {
-  background: #e9ecef;
-  color: #495057;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 /* Preview del total en presupuestos */
@@ -452,19 +473,19 @@
 
 /* Badges específicos de documentos */
 .badge-tipo {
-  background: #e9ecef;
-  color: #495057;
+  background: rgba(77, 182, 168, 0.15);
+  color: #4DB6A8;
   text-transform: capitalize;
 }
 
 .badge-publico {
-  background: #d4edda;
-  color: #155724;
+  background: rgba(52, 152, 219, 0.18);
+  color: #60a5fa;
 }
 
 .badge-privado {
-  background: #fff3cd;
-  color: #856404;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .btn-download {
