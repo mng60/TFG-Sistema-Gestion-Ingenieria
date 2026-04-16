@@ -2,7 +2,8 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  min-height: 100dvh;
+  min-height: var(--app-height);
+  height: var(--app-height);
   background: var(--color-bg);
 }
 
@@ -78,6 +79,12 @@
    .mobile-main haga scroll y arrastre el header cuando aparece el teclado */
 body.screen-chat .mobile-main {
   overflow-y: hidden;
+  overscroll-behavior: none;
+  background: #f0f2f5;
+}
+
+body.screen-chat .mobile-layout {
+  background: #f0f2f5;
 }
 
 /* Ocultar bottom nav cuando el teclado está abierto */

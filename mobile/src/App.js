@@ -23,17 +23,35 @@ function PublicRoute({ children }) {
 
 function KeyboardManager() {
   useEffect(() => {
-    // Con adjustResize, window.innerHeight se encoge cuando aparece el teclado.
-    // Guardamos la altura inicial y comparamos contra ella.
-    const initialHeight = window.innerHeight;
+    const viewport = window.visualViewport;
+    let maxViewportHeight = viewport?.height || window.innerHeight;
 
-    const handleResize = () => {
-      const keyboardOpen = window.innerHeight < initialHeight - 100;
+    const syncViewport = () => {
+      const currentHeight = viewport?.height || window.innerHeight;
+      const offsetTop = viewport?.offsetTop || 0;
+
+      if (currentHeight > maxViewportHeight) {
+        maxViewportHeight = currentHeight;
+      }
+
+      const keyboardOpen = currentHeight < maxViewportHeight - 100;
       document.body.classList.toggle('keyboard-open', keyboardOpen);
+
+      document.documentElement.style.setProperty('--app-height', `${currentHeight}px`);
+      document.documentElement.style.setProperty('--visual-viewport-offset-top', `${offsetTop}px`);
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    syncViewport();
+
+    window.addEventListener('resize', syncViewport);
+    viewport?.addEventListener('resize', syncViewport);
+    viewport?.addEventListener('scroll', syncViewport);
+
+    return () => {
+      window.removeEventListener('resize', syncViewport);
+      viewport?.removeEventListener('resize', syncViewport);
+      viewport?.removeEventListener('scroll', syncViewport);
+    };
   }, []);
 
   return null;

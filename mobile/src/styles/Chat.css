@@ -1428,7 +1428,8 @@
 .chat-layout-mobile {
   position: relative;
   margin-top: var(--statusbar-space);
-  height: calc(100dvh - var(--bottom-nav-height) - var(--safe-bottom) - var(--statusbar-space));
+  height: calc(var(--app-height) - var(--bottom-nav-height) - var(--safe-bottom) - var(--statusbar-space));
+  min-height: 0;
   overflow: hidden;
   background: #f0f2f5;
   /* Evita que el WebView de Android aplique dark mode a esta sección */
@@ -1437,7 +1438,7 @@
 
 /* Con teclado abierto: nav oculto, chat ocupa el espacio completo */
 body.keyboard-open .chat-layout-mobile {
-  height: calc(100dvh - var(--statusbar-space));
+  height: calc(var(--app-height) - var(--statusbar-space));
 }
 
 .chat-list-screen {
@@ -1464,6 +1465,7 @@ body.keyboard-open .chat-layout-mobile {
   transition: transform 0.3s ease;
   transform: translateX(100%);
   z-index: 2;
+  overflow: hidden;
 }
 
 .chat-window-screen.visible {
@@ -1484,10 +1486,18 @@ body.keyboard-open .chat-layout-mobile {
   min-height: 0;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+
+.chat-window-screen .chat-header {
+  position: sticky;
+  top: 0;
+  z-index: 3;
 }
 
 .chat-window-screen .chat-messages {
   padding-top: 14px;
+  overscroll-behavior: contain;
 }
 
 .chat-window-screen .chat-footer {

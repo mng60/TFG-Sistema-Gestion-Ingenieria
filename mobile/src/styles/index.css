@@ -16,6 +16,8 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-top: env(safe-area-inset-top, 0px);
   --statusbar-space: 28px;
+  --app-height: 100dvh;
+  --visual-viewport-offset-top: 0px;
 }
 
 *, *::before, *::after {
@@ -43,9 +45,20 @@ body {
   padding-bottom: var(--safe-bottom);
 }
 
+body.screen-chat {
+  overflow: hidden;
+  padding-bottom: 0;
+  background: #f0f2f5;
+}
+
 #root {
   min-height: 100vh;
   min-height: 100dvh;
+}
+
+body.screen-chat #root {
+  min-height: var(--app-height);
+  background: #f0f2f5;
 }
 
 button {
