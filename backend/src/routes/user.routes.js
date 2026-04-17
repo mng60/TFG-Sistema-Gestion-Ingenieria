@@ -6,7 +6,8 @@ const {
   createUser,
   updateUser,
   deleteUser,
-  updatePassword
+  updatePassword,
+  testEmail
 } = require('../controllers/user.controller');
 const User = require('../models/User');
 const authMiddleware = require('../middlewares/auth.middleware');
@@ -70,5 +71,8 @@ router.delete('/:id', checkRole('admin'), deleteUser);
 
 // PUT /api/users/:id/password - Actualizar contraseña
 router.put('/:id/password', updatePasswordValidation, updatePassword);
+
+// POST /api/users/test-email - Verificar configuración de email (solo admin)
+router.post('/test-email', checkRole('admin'), testEmail);
 
 module.exports = router;

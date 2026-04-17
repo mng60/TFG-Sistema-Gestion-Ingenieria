@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
-const { sendBienvenidaEmpleado } = require('../utils/emailService');
+const { sendBienvenidaEmpleado, sendMail } = require('../utils/emailService');
 
 // Obtener todos los usuarios (solo admin)
 const getAllUsers = async (req, res) => {
@@ -231,11 +231,37 @@ const updatePassword = async (req, res) => {
   }
 };
 
+const testEmail = async (req, res) => {
+  const { to } = req.body;
+  if (!to) return res.status(400).json({ success: false, message: 'Falta el campo "to"' });
+
+  try {
+    const emailUser = process.env.EMAIL_USER;
+    const emailPass = process.env.EMAIL_PASS;
+    const enabled = emailUser && emailUser !== 'tuCorreo@gmail.com';
+
+    if (!enabled) {
+      return res.json({ success: false, message: 'Email desactivado — EMAIL_USER no configurado', emailUser: emailUser || null });
+    }
+
+    await sendMail({
+      to,
+      subject: 'Test de email — BlueArc Ingeniería',
+      html: `<p>Test enviado desde Railway. EMAIL_USER: <strong>${emailUser}</strong></p>`
+    });
+
+    res.json({ success: true, message: `Email enviado a ${to}`, emailUser });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message, emailUser: process.env.EMAIL_USER || null });
+  }
+};
+
 module.exports = {
   getAllUsers,
   getUserById,
   createUser,
   updateUser,
   deleteUser,
-  updatePassword
+  updatePassword,
+  testEmail
 };

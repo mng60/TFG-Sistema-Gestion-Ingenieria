@@ -206,6 +206,7 @@ async function sendBienvenidaEmpleado({ to, nombre, password, adminUrl, rol }) {
 }
 
 module.exports = {
+  sendMail,
   sendPasswordReset,
   sendNuevoPresupuesto,
   sendPresupuestoAceptado,
