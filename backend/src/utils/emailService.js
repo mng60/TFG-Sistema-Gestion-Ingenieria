@@ -1,17 +1,10 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  },
-  connectionTimeout: 8000,
-  greetingTimeout: 8000,
-  socketTimeout: 8000
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-const emailEnabled = () => process.env.EMAIL_USER && process.env.EMAIL_USER !== 'tuCorreo@gmail.com';
+const FROM = process.env.EMAIL_FROM || 'BlueArc Ingeniería <onboarding@resend.dev>';
+
+const emailEnabled = () => !!process.env.RESEND_API_KEY;
 
 async function sendMail({ to, subject, html }) {
   if (!emailEnabled()) {
@@ -20,8 +13,12 @@ async function sendMail({ to, subject, html }) {
   }
   if (!to) return;
   try {
-    await transporter.sendMail({ from: process.env.EMAIL_FROM, to, subject, html });
-    console.log(`[EMAIL] Enviado a ${to}: ${subject}`);
+    const { data, error } = await resend.emails.send({ from: FROM, to: [to], subject, html });
+    if (error) {
+      console.error(`[EMAIL ERROR] No se pudo enviar a ${to}:`, error.message);
+    } else {
+      console.log(`[EMAIL] Enviado a ${to}: ${subject} (id: ${data.id})`);
+    }
   } catch (err) {
     console.error(`[EMAIL ERROR] No se pudo enviar a ${to}:`, err.message);
   }
@@ -76,7 +73,6 @@ function baseLayout(contenido) {
   </html>`;
 }
 
-// 1. Reset de contraseña → destinatario: empleado o cliente
 async function sendPasswordReset({ to, nombre, newPassword, tipoUsuario }) {
   const subject = 'Tu nueva contraseña — BlueArc Ingeniería';
   const html = baseLayout(`
@@ -93,7 +89,6 @@ async function sendPasswordReset({ to, nombre, newPassword, tipoUsuario }) {
   await sendMail({ to, subject, html });
 }
 
-// 2. Nuevo presupuesto enviado → destinatario: cliente (email_personal)
 async function sendNuevoPresupuesto({ to, nombreEmpresa, nombreProyecto, numeroPresupuesto, total, portalUrl }) {
   const subject = `Nuevo presupuesto pendiente de aprobación — ${numeroPresupuesto}`;
   const html = baseLayout(`
@@ -110,7 +105,6 @@ async function sendNuevoPresupuesto({ to, nombreEmpresa, nombreProyecto, numeroP
   await sendMail({ to, subject, html });
 }
 
-// 3. Presupuesto aceptado → destinatario: admins (email_personal)
 async function sendPresupuestoAceptado({ to, nombreEmpresa, nombreProyecto, numeroPresupuesto, total }) {
   const subject = `✅ Presupuesto aceptado — ${numeroPresupuesto}`;
   const html = baseLayout(`
@@ -126,7 +120,6 @@ async function sendPresupuestoAceptado({ to, nombreEmpresa, nombreProyecto, nume
   await sendMail({ to, subject, html });
 }
 
-// 4. Presupuesto rechazado → destinatario: admins (email_personal)
 async function sendPresupuestoRechazado({ to, nombreEmpresa, nombreProyecto, numeroPresupuesto }) {
   const subject = `❌ Presupuesto rechazado — ${numeroPresupuesto}`;
   const html = baseLayout(`
@@ -141,7 +134,6 @@ async function sendPresupuestoRechazado({ to, nombreEmpresa, nombreProyecto, num
   await sendMail({ to, subject, html });
 }
 
-// 5. Proyecto completado → destinatario: cliente (email_personal)
 async function sendProyectoCompletado({ to, nombreEmpresa, nombreProyecto, portalUrl }) {
   const subject = `Tu proyecto ha finalizado — ${nombreProyecto}`;
   const html = baseLayout(`
@@ -155,7 +147,6 @@ async function sendProyectoCompletado({ to, nombreEmpresa, nombreProyecto, porta
   await sendMail({ to, subject, html });
 }
 
-// 6. Bienvenida al portal → destinatario: cliente (email_personal)
 async function sendBienvenidaPortal({ to, nombreEmpresa, emailLogin, password, portalUrl }) {
   const subject = 'Bienvenido al Portal de Clientes — BlueArc Ingeniería';
   const html = baseLayout(`
@@ -172,7 +163,6 @@ async function sendBienvenidaPortal({ to, nombreEmpresa, emailLogin, password, p
   await sendMail({ to, subject, html });
 }
 
-// 7. Confirmación de contacto web → destinatario: usuario externo
 async function sendConfirmacionContacto({ to, nombre }) {
   const subject = 'Hemos recibido tu mensaje — BlueArc Ingeniería';
   const html = baseLayout(`
@@ -188,7 +178,6 @@ async function sendConfirmacionContacto({ to, nombre }) {
   await sendMail({ to, subject, html });
 }
 
-// 8. Bienvenida a empleado/admin recién creado → destinatario: empleado (email)
 async function sendBienvenidaEmpleado({ to, nombre, password, adminUrl, rol }) {
   const esAdmin = rol === 'admin';
   const subject = esAdmin

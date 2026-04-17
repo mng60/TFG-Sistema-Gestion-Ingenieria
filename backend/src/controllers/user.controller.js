@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
-const { sendBienvenidaEmpleado, sendMail } = require('../utils/emailService');
+const { sendBienvenidaEmpleado } = require('../utils/emailService');
 
 // Obtener todos los usuarios (solo admin)
 const getAllUsers = async (req, res) => {
@@ -235,33 +235,28 @@ const testEmail = async (req, res) => {
   const { to } = req.body;
   if (!to) return res.status(400).json({ success: false, message: 'Falta el campo "to"' });
 
-  const emailUser = process.env.EMAIL_USER;
-  const emailPass = process.env.EMAIL_PASS;
-
-  if (!emailUser || emailUser === 'tuCorreo@gmail.com') {
-    return res.json({ success: false, message: 'EMAIL_USER no configurado', emailUser: emailUser || null });
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    return res.json({ success: false, message: 'RESEND_API_KEY no configurado en Railway' });
   }
 
   try {
-    const nodemailer = require('nodemailer');
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: { user: emailUser, pass: emailPass },
-      connectionTimeout: 8000,
-      greetingTimeout: 8000,
-      socketTimeout: 8000
-    });
-
-    const info = await transporter.sendMail({
-      from: process.env.EMAIL_FROM,
-      to,
+    const { Resend } = require('resend');
+    const r = new Resend(apiKey);
+    const from = process.env.EMAIL_FROM || 'BlueArc Ingeniería <onboarding@resend.dev>';
+    const { data, error } = await r.emails.send({
+      from,
+      to: [to],
       subject: 'Test email — BlueArc Ingeniería',
-      html: `<p>Test directo desde Railway. Enviado por <strong>${emailUser}</strong></p>`
+      html: '<p>Test desde Railway con Resend. ¡Funciona!</p>'
     });
 
-    res.json({ success: true, message: `Enviado: ${info.messageId}`, emailUser, response: info.response });
+    if (error) {
+      return res.status(500).json({ success: false, message: error.message, from });
+    }
+    res.json({ success: true, message: `Enviado con id: ${data.id}`, from });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message, code: err.code, emailUser });
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 
