@@ -18,6 +18,18 @@ const {
   expandirConSinonimos,
   truncar
 } = require('./helpers/asistenteTexto.helper');
+const {
+  extraerPreguntaSinSaludo,
+  esConsultaFechaHora,
+  construirRespuestaFechaHora,
+  esConsultaTiempo,
+  construirRespuestaTiempo,
+  esConsultaCalculadoraSolar,
+  construirRespuestaCalculadoraSolar,
+  esConsultaCapacidades,
+  construirRespuestaCapacidades,
+  detectarEasterEgg,
+} = require('./helpers/asistenteGeneral.helper');
 
 let knowledgeBase = [];
 
@@ -246,44 +258,73 @@ const preguntar = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Pregunta demasiado corta' });
     }
 
-    const esSeguimientoPrecio = esSeguimientoDePrecio(pregunta, historial);
+    // Easter egg: detectar antes de procesar nada
+    const easterEgg = detectarEasterEgg(pregunta);
+    const conEgg = (texto) => easterEgg ? `${texto} ${easterEgg}` : texto;
+
+    // Bug fix: "hola, cuanto cuesta..." → extraer solo "cuanto cuesta..."
+    const preguntaReal = extraerPreguntaSinSaludo(pregunta);
+    const preguntaBase = preguntaReal || pregunta;
+
+    // Sentido común: fecha/hora — no se cachea (cambia cada minuto)
+    if (esConsultaFechaHora(preguntaBase)) {
+      return res.json({ success: true, respuesta: conEgg(construirRespuestaFechaHora(preguntaBase)) });
+    }
+
+    // Sentido común: tiempo meteorológico — no se cachea
+    if (esConsultaTiempo(preguntaBase)) {
+      const respTiempo = await construirRespuestaTiempo();
+      return res.json({ success: true, respuesta: conEgg(respTiempo) });
+    }
+
+    // Sentido común: capacidades del asistente
+    if (esConsultaCapacidades(preguntaBase)) {
+      return res.json({ success: true, respuesta: conEgg(construirRespuestaCapacidades()) });
+    }
+
+    // Sentido común: calculadora solar básica
+    if (esConsultaCalculadoraSolar(preguntaBase)) {
+      return res.json({ success: true, respuesta: conEgg(construirRespuestaCalculadoraSolar(preguntaBase)) });
+    }
+
+    // Saludo puro (sin pregunta real adjunta)
+    if (!preguntaReal) {
+      const respuestaConversacional = construirRespuestaConversacional(pregunta);
+      if (respuestaConversacional) {
+        return res.json({ success: true, respuesta: conEgg(respuestaConversacional) });
+      }
+    }
+
+    const esSeguimientoPrecio = esSeguimientoDePrecio(preguntaBase, historial);
     const preguntaAnalizada = esSeguimientoPrecio
-      ? construirPreguntaCompuesta(pregunta, historial)
-      : pregunta;
+      ? construirPreguntaCompuesta(preguntaBase, historial)
+      : preguntaBase;
 
     const clave = esSeguimientoPrecio ? null : claveCache(preguntaAnalizada);
     if (clave && cache.has(clave)) {
       console.log('[AsistenteIA] Cache hit');
-      return res.json({ success: true, respuesta: cache.get(clave) });
+      return res.json({ success: true, respuesta: conEgg(cache.get(clave)) });
     }
 
-    const respuestaConversacional = construirRespuestaConversacional(pregunta);
-    if (respuestaConversacional) {
-      if (clave) guardarEnCache(clave, respuestaConversacional);
-      return res.json({ success: true, respuesta: respuestaConversacional });
-    }
-
-    if (esConsultaEnergiaActual(pregunta)) {
-      const respuestaEnergia = await construirRespuestaEnergia(pregunta);
-      // Si la pregunta parece inglés, traducir vía LLM manteniendo números y unidades
-      if (esEnIngles(pregunta)) {
+    if (esConsultaEnergiaActual(preguntaBase)) {
+      const respuestaEnergia = await construirRespuestaEnergia(preguntaBase);
+      if (esEnIngles(preguntaBase)) {
         try {
           const traducida = await ask(
             'You are a translator. Translate the following Spanish text to English. Keep all numbers, units (€/kWh, h) and time values exactly as they are. Output only the translated text, nothing else.',
             respuestaEnergia
           );
-          return res.json({ success: true, respuesta: traducida });
-        } catch (_) { /* si falla la traducción, devolver en español */ }
+          return res.json({ success: true, respuesta: conEgg(traducida) });
+        } catch (_) {}
       }
-      // No cacheamos: el precio cambia cada hora
-      return res.json({ success: true, respuesta: respuestaEnergia });
+      return res.json({ success: true, respuesta: conEgg(respuestaEnergia) });
     }
 
     const resultados = buscarContexto(preguntaAnalizada);
 
     if (resultados.length === 0) {
       console.log('[AsistenteIA] Sin contexto suficiente, respuesta directa');
-      return res.json({ success: true, respuesta: RESPUESTA_SIN_CONTEXTO });
+      return res.json({ success: true, respuesta: conEgg(RESPUESTA_SIN_CONTEXTO) });
     }
 
     const debeResolverComoPrecio =
@@ -292,29 +333,28 @@ const preguntar = async (req, res) => {
       esPreguntaSobreTema(preguntaAnalizada) ||
       /alguna recomendacion|que me recomiendas|que opcion recomiendas|que harias|merece.*la pena|merecer.*la pena|recomendarias/.test(normalizarTextoPlano(preguntaAnalizada));
 
-    if (!debeResolverComoPrecio && esConsultaNormativa(pregunta, preguntaAnalizada)) {
+    if (!debeResolverComoPrecio && esConsultaNormativa(preguntaBase, preguntaAnalizada)) {
       const respuestaNormativa = construirRespuestaNormativa({
-        preguntaActual: pregunta,
+        preguntaActual: preguntaBase,
         preguntaAnalizada,
         knowledgeBase
       });
-
       if (respuestaNormativa) {
         if (clave) guardarEnCache(clave, respuestaNormativa);
-        return res.json({ success: true, respuesta: respuestaNormativa });
+        return res.json({ success: true, respuesta: conEgg(respuestaNormativa) });
       }
     }
 
     if (debeResolverComoPrecio) {
       const respuestaPrecio = construirRespuestaPrecio({
-        preguntaActual: pregunta,
+        preguntaActual: preguntaBase,
         preguntaAnalizada,
         historialUsuario: obtenerMensajesUsuarioRecientes(historial, 6).map((msg) => msg.text),
         resultados,
         knowledgeBase
       });
       if (clave) guardarEnCache(clave, respuestaPrecio);
-      return res.json({ success: true, respuesta: respuestaPrecio });
+      return res.json({ success: true, respuesta: conEgg(respuestaPrecio) });
     }
 
     const contexto = `Informacion relevante:\n\n${resultados.map((r) => r.fragmento).join('\n\n')}`;
@@ -322,7 +362,7 @@ const preguntar = async (req, res) => {
     const respuestaFinal = limitarFrases(sanearRespuestaModelo(respuesta), 2);
 
     if (clave) guardarEnCache(clave, respuestaFinal);
-    res.json({ success: true, respuesta: respuestaFinal });
+    res.json({ success: true, respuesta: conEgg(respuestaFinal) });
   } catch (error) {
     console.error('[AsistenteIA] Error:', error.message);
     res.status(503).json({ success: false, message: 'Asistente no disponible' });
