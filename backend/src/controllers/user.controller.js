@@ -52,7 +52,7 @@ const getUserById = async (req, res) => {
 // Crear usuario (solo admin)
 const createUser = async (req, res) => {
   try {
-    const { nombre, email, password, rol, telefono } = req.body;
+    const { nombre, email, password, rol, telefono, email_personal } = req.body;
 
     // Verificar si el usuario ya existe
     const existingUser = await User.findByEmail(email);
@@ -73,16 +73,18 @@ const createUser = async (req, res) => {
       email,
       password: hashedPassword,
       rol: rol || 'empleado',
-      telefono
+      telefono,
+      email_personal
     });
 
+    const destinoEmail = email_personal || email;
     sendBienvenidaEmpleado({
-      to: email,
+      to: destinoEmail,
       nombre,
       password,
       rol: rol || 'empleado',
       adminUrl: process.env.ADMIN_URL || null
-    }).catch(() => {});
+    }).catch((err) => console.error('[EMAIL] Error enviando bienvenida a empleado:', err.message));
 
     res.status(201).json({
       success: true,
@@ -103,7 +105,7 @@ const createUser = async (req, res) => {
 const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, email, telefono, rol } = req.body;
+    const { nombre, email, telefono, rol, email_personal } = req.body;
 
     // Verificar permisos: admin puede actualizar a cualquiera, usuario solo a sí mismo
     if (req.user.rol !== 'admin' && req.user.id !== parseInt(id)) {
@@ -118,6 +120,7 @@ const updateUser = async (req, res) => {
       nombre,
       email,
       telefono,
+      email_personal,
       ...(req.user.rol === 'admin' && { rol })
     };
 
