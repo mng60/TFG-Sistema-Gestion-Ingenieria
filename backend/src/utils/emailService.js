@@ -13,7 +13,8 @@ async function sendMail({ to, subject, html }) {
   }
   if (!to) return;
   try {
-    const { data, error } = await resend.emails.send({ from: FROM, to: [to], subject, html });
+    const replyTo = process.env.EMAIL_REPLY_TO || undefined;
+    const { data, error } = await resend.emails.send({ from: FROM, to: [to], subject, html, ...(replyTo && { reply_to: replyTo }) });
     if (error) {
       console.error(`[EMAIL ERROR] No se pudo enviar a ${to}:`, error.message);
     } else {
