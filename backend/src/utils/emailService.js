@@ -179,7 +179,7 @@ async function sendConfirmacionContacto({ to, nombre }) {
   await sendMail({ to, subject, html });
 }
 
-async function sendBienvenidaEmpleado({ to, nombre, password, adminUrl, rol }) {
+async function sendBienvenidaEmpleado({ to, emailLogin, nombre, password, adminUrl, rol }) {
   const esAdmin = rol === 'admin';
   const subject = esAdmin
     ? 'Acceso de administrador creado — BlueArc Ingeniería'
@@ -189,7 +189,7 @@ async function sendBienvenidaEmpleado({ to, nombre, password, adminUrl, rol }) {
     <p>Hola <strong>${nombre}</strong>,</p>
     <p>Se ha creado tu cuenta${esAdmin ? ' con permisos de <strong>administrador</strong>' : ''} en el <strong>Panel de Gestión</strong> de BlueArc Ingeniería.</p>
     <div class="highlight">
-      <strong>Email de acceso:</strong> ${to}<br/>
+      <strong>Email de acceso:</strong> ${emailLogin}<br/>
       <strong>Contraseña temporal:</strong> <span style="font-size:1.1rem;letter-spacing:0.08em;">${password}</span>
     </div>
     <p>Por seguridad, te recomendamos cambiar la contraseña desde tu perfil tras el primer acceso.</p>

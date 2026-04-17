@@ -80,6 +80,7 @@ const createUser = async (req, res) => {
     const destinoEmail = email_personal || email;
     sendBienvenidaEmpleado({
       to: destinoEmail,
+      emailLogin: email,
       nombre,
       password,
       rol: rol || 'empleado',
