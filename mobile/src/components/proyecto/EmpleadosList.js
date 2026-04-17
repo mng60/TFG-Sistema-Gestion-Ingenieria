@@ -3,7 +3,7 @@ import { Plus, Users } from 'lucide-react';
 import proyectoService from '../../services/proyectoService';
 import usuarioService from '../../services/usuarioService';
 import ConfirmModal from '../common/ConfirmModal';
-import { getAvatarInitial } from '../../utils/format';
+import { getAvatarInitial, getAvatarSrc } from '../../utils/format';
 import '../../styles/Modal.css';
 
 function AsignarModal({ proyectoId, empleadosAsignados, onClose, onSuccess }) {
@@ -69,12 +69,15 @@ function AsignarModal({ proyectoId, empleadosAsignados, onClose, onSuccess }) {
                   onClick={() => setSeleccionado(emp)}
                 >
                   <div style={{
-                    width: 36, height: 36, borderRadius: '50%',
+                    width: 36, height: 36, borderRadius: '50%', overflow: 'hidden',
                     background: 'linear-gradient(135deg, #4DB6A8, #3A9089)',
                     color: 'white', display: 'flex', alignItems: 'center',
                     justifyContent: 'center', fontWeight: 700, flexShrink: 0
                   }}>
-                    {getAvatarInitial(emp.nombre)}
+                    {getAvatarSrc(emp.foto_url)
+                      ? <img src={getAvatarSrc(emp.foto_url)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      : getAvatarInitial(emp.nombre)
+                    }
                   </div>
                   <div>
                     <div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{emp.nombre}</div>
@@ -140,7 +143,10 @@ function EmpleadosList({ proyectoId, empleados, isAdmin, onReload, showToast }) 
         empleados.map((emp) => (
           <div key={emp.user_id || emp.id} className="empleado-card-m">
             <div className="empleado-avatar-m">
-              {getAvatarInitial(emp.empleado_nombre || emp.nombre)}
+              {getAvatarSrc(emp.foto_url)
+                ? <img src={getAvatarSrc(emp.foto_url)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                : getAvatarInitial(emp.empleado_nombre || emp.nombre)
+              }
             </div>
             <div className="empleado-info-m">
               <div className="empleado-nombre-m">{emp.empleado_nombre || emp.nombre}</div>

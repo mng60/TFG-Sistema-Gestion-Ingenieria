@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Award, ClipboardList, Download, FileText, Image, MapPin, Ruler, Scroll, BarChart2 } from 'lucide-react';
 import api from '../services/api';
-import { formatearFecha, formatearMoneda, getAvatarInitial } from '../utils/format';
+import { formatearFecha, formatearMoneda, getAvatarInitial, getAvatarSrc } from '../utils/format';
 import Toast from '../components/Toast';
 import '../styles/ProyectoCompleto.css';
 
@@ -212,7 +212,10 @@ function ProyectoCompleto() {
                   {empleados.map((emp) => (
                     <div key={emp.id} className="empleado-card">
                       <div className="empleado-avatar">
-                        {getAvatarInitial(emp.nombre)}
+                        {getAvatarSrc(emp.foto_url)
+                          ? <img src={getAvatarSrc(emp.foto_url)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                          : getAvatarInitial(emp.nombre)
+                        }
                       </div>
                       <div className="empleado-info">
                         <strong>{emp.nombre}</strong>
