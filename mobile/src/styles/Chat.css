@@ -727,11 +727,26 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   padding: 8px;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 8px;
-  min-width: 280px;
+  min-width: 240px;
   margin-bottom: 10px;
   z-index: 100;
+}
+
+.attachment-menu-back {
+  grid-column: 1 / -1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 10px;
+  background: #eef6ff;
+  color: #2c3e50;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 .attachment-option {

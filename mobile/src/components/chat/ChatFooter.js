@@ -73,6 +73,9 @@ function ChatFooter({ onSendMessage, onTyping, onSendFile, showToast }) {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = opcion.accept;
+    if (opcion.capture) {
+      input.capture = opcion.capture;
+    }
     input.onchange = (e) => handleFileSelect(e, opcion.tipo_mensaje);
     input.click();
   };

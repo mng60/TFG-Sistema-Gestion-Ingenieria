@@ -456,8 +456,8 @@
 }
 
 .actualizacion-card {
-  background: rgba(255, 255, 255, 0.96);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: linear-gradient(180deg, rgba(13, 27, 42, 0.98), rgba(10, 21, 32, 0.98));
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 18px;
   padding: 14px 16px;
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
@@ -480,12 +480,12 @@
 
 .actualizacion-card-author strong {
   font-size: 0.95rem;
-  color: #243447;
+  color: #f8fafc;
 }
 
 .actualizacion-card-author span {
   font-size: 0.8rem;
-  color: #8b98a5;
+  color: rgba(255, 255, 255, 0.45);
 }
 
 .btn-delete-update {
@@ -518,7 +518,7 @@
 .actualizacion-block p {
   margin: 6px 0 0;
   font-size: 0.94rem;
-  color: #3b4450;
+  color: rgba(255, 255, 255, 0.82);
   line-height: 1.55;
 }
 
