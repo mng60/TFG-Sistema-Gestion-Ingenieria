@@ -235,24 +235,30 @@ const testEmail = async (req, res) => {
   const { to } = req.body;
   if (!to) return res.status(400).json({ success: false, message: 'Falta el campo "to"' });
 
+  const emailUser = process.env.EMAIL_USER;
+  const emailPass = process.env.EMAIL_PASS;
+
+  if (!emailUser || emailUser === 'tuCorreo@gmail.com') {
+    return res.json({ success: false, message: 'EMAIL_USER no configurado', emailUser: emailUser || null });
+  }
+
   try {
-    const emailUser = process.env.EMAIL_USER;
-    const emailPass = process.env.EMAIL_PASS;
-    const enabled = emailUser && emailUser !== 'tuCorreo@gmail.com';
-
-    if (!enabled) {
-      return res.json({ success: false, message: 'Email desactivado — EMAIL_USER no configurado', emailUser: emailUser || null });
-    }
-
-    await sendMail({
-      to,
-      subject: 'Test de email — BlueArc Ingeniería',
-      html: `<p>Test enviado desde Railway. EMAIL_USER: <strong>${emailUser}</strong></p>`
+    const nodemailer = require('nodemailer');
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: { user: emailUser, pass: emailPass }
     });
 
-    res.json({ success: true, message: `Email enviado a ${to}`, emailUser });
+    const info = await transporter.sendMail({
+      from: process.env.EMAIL_FROM,
+      to,
+      subject: 'Test email — BlueArc Ingeniería',
+      html: `<p>Test directo desde Railway. Enviado por <strong>${emailUser}</strong></p>`
+    });
+
+    res.json({ success: true, message: `Enviado: ${info.messageId}`, emailUser, response: info.response });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message, emailUser: process.env.EMAIL_USER || null });
+    res.status(500).json({ success: false, message: err.message, code: err.code, emailUser });
   }
 };
 
