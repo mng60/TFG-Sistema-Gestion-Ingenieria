@@ -575,7 +575,7 @@ const getEmpleadosProyecto = async (req, res) => {
     }
 
     const query = `
-      SELECT u.id, u.nombre, u.email, u.rol, pe.rol_proyecto
+      SELECT u.id, u.nombre, u.email, u.rol, u.foto_url, pe.rol_proyecto
       FROM proyecto_empleados pe
       JOIN users u ON pe.user_id = u.id
       WHERE pe.proyecto_id = $1

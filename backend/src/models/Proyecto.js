@@ -295,12 +295,13 @@ class Proyecto {
   static async getEmpleados(proyectoId) {
     try {
       const query = `
-        SELECT 
+        SELECT
           pe.*,
           u.nombre as empleado_nombre,
           u.email as empleado_email,
           u.telefono as empleado_telefono,
-          u.rol as empleado_rol
+          u.rol as empleado_rol,
+          u.foto_url
         FROM proyecto_empleados pe
         JOIN users u ON pe.user_id = u.id
         WHERE pe.proyecto_id = $1 AND pe.activo = true
