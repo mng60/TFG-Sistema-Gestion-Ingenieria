@@ -3,11 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import MobileLayout from '../components/layout/MobileLayout';
 import api from '../services/api';
-import { getAvatarInitial } from '../utils/format';
+import { getAvatarInitial, getAvatarSrc } from '../utils/format';
 import { Camera, Save, Lock, LogOut, ChevronDown, ChevronUp } from 'lucide-react';
 import '../styles/Perfil.css';
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || `http://${window.location.hostname}:5000`;
 
 function FieldGroup({ label, children }) {
   return (
@@ -94,7 +92,7 @@ function Perfil() {
 
   const handleLogout = () => { logout(); navigate('/login'); };
 
-  const avatarSrc = empleado?.foto_url ? `${BACKEND_URL}${empleado.foto_url}` : null;
+  const avatarSrc = getAvatarSrc(empleado?.foto_url);
 
   return (
     <MobileLayout>

@@ -24,6 +24,9 @@ export const EmpleadoAuthProvider = ({ children }) => {
 
     if (empleadoGuardado && token) {
       setEmpleado({ ...empleadoGuardado, tipo_usuario: 'empleado' });
+      empleadoAuthService.getProfile()
+        .then(updated => { if (updated) setEmpleado({ ...updated, tipo_usuario: 'empleado' }); })
+        .catch(() => {});
     }
     setLoading(false);
   }, []);

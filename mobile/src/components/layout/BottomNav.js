@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { FolderOpen, MessagesSquare, CircleUserRound } from 'lucide-react';
 
-const BACKEND = process.env.REACT_APP_BACKEND_URL || `http://${window.location.hostname}:5000`;
+import { getAvatarSrc } from '../../utils/format';
 
 function BottomNav() {
   const navigate = useNavigate();
@@ -84,8 +84,8 @@ function BottomNav() {
         onClick={() => navigate('/perfil')}
       >
         <span className="bottom-nav-icon">
-          {empleado?.foto_url
-            ? <img src={`${BACKEND}${empleado.foto_url}`} alt="av" style={{ width: 22, height: 22, borderRadius: '50%', objectFit: 'cover' }} />
+          {getAvatarSrc(empleado?.foto_url)
+            ? <img src={getAvatarSrc(empleado.foto_url)} alt="av" style={{ width: 22, height: 22, borderRadius: '50%', objectFit: 'cover' }} />
             : <CircleUserRound size={22} />
           }
         </span>

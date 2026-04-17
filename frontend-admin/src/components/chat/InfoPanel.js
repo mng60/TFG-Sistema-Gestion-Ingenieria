@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ArchivosPanel from './ArchivosPanel';
-import { Paperclip, Mail, Phone } from 'lucide-react';
+import { Paperclip, Mail, Phone, FolderOpen } from 'lucide-react';
+import { getAvatarSrc } from '../../utils/format';
 
 function InfoPanel({ participant, conversacion, currentUser, onClose }) {
   const [infoAdicional, setInfoAdicional] = useState(null);
@@ -51,7 +52,10 @@ function InfoPanel({ participant, conversacion, currentUser, onClose }) {
           {/* Avatar grande */}
           <div className="info-avatar-large">
             <div className="avatar-circle-large">
-              {participant.nombre?.charAt(0).toUpperCase() || '?'}
+              {getAvatarSrc(participant.foto_url)
+                ? <img src={getAvatarSrc(participant.foto_url)} alt="av" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                : participant.nombre?.charAt(0).toUpperCase() || '?'
+              }
             </div>
           </div>
 
@@ -117,7 +121,7 @@ function InfoPanel({ participant, conversacion, currentUser, onClose }) {
               className="info-action-btn"
               onClick={() => setShowArchivos(true)}
             >
-              <Paperclip size={14} color="grey" /> Ver archivos compartidos
+              <Paperclip size={14} /> Ver archivos compartidos
             </button>
 
             {currentUser.rol === 'admin' && (
@@ -126,14 +130,14 @@ function InfoPanel({ participant, conversacion, currentUser, onClose }) {
                   className="info-action-btn"
                   onClick={() => { navigate(`/proyectos?cliente_id=${participant.user_id}&nombre=${encodeURIComponent(participant.nombre)}`); onClose(); }}
                 >
-                  <Paperclip size={14} color="grey" /> Ver proyectos del cliente
+                  <FolderOpen size={14} /> Ver proyectos del cliente
                 </button>
               ) : (
                 <button
                   className="info-action-btn"
                   onClick={() => { navigate(`/proyectos?solo_empleado_id=${participant.user_id}&nombre=${encodeURIComponent(participant.nombre)}`); onClose(); }}
                 >
-                  <Paperclip size={14} color="grey" /> Ver todos sus proyectos
+                  <FolderOpen size={14} /> Ver todos sus proyectos
                 </button>
               )
             )}

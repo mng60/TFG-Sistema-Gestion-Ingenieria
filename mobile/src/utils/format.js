@@ -22,3 +22,10 @@ export const formatearFechaHora = (fecha) => {
 
 export const getAvatarInitial = (nombre, fallback = '?') =>
   nombre?.charAt(0).toUpperCase() || fallback;
+
+export const getAvatarSrc = (fotoUrl) => {
+  if (!fotoUrl) return null;
+  if (fotoUrl.startsWith('http')) return fotoUrl;
+  const BACKEND = process.env.REACT_APP_BACKEND_URL || `http://${window.location.hostname}:5000`;
+  return `${BACKEND}${fotoUrl}`;
+};

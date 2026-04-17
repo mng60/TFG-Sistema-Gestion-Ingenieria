@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { ClipboardList, FolderOpen, MessagesSquare, LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { getAvatarInitial } from '../../utils/format';
+import { getAvatarInitial, getAvatarSrc } from '../../utils/format';
 import '../../styles/ClienteLayout.css';
 
 // PRNG determinista con sin() — sin Math.random(), siempre igual, sin patrón visible
@@ -142,9 +142,9 @@ function ClienteLayout({ children }) {
             title="Ver mi perfil"
           >
             <div className="user-avatar">
-              {cliente?.foto_url
+              {getAvatarSrc(cliente?.foto_url)
                 ? <img
-                    src={`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'}${cliente.foto_url}`}
+                    src={getAvatarSrc(cliente.foto_url)}
                     alt="avatar"
                     style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
                   />

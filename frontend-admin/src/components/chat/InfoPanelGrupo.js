@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Paperclip, CircleMinus } from 'lucide-react';
 import { useEmpleadoAuth } from '../../context/EmpleadoAuthContext';
 import ConfirmModal from '../ConfirmModal';
+import { getAvatarSrc } from '../../utils/format';
 import ArchivosPanel from './ArchivosPanel';
 
 function InfoPanelGrupo({ conversacion, currentUser, onClose, onConversacionEliminada, showToast, onOpenDirectChat }) {
@@ -138,8 +139,8 @@ function InfoPanelGrupo({ conversacion, currentUser, onClose, onConversacionElim
                 >
                   <div className="participante-avatar">
                     <div className="avatar-circle" style={{ width: 34, height: 34, fontSize: '0.85rem' }}>
-                      {participante.foto_url
-                        ? <img src={`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'}${participante.foto_url}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                      {getAvatarSrc(participante.foto_url)
+                        ? <img src={getAvatarSrc(participante.foto_url)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                         : participante.nombre?.charAt(0).toUpperCase() || '?'
                       }
                     </div>
@@ -174,7 +175,7 @@ function InfoPanelGrupo({ conversacion, currentUser, onClose, onConversacionElim
                 className="info-action-btn"
                 onClick={() => setShowArchivos(true)}
               >
-                <Paperclip size={14} color="grey" /> Ver archivos compartidos
+                <Paperclip size={14} /> Ver archivos compartidos
               </button>
               
               <button 

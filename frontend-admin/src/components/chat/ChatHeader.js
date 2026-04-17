@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import InfoPanel from './InfoPanel';
 import { useNavigate } from 'react-router-dom';
 import ConfirmModal from '../../components/ConfirmModal';
+import { getAvatarSrc } from '../../utils/format';
 
 function ChatHeader({ conversacion, currentUser, onConversacionEliminada, onlineUsers = new Set() }) {
   const [showMenu, setShowMenu] = useState(false);
@@ -77,8 +78,8 @@ function ChatHeader({ conversacion, currentUser, onConversacionEliminada, online
           {/* Avatar */}
           <div className="header-avatar">
             <div className="avatar-circle">
-              {otherParticipant?.foto_url
-                ? <img src={`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'}${otherParticipant.foto_url}`} alt="av" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+              {getAvatarSrc(otherParticipant?.foto_url)
+                ? <img src={getAvatarSrc(otherParticipant.foto_url)} alt="av" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                 : otherParticipant?.nombre?.charAt(0).toUpperCase() || '?'
               }
             </div>

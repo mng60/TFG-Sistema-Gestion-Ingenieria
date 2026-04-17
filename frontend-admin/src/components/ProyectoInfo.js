@@ -3,6 +3,7 @@ import proyectoService from '../services/proyectoService';
 import EditarProyectoModal from './modals/EditarProyectoModal';
 import AsignarEmpleadoModal from './modals/AsignarEmpleadoModal';
 import { Plus, Pencil, CircleMinus } from 'lucide-react';
+import { getAvatarSrc } from '../utils/format';
 import { formatearFecha } from '../utils/format';
 
 function ProyectoInfo({ 
@@ -117,8 +118,8 @@ function ProyectoInfo({
               <div key={emp.id} className="empleado-card">
                 <div className="empleado-avatar">
                   <div className="avatar-circle" style={{ width: 36, height: 36, fontSize: '0.9rem' }}>
-                    {emp.foto_url
-                      ? <img src={`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'}${emp.foto_url}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                    {getAvatarSrc(emp.foto_url)
+                      ? <img src={getAvatarSrc(emp.foto_url)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                       : (emp.empleado_nombre || emp.nombre)?.charAt(0).toUpperCase() || '?'
                     }
                   </div>

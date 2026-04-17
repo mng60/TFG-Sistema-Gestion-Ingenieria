@@ -19,10 +19,12 @@ export const AuthProvider = ({ children }) => {
   const [onlineUsers, setOnlineUsers] = useState(new Set());
 
   useEffect(() => {
-    // Verificar si hay sesión guardada
     const clienteGuardado = authService.getCurrentCliente();
     if (clienteGuardado && authService.isAuthenticated()) {
       setCliente(clienteGuardado);
+      authService.getPerfil()
+        .then(updated => { if (updated) setCliente(updated); })
+        .catch(() => {});
     }
     setLoading(false);
   }, []);

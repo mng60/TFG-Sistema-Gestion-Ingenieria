@@ -2,10 +2,10 @@ import React, { useState, useRef } from 'react';
 import { useEmpleadoAuth } from '../context/EmpleadoAuthContext';
 import axios from 'axios';
 import { Camera, Save, Lock, User } from 'lucide-react';
+import { getAvatarSrc } from '../utils/format';
 import '../styles/GestionPages.css';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
 function Perfil() {
   const { empleado, actualizarEmpleado } = useEmpleadoAuth();
@@ -87,7 +87,7 @@ function Perfil() {
     }
   };
 
-  const avatarSrc = empleado?.foto_url ? `${BACKEND_URL}${empleado.foto_url}` : null;
+  const avatarSrc = getAvatarSrc(empleado?.foto_url);
 
   return (
     <div className="gestion-container perfil-page">

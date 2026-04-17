@@ -633,8 +633,20 @@ const updatePerfilCliente = async (req, res) => {
 const uploadAvatarCliente = async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ success: false, message: 'No se subió ningún archivo' });
-    const fotoUrl = `/uploads/avatares/${req.file.filename}`;
     const { pool } = require('../config/database');
+
+    // Borrar avatar anterior de Cloudinary si existe
+    const current = await pool.query('SELECT foto_url FROM clientes WHERE id = $1', [req.user.id]);
+    const oldUrl = current.rows[0]?.foto_url;
+    if (oldUrl?.startsWith('https://res.cloudinary.com')) {
+      const match = oldUrl.match(/\/upload\/(?:v\d+\/)?(.+)\.[^.]+$/);
+      if (match) {
+        const cloudinary = require('cloudinary').v2;
+        cloudinary.uploader.destroy(match[1]).catch(() => {});
+      }
+    }
+
+    const fotoUrl = req.file.path?.startsWith('http') ? req.file.path : `/uploads/avatares/${req.file.filename}`;
     const result = await pool.query(
       'UPDATE clientes SET foto_url = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *',
       [fotoUrl, req.user.id]

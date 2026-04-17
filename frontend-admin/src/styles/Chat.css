@@ -937,6 +937,79 @@
   border-color: #667eea;
 }
 
+.info-panel .info-section {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.info-panel .info-section:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.info-panel .info-section h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1B3A4B;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #f0f0f0;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.info-panel .info-item {
+  gap: 6px;
+}
+
+.info-panel .info-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #1B3A4B;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.info-panel .info-value {
+  color: #1B3A4B;
+  line-height: 1.5;
+}
+
+.info-panel .proyecto-info-card,
+.info-panel .participante-item,
+.info-panel .grupo-item {
+  background: #f8f9fa;
+  border: 1px solid #e8edf2;
+  border-radius: 12px;
+}
+
+.info-panel .participante-item:hover,
+.info-panel .grupo-item:hover {
+  background: #eef2f5;
+}
+
+.info-panel .info-action-btn {
+  background: white;
+  border: 1px solid #e0e0e0;
+  color: #2c3e50;
+}
+
+.info-panel .info-action-btn:hover {
+  background: #f8f9fa;
+  border-color: #1B3A4B;
+}
+
+.info-panel .info-action-btn svg {
+  color: #6c757d;
+}
+
 /* ==================== BOTÓN VOLVER MÓVIL ==================== */
 .chat-mobile-back {
   display: none;

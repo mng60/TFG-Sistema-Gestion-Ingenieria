@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Plus, Paperclip } from 'lucide-react';
 import { formatearFechaLista, getConversationSortDate } from './chatUtils';
-import { getAvatarInitial } from '../../utils/format';
+import { getAvatarInitial, getAvatarSrc } from '../../utils/format';
 
 function ConversationList({ conversaciones, conversacionActiva, onSelectConversacion, onNewConversacion, currentUser, onlineUsers = new Set() }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -27,6 +27,9 @@ function ConversationList({ conversaciones, conversacionActiva, onSelectConversa
       return getAvatarInitial(conversacion.nombre, 'G');
     }
     const other = getOtherParticipant(conversacion);
+    if (getAvatarSrc(other?.foto_url)) {
+      return <img src={getAvatarSrc(other.foto_url)} alt="av" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />;
+    }
     return getAvatarInitial(other?.nombre);
   };
 

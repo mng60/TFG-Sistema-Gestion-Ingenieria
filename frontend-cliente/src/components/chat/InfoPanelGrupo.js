@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Paperclip, FolderOpen } from 'lucide-react';
 import ArchivosPanel from './ArchivosPanel';
-import { getAvatarInitial } from '../../utils/format';
+import { getAvatarInitial, getAvatarSrc } from '../../utils/format';
 
 function InfoPanelGrupo({ conversacion, currentUser, onClose }) {
   const navigate = useNavigate();
@@ -74,8 +74,8 @@ function InfoPanelGrupo({ conversacion, currentUser, onClose }) {
                 >
                   <div className="participante-avatar">
                     <div className="avatar-circle" style={{ width: 34, height: 34, fontSize: '0.85rem' }}>
-                      {participante.foto_url
-                        ? <img src={`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'}${participante.foto_url}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                      {getAvatarSrc(participante.foto_url)
+                        ? <img src={getAvatarSrc(participante.foto_url)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                         : getAvatarInitial(participante.nombre)
                       }
                     </div>
@@ -92,7 +92,7 @@ function InfoPanelGrupo({ conversacion, currentUser, onClose }) {
           <div className="info-section">
             <h3>Acciones rápidas</h3>
             <button className="info-action-btn" onClick={() => setShowArchivos(true)}>
-              <Paperclip size={14} color="grey" /> Ver archivos compartidos
+              <Paperclip size={14} /> Ver archivos compartidos
             </button>
             {proyecto && (
               <button

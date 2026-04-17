@@ -23,6 +23,9 @@ export const AuthProvider = ({ children }) => {
     const token = authService.getToken();
     if (empleadoGuardado && token) {
       setEmpleado(empleadoGuardado);
+      authService.getProfile()
+        .then(updated => { if (updated) setEmpleado(updated); })
+        .catch(() => {});
     }
     setLoading(false);
   }, []);

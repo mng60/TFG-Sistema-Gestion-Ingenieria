@@ -3,6 +3,7 @@ import axios from 'axios';
 import { CalendarClock, ChevronUp, Plus, Trash2 } from 'lucide-react';
 import { useEmpleadoAuth } from '../context/EmpleadoAuthContext';
 import '../styles/ProyectoActualizaciones.css';
+import { getAvatarSrc } from '../utils/format';
 import { formatearFecha, formatearFechaHora } from '../utils/format';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
@@ -108,12 +109,10 @@ function ProyectoActualizaciones({ proyectoId, actualizaciones, isAdmin, onReloa
   };
 
   const getAvatar = (actualizacion) => {
-    const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
-
-    if (actualizacion.empleado_foto) {
+    if (getAvatarSrc(actualizacion.empleado_foto)) {
       return (
         <img
-          src={`${backendUrl}${actualizacion.empleado_foto}`}
+          src={getAvatarSrc(actualizacion.empleado_foto)}
           alt={actualizacion.empleado_nombre}
           className="act-avatar-img"
         />

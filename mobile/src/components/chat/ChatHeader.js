@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import InfoPanel from './InfoPanel';
-import { getAvatarInitial } from '../../utils/format';
+import { getAvatarInitial, getAvatarSrc } from '../../utils/format';
 import { useNavigate } from 'react-router-dom';
 import ConfirmModal from '../common/ConfirmModal';
 import { ArrowLeft } from 'lucide-react';
@@ -93,8 +93,8 @@ function ChatHeader({ conversacion, currentUser, onConversacionEliminada, onBack
           {/* Avatar */}
           <div className="header-avatar">
             <div className="avatar-circle">
-              {otherParticipant?.foto_url
-                ? <img src={`${process.env.REACT_APP_BACKEND_URL || `http://${window.location.hostname}:5000`}${otherParticipant.foto_url}`} alt="av" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+              {getAvatarSrc(otherParticipant?.foto_url)
+                ? <img src={getAvatarSrc(otherParticipant.foto_url)} alt="av" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                 : getAvatarInitial(otherParticipant?.nombre)
               }
             </div>

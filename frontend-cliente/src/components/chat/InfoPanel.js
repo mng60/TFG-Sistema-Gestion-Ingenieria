@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Paperclip, Mail, Phone } from 'lucide-react';
 import ArchivosPanel from './ArchivosPanel';
-import { getAvatarInitial } from '../../utils/format';
+import { getAvatarInitial, getAvatarSrc } from '../../utils/format';
 
 function InfoPanel({ participant, conversacion, currentUser, onClose }) {
   const [infoAdicional, setInfoAdicional] = useState(null);
@@ -43,7 +43,10 @@ function InfoPanel({ participant, conversacion, currentUser, onClose }) {
         <div className="info-panel-content">
           <div className="info-avatar-large">
             <div className="avatar-circle-large">
-              {getAvatarInitial(participant.nombre)}
+              {getAvatarSrc(participant.foto_url)
+                ? <img src={getAvatarSrc(participant.foto_url)} alt="av" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                : getAvatarInitial(participant.nombre)
+              }
             </div>
           </div>
 
@@ -96,7 +99,7 @@ function InfoPanel({ participant, conversacion, currentUser, onClose }) {
           <div className="info-section">
             <h3>Acciones rápidas</h3>
             <button className="info-action-btn" onClick={() => setShowArchivos(true)}>
-              <Paperclip size={14} color="grey" /> Ver archivos compartidos
+              <Paperclip size={14} /> Ver archivos compartidos
             </button>
           </div>
         </div>

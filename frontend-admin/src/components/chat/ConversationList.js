@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Plus } from 'lucide-react';
 import { formatearFechaLista, getConversationSortDate } from './chatUtils';
+import { getAvatarSrc } from '../../utils/format';
 
 function ConversationList({
   conversaciones,
@@ -50,8 +51,8 @@ function ConversationList({
       return conversacion.nombre?.charAt(0).toUpperCase() || 'G';
     }
     const otherParticipant = getOtherParticipant(conversacion);
-    if (otherParticipant?.foto_url) {
-      return <img src={`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'}${otherParticipant.foto_url}`} alt="av" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />;
+    if (getAvatarSrc(otherParticipant?.foto_url)) {
+      return <img src={getAvatarSrc(otherParticipant.foto_url)} alt="av" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />;
     }
     return otherParticipant?.nombre?.charAt(0).toUpperCase() || '?';
   };

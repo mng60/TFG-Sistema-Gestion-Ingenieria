@@ -1,11 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
-import { getAvatarInitial } from '../utils/format';
+import { getAvatarInitial, getAvatarSrc } from '../utils/format';
 import Toast from '../components/Toast';
 import { Camera, Save, Lock, Building2 } from 'lucide-react';
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
 const card = {
   background: 'white', borderRadius: 16, padding: 28,
@@ -110,7 +108,7 @@ function Perfil() {
     }
   };
 
-  const avatarSrc = cliente?.foto_url ? `${BACKEND_URL}${cliente.foto_url}` : null;
+  const avatarSrc = getAvatarSrc(cliente?.foto_url);
 
   return (
     <div style={{ padding: '30px 24px', maxWidth: 1100, margin: '0 auto' }}>

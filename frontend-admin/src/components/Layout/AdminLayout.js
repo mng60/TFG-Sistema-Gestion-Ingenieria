@@ -10,6 +10,7 @@ import {
   UserRoundCog
 } from 'lucide-react';
 import { useEmpleadoAuth } from '../../context/EmpleadoAuthContext';
+import { getAvatarSrc } from '../../utils/format';
 import '../../styles/AdminLayout.css';
 
 function AdminLayout({ children }) {
@@ -191,9 +192,9 @@ function AdminLayout({ children }) {
               title="Ver mi perfil"
             >
               <div className="user-avatar">
-                {empleado?.foto_url
+                {getAvatarSrc(empleado?.foto_url)
                   ? <img
-                      src={`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'}${empleado.foto_url}`}
+                      src={getAvatarSrc(empleado.foto_url)}
                       alt="avatar"
                       style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
                     />

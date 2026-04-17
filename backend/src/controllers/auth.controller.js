@@ -200,7 +200,18 @@ const changePassword = async (req, res) => {
 const uploadAvatar = async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ success: false, message: 'No se subió ningún archivo' });
-    const fotoUrl = `/uploads/avatares/${req.file.filename}`;
+
+    // Borrar avatar anterior de Cloudinary si existe
+    const current = await User.findById(req.user.id);
+    if (current?.foto_url?.startsWith('https://res.cloudinary.com')) {
+      const match = current.foto_url.match(/\/upload\/(?:v\d+\/)?(.+)\.[^.]+$/);
+      if (match) {
+        const cloudinary = require('cloudinary').v2;
+        cloudinary.uploader.destroy(match[1]).catch(() => {});
+      }
+    }
+
+    const fotoUrl = req.file.path?.startsWith('http') ? req.file.path : `/uploads/avatares/${req.file.filename}`;
     const updated = await User.updateFoto(req.user.id, fotoUrl);
     res.json({ success: true, foto_url: fotoUrl, user: updated });
   } catch (error) {

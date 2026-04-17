@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Plus } from 'lucide-react';
 import { formatearFechaLista, getConversationSortDate } from './chatUtils';
-import { getAvatarInitial } from '../../utils/format';
+import { getAvatarInitial, getAvatarSrc } from '../../utils/format';
 
 function ConversationList({
   conversaciones,
@@ -46,15 +46,13 @@ function ConversationList({
     return { text: 'Empleado', color: '#3498db' };
   };
 
-  const BACKEND = process.env.REACT_APP_BACKEND_URL || `http://${window.location.hostname}:5000`;
-
   const getAvatarContent = (conversacion) => {
     if (conversacion.tipo === 'proyecto_grupo') {
       return getAvatarInitial(conversacion.nombre, 'G');
     }
     const otherParticipant = getOtherParticipant(conversacion);
-    if (otherParticipant?.foto_url) {
-      return <img src={`${BACKEND}${otherParticipant.foto_url}`} alt="av" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />;
+    if (getAvatarSrc(otherParticipant?.foto_url)) {
+      return <img src={getAvatarSrc(otherParticipant.foto_url)} alt="av" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />;
     }
     return getAvatarInitial(otherParticipant?.nombre);
   };

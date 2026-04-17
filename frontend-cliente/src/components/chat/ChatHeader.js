@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import InfoPanel from './InfoPanel';
-import { getAvatarInitial } from '../../utils/format';
+import { getAvatarInitial, getAvatarSrc } from '../../utils/format';
 
 function ChatHeader({ conversacion, currentUser, onlineUsers = new Set() }) {
   const [showMenu, setShowMenu] = useState(false);
@@ -23,7 +23,10 @@ function ChatHeader({ conversacion, currentUser, onlineUsers = new Set() }) {
         <div className="chat-header-info">
           <div className="header-avatar">
             <div className="avatar-circle">
-              {getAvatarInitial(otherParticipant?.nombre)}
+              {getAvatarSrc(otherParticipant?.foto_url)
+                ? <img src={getAvatarSrc(otherParticipant.foto_url)} alt="av" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                : getAvatarInitial(otherParticipant?.nombre)
+              }
             </div>
             <div className={`status-indicator ${otherParticipant && onlineUsers.has(`${otherParticipant.user_id}_${otherParticipant.tipo_usuario}`) ? 'online' : ''}`}></div>
           </div>

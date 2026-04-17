@@ -27,7 +27,17 @@ const authService = {
 
   isAuthenticated: () => !!localStorage.getItem('empleado_token'),
 
-  getToken: () => localStorage.getItem('empleado_token')
+  getToken: () => localStorage.getItem('empleado_token'),
+
+  getProfile: async () => {
+    const response = await api.get('/auth/profile');
+    if (response.data.success) {
+      const stored = JSON.parse(localStorage.getItem('empleado') || '{}');
+      const updated = { ...stored, ...response.data.user };
+      localStorage.setItem('empleado', JSON.stringify(updated));
+      return updated;
+    }
+  }
 };
 
 export default authService;
