@@ -246,7 +246,10 @@ const testEmail = async (req, res) => {
     const nodemailer = require('nodemailer');
     const transporter = nodemailer.createTransport({
       service: 'gmail',
-      auth: { user: emailUser, pass: emailPass }
+      auth: { user: emailUser, pass: emailPass },
+      connectionTimeout: 8000,
+      greetingTimeout: 8000,
+      socketTimeout: 8000
     });
 
     const info = await transporter.sendMail({
