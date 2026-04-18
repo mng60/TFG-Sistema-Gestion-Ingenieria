@@ -91,7 +91,7 @@ function AsistenteIA() {
         <div className="chatbot-window">
           <div className="chatbot-header">
             <div className="chatbot-header-info">
-              <div className="chatbot-avatar">Blue</div>
+              <div className="chatbot-avatar">B</div>
               <div>
                 <strong>Blue</strong>
                 <span>Asistente de BlueArc Ingenieria</span>
