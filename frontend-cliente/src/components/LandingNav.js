@@ -64,7 +64,7 @@ function LandingNav() {
               </li>
             </ul>
             <div className="nav-overlay-footer">
-              <p>info@bluearc-energy.com</p>
+              <p>bluearc.ingenieria@gmail.com</p>
               <p>+34 900 123 456</p>
             </div>
           </div>

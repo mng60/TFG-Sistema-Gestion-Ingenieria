@@ -62,7 +62,7 @@ function Contacto() {
           <div className="contacto-datos">
             <div className="dato-bloque">
               <span className="dato-label">Email</span>
-              <span>info@bluearc-energy.com</span>
+              <span>bluearc.ingenieria@gmail.com</span>
             </div>
             <div className="dato-bloque">
               <span className="dato-label">Teléfono</span>
@@ -70,7 +70,7 @@ function Contacto() {
             </div>
             <div className="dato-bloque">
               <span className="dato-label">Dirección</span>
-              <span>Polígono Industrial Norte, Nave 12<br />28000 Madrid, España</span>
+              <span>Polígono Industrial Oeste, Calle del Acero 14, Nave 3<br />30169 San Ginés, Murcia, España</span>
             </div>
             <div className="dato-bloque">
               <span className="dato-label">Horario</span>
