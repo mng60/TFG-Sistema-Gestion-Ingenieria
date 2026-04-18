@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Download, X } from 'lucide-react';
 import { downloadUrlToDevice } from '../../utils/nativeDownloads';
 
-function ImageViewer({ imageUrl, imageName, onClose }) {
+function ImageViewer({ imageUrl, imageName, downloadUrl, onClose }) {
   const [downloading, setDownloading] = useState(false);
 
   const handleDownload = async (e) => {
@@ -10,7 +10,7 @@ function ImageViewer({ imageUrl, imageName, onClose }) {
     setDownloading(true);
     try {
       await downloadUrlToDevice({
-        url: imageUrl,
+        url: downloadUrl || imageUrl,
         fileName: imageName || 'imagen',
         category: 'image'
       });

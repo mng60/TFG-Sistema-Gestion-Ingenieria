@@ -11,6 +11,7 @@ const authAnyMiddleware = require('../middlewares/authAny.middleware');
 const Conversacion = require('../models/Conversacion');
 const Mensaje = require('../models/Mensaje');
 const { uploadChat } = require('../config/multer');
+const { sendStoredFile } = require('../utils/fileDelivery');
 
 const router = express.Router();
 
@@ -28,6 +29,47 @@ router.get('/conversaciones/:conversacionId', getConversacionById);
 
 // GET /api/chat/mensajes/:conversacionId - Obtener mensajes de una conversación
 router.get('/mensajes/:conversacionId', getMensajes);
+
+router.get('/mensajes/:mensajeId/file', async (req, res) => {
+  try {
+    const { mensajeId } = req.params;
+    const usuario = req.user;
+    const pool = require('../config/database').pool;
+
+    const messageResult = await pool.query(
+      `SELECT id, conversacion_id, archivo_url, archivo_nombre
+       FROM mensajes
+       WHERE id = $1
+         AND archivo_url IS NOT NULL
+         AND is_deleted = FALSE`,
+      [mensajeId]
+    );
+
+    if (messageResult.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Archivo no encontrado' });
+    }
+
+    const mensaje = messageResult.rows[0];
+
+    const participanteQuery = await pool.query(
+      'SELECT 1 FROM conversacion_participantes WHERE conversacion_id = $1 AND user_id = $2 AND tipo_usuario = $3',
+      [mensaje.conversacion_id, usuario.id, usuario.tipo_usuario]
+    );
+
+    if (participanteQuery.rows.length === 0) {
+      return res.status(403).json({ success: false, message: 'No tienes acceso a este archivo' });
+    }
+
+    await sendStoredFile(res, mensaje.archivo_url, mensaje.archivo_nombre);
+  } catch (error) {
+    console.error('Error al descargar archivo del chat:', error);
+    res.status(error.status || 500).json({
+      success: false,
+      message: error.status === 404 ? 'Archivo no encontrado' : 'Error al descargar el archivo',
+      error: error.message
+    });
+  }
+});
 
 // POST /api/chat/mensajes - Enviar mensaje
 router.post('/mensajes', sendMensaje);

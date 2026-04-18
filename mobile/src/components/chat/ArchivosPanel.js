@@ -56,11 +56,9 @@ function ArchivosPanel({ conversacionId, onClose }) {
   };
 
   const handleDescargar = async (archivo) => {
-    const url = getFullUrl(archivo.archivo_url);
-
     try {
       await downloadUrlToDevice({
-        url,
+        url: `/api/chat/mensajes/${archivo.id}/file`,
         fileName: archivo.archivo_nombre,
         category: archivo.tipo_mensaje === 'audio' ? 'audio' : 'document'
       });
@@ -227,6 +225,7 @@ function ArchivosPanel({ conversacionId, onClose }) {
       <ImageViewer
         imageUrl={getFullUrl(imagenSeleccionada.archivo_url)}
         imageName={imagenSeleccionada.archivo_nombre}
+        downloadUrl={`/api/chat/mensajes/${imagenSeleccionada.id}/file`}
         onClose={() => setImagenSeleccionada(null)}
       />
     )}

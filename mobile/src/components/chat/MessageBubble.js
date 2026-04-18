@@ -56,10 +56,9 @@ function MessageBubble({ mensaje, isOwn, conversacion }) {
             className="message-file"
             onClick={async (e) => {
               e.stopPropagation();
-              const url = getFullUrl(mensaje.archivo_url);
               try {
                 await downloadUrlToDevice({
-                  url,
+                  url: `/api/chat/mensajes/${mensaje.id}/file`,
                   fileName: mensaje.archivo_nombre || 'archivo',
                   category: 'document'
                 });
@@ -101,6 +100,7 @@ function MessageBubble({ mensaje, isOwn, conversacion }) {
               <ImageViewer
                 imageUrl={getFullUrl(mensaje.archivo_url)}
                 imageName={mensaje.archivo_nombre}
+                downloadUrl={`/api/chat/mensajes/${mensaje.id}/file`}
                 onClose={() => setShowImageViewer(false)}
               />
             )}

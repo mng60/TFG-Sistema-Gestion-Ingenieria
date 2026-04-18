@@ -6,6 +6,7 @@ const {
   getDocumentosByProyecto,
   uploadDocumento,
   downloadDocumento,
+  downloadDocumentoFile,
   streamDocumento,
   updateDocumento,
   deleteDocumento,
@@ -45,6 +46,9 @@ router.get('/', getAllDocumentos);
 
 // GET /api/documentos/proyecto/:proyectoId - Obtener documentos de un proyecto
 router.get('/proyecto/:proyectoId', getDocumentosByProyecto);
+
+// GET /api/documentos/:id/file - Descargar el archivo real (flujo móvil)
+router.get('/:id/file', downloadDocumentoFile);
 
 // GET /api/documentos/:id - Obtener un documento por ID
 router.get('/:id', getDocumentoById);

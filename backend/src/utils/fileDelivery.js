@@ -1,9 +1,13 @@
 const fs = require('fs');
 const path = require('path');
+const http = require('http');
+const https = require('https');
 const jwt = require('jsonwebtoken');
 const cloudinary = require('cloudinary').v2;
+const { pipeline } = require('stream');
 
 const isRemoteFile = (filePath = '') => /^https?:\/\//i.test(filePath);
+const MAX_REDIRECTS = 5;
 
 // Extracts { publicId, resourceType } from a Cloudinary delivery URL.
 // For image/video types the public_id has no extension; raw types keep it.
@@ -63,6 +67,63 @@ const sendLocalFile = (res, filePath, downloadName) =>
     res.download(filePath, safeName, (err) => (err ? reject(err) : resolve()));
   });
 
+const streamRemoteFile = (res, fileUrl, downloadName, redirectCount = 0) =>
+  new Promise((resolve, reject) => {
+    if (redirectCount > MAX_REDIRECTS) {
+      const error = new Error('Demasiadas redirecciones al descargar el archivo remoto');
+      error.status = 502;
+      reject(error);
+      return;
+    }
+
+    const client = fileUrl.startsWith('https://') ? https : http;
+
+    const request = client.get(fileUrl, (remoteResponse) => {
+      if (
+        remoteResponse.statusCode >= 300 &&
+        remoteResponse.statusCode < 400 &&
+        remoteResponse.headers.location
+      ) {
+        remoteResponse.resume();
+        const redirectUrl = new URL(remoteResponse.headers.location, fileUrl).toString();
+        resolve(streamRemoteFile(res, redirectUrl, downloadName, redirectCount + 1));
+        return;
+      }
+
+      if (remoteResponse.statusCode !== 200) {
+        remoteResponse.resume();
+        const error = new Error(`El archivo remoto devolvió ${remoteResponse.statusCode}`);
+        error.status = remoteResponse.statusCode === 404 ? 404 : 502;
+        reject(error);
+        return;
+      }
+
+      const safeName = (downloadName || 'archivo').replace(/["\r\n]/g, '_');
+      res.setHeader('Content-Disposition', `attachment; filename="${safeName}"; filename*=UTF-8''${encodeURIComponent(safeName)}`);
+      res.setHeader('Content-Type', remoteResponse.headers['content-type'] || 'application/octet-stream');
+
+      if (remoteResponse.headers['content-length']) {
+        res.setHeader('Content-Length', remoteResponse.headers['content-length']);
+      }
+
+      pipeline(remoteResponse, res, (error) => (error ? reject(error) : resolve()));
+    });
+
+    request.on('error', reject);
+  });
+
+const sendStoredFile = async (res, filePath, downloadName) => {
+  if (!isRemoteFile(filePath)) {
+    return sendLocalFile(res, filePath, downloadName);
+  }
+
+  const remoteUrl = filePath.includes('res.cloudinary.com')
+    ? getCloudinaryDownloadUrl(filePath, downloadName)
+    : filePath;
+
+  return streamRemoteFile(res, remoteUrl, downloadName);
+};
+
 module.exports = {
   isRemoteFile,
   parseCloudinaryUrl,
@@ -71,4 +132,5 @@ module.exports = {
   getLocalDownloadToken,
   verifyLocalDownloadToken,
   sendLocalFile,
+  sendStoredFile,
 };

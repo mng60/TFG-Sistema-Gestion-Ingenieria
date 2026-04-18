@@ -9,6 +9,7 @@ const {
   getLocalDownloadToken,
   verifyLocalDownloadToken,
   sendLocalFile,
+  sendStoredFile,
 } = require('../utils/fileDelivery');
 
 // Obtener todos los documentos
@@ -188,6 +189,27 @@ const downloadDocumento = async (req, res) => {
   }
 };
 
+// Stream autenticado del archivo para la app móvil
+const downloadDocumentoFile = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const documento = await Documento.findById(id);
+
+    if (!documento) {
+      return res.status(404).json({ success: false, message: 'Documento no encontrado' });
+    }
+
+    await sendStoredFile(res, documento.ruta_archivo, documento.nombre);
+  } catch (error) {
+    console.error('Error en downloadDocumentoFile:', error);
+    res.status(error.status || 500).json({
+      success: false,
+      message: error.status === 404 ? 'Archivo no encontrado' : 'Error al descargar documento',
+      error: error.message
+    });
+  }
+};
+
 // Stream de archivo local protegido con token de un solo uso (solo para rutas locales)
 const streamDocumento = async (req, res) => {
   try {
@@ -201,7 +223,7 @@ const streamDocumento = async (req, res) => {
     const documento = await Documento.findById(id);
     if (!documento) return res.status(404).json({ success: false, message: 'Documento no encontrado' });
 
-    await sendLocalFile(res, documento.ruta_archivo, documento.nombre);
+    await sendStoredFile(res, documento.ruta_archivo, documento.nombre);
   } catch (error) {
     console.error('Error en streamDocumento:', error);
     res.status(error.status || 500).json({ success: false, message: error.message });
@@ -312,6 +334,7 @@ module.exports = {
   getDocumentosByProyecto,
   uploadDocumento,
   downloadDocumento,
+  downloadDocumentoFile,
   streamDocumento,
   updateDocumento,
   deleteDocumento,
