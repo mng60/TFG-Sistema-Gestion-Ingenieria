@@ -84,26 +84,6 @@ function ChatLayout() {
     }
   };
 
-  // Abrir conversación específica cuando se llega desde una push notification
-  useEffect(() => {
-    if (!conversaciones.length) return;
-    const pendingId = sessionStorage.getItem('push_open_conversacion_id');
-    if (!pendingId) return;
-    sessionStorage.removeItem('push_open_conversacion_id');
-    const conv = conversaciones.find(c => String(c.id) === String(pendingId));
-    if (conv) handleSelectConversacion(conv);
-  }, [conversaciones, handleSelectConversacion]);
-
-  // Escuchar navegación desde push mientras el chat ya está abierto
-  useEffect(() => {
-    const prev = window.__pushNavigateToChat;
-    window.__pushNavigateToChat = (conversacionId) => {
-      const conv = conversaciones.find(c => String(c.id) === String(conversacionId));
-      if (conv) handleSelectConversacion(conv);
-    };
-    return () => { window.__pushNavigateToChat = prev; };
-  }, [conversaciones, handleSelectConversacion]);
-
   const handleSelectConversacion = useCallback((conv) => {
     if (activeViewRef.current !== 'window') {
       window.history.pushState(
@@ -192,6 +172,25 @@ function ChatLayout() {
     setConversacionActiva(realConv);
     cargarConversaciones();
   }, []);
+
+  // Abrir conversación específica al llegar desde una push notification
+  useEffect(() => {
+    if (!conversaciones.length) return;
+    const pendingId = sessionStorage.getItem('push_open_conversacion_id');
+    if (!pendingId) return;
+    sessionStorage.removeItem('push_open_conversacion_id');
+    const conv = conversaciones.find(c => String(c.id) === String(pendingId));
+    if (conv) handleSelectConversacion(conv);
+  }, [conversaciones, handleSelectConversacion]);
+
+  // Registrar navegador de push mientras el chat está abierto
+  useEffect(() => {
+    window.__pushNavigateToChat = (conversacionId) => {
+      const conv = conversaciones.find(c => String(c.id) === String(conversacionId));
+      if (conv) handleSelectConversacion(conv);
+    };
+    return () => { window.__pushNavigateToChat = null; };
+  }, [conversaciones, handleSelectConversacion]);
 
   return (
     <div className="chat-layout-mobile">
