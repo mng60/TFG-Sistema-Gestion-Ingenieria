@@ -117,11 +117,7 @@ const sendStoredFile = async (res, filePath, downloadName) => {
     return sendLocalFile(res, filePath, downloadName);
   }
 
-  const remoteUrl = filePath.includes('res.cloudinary.com')
-    ? getCloudinaryDownloadUrl(filePath, downloadName)
-    : filePath;
-
-  return streamRemoteFile(res, remoteUrl, downloadName);
+  return streamRemoteFile(res, filePath, downloadName);
 };
 
 module.exports = {
