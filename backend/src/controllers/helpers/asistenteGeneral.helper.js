@@ -17,7 +17,7 @@ function extraerPreguntaSinSaludo(pregunta) {
 // ── Fecha / hora ─────────────────────────────────────────────────────────────
 function esConsultaFechaHora(pregunta) {
   const t = normalizarTextoPlano(pregunta);
-  return /que dia es|que fecha|que hora es|que horas son|en que mes|que dia de la semana|fecha de hoy|hoy que dia|dia de hoy|hora actual|hora ahora|que ano|que year/.test(t);
+  return /que dia es|que fecha|que hora es|que horas son|en que mes|que dia de la semana|fecha de hoy|hoy que dia|dia de hoy|hora actual|hora ahora|que ano|que year|dia y hora|hora y dia/.test(t);
 }
 
 function construirRespuestaFechaHora(pregunta) {
@@ -52,8 +52,8 @@ async function construirRespuestaTiempo() {
   }
   try {
     const res  = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=Murcia,ES&appid=${apiKey}&units=metric&lang=es`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    if (data.cod !== 200) throw new Error('api error');
 
     const desc     = data.weather[0].description;
     const temp     = Math.round(data.main.temp);
@@ -118,7 +118,7 @@ function esConsultaCapacidades(pregunta) {
 }
 
 function construirRespuestaCapacidades() {
-  return 'Soy el asistente de BlueArc Ingenieria. Puedo responder sobre instalaciones electricas, precios orientativos, normativa tecnica, calcular paneles solares, decirte el precio de la luz ahora mismo, darte la fecha y hora, y contarte el tiempo en Murcia. Para todo lo demas, contacta con el equipo.';
+  return 'Soy Blue, el asistente de BlueArc Ingenieria. Puedo responder sobre instalaciones electricas, precios orientativos, normativa tecnica, calcular paneles solares, decirte el precio de la luz ahora mismo, darte la fecha y hora, y contarte el tiempo en Murcia. Para todo lo demas, contacta con el equipo.';
 }
 
 // ── Easter egg: jerga / emoticonos ───────────────────────────────────────────

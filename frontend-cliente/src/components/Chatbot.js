@@ -141,10 +141,10 @@ function Chatbot() {
           {/* Header sin botón X */}
           <div className="chatbot-header">
             <div className="chatbot-header-info">
-              <div className="chatbot-avatar">BE</div>
+              <div className="chatbot-avatar">Blue</div>
               <div>
-                <strong>BlueArc Asistente</strong>
-                <span>Respuesta inmediata</span>
+                <strong>Blue</strong>
+                <span>Asistente de BlueArc Ingenieria</span>
               </div>
             </div>
           </div>

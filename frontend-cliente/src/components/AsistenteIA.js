@@ -4,7 +4,7 @@ import Chatbot from './Chatbot';
 import api from '../services/api';
 import '../styles/AsistenteIA.css';
 
-const MSG_BIENVENIDA = 'Hola. Soy el asistente de BlueArc Ingenieria. Puedo ayudarte con dudas sobre servicios, precios orientativos o normativa electrica. En que puedo ayudarte?';
+const MSG_BIENVENIDA = 'Hola, soy Blue, el asistente de BlueArc Ingenieria. Puedo ayudarte con instalaciones electricas, precios orientativos, normativa, calcular paneles solares, decirte el precio de la luz ahora mismo o el tiempo en Murcia. En que puedo ayudarte?';
 
 function AsistenteIA() {
   const [isOpen, setIsOpen] = useState(false);
@@ -91,10 +91,10 @@ function AsistenteIA() {
         <div className="chatbot-window">
           <div className="chatbot-header">
             <div className="chatbot-header-info">
-              <div className="chatbot-avatar">BE</div>
+              <div className="chatbot-avatar">Blue</div>
               <div>
-                <strong>BlueArc Asistente</strong>
-                <span>Preguntame lo que quieras</span>
+                <strong>Blue</strong>
+                <span>Asistente de BlueArc Ingenieria</span>
               </div>
             </div>
             <button className="asistente-header-close" onClick={() => setIsOpen(false)} title="Cerrar">
