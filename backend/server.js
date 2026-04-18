@@ -8,6 +8,8 @@ const { testConnection } = require('./src/config/database');
 const { initializeSocket } = require('./src/config/socket');
 const { startCleanupJob } = require('./src/jobs/cleanupChats');
 const { startPrecioEnergiaJob } = require('./src/jobs/precioEnergia.job');
+const { initializeFirebase } = require('./src/config/firebase');
+const FcmToken = require('./src/models/FcmToken');
 require('dotenv').config();
 
 const app = express();
@@ -79,6 +81,7 @@ app.use('/api/tickets', require('./src/routes/ticket.routes'));
 app.use('/api/dashboard', require('./src/routes/dashboard.routes'));
 app.use('/api/proyectos/:id/actualizaciones', require('./src/routes/actualizacion.routes'));
 app.use('/api/asistente', require('./src/routes/asistente.routes'));
+app.use('/api/notifications', require('./src/routes/notification.routes'));
 
 // Manejo de errores 404
 app.use((req, res) => {
@@ -97,6 +100,10 @@ const startServer = async () => {
     console.error('❌ No se pudo conectar a la base de datos. Verifica la configuración.');
     process.exit(1);
   }
+
+  // Inicializar Firebase Admin SDK (push notifications)
+  initializeFirebase();
+  await FcmToken.ensureTable();
 
   // Arrancar job de limpieza de chats expirados
   startCleanupJob();

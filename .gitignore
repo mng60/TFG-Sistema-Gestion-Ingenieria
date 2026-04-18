@@ -144,3 +144,9 @@ uploads/
 # Configuracion local de asistentes
 .claude/
 .codex/
+
+# Credenciales Firebase (NO subir al repo)
+backend/firebase-service-account.json
+**/google-services.json
+backend/firebase-service-account.json
+**/google-services.json

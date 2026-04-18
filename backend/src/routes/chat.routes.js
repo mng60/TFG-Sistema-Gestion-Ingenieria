@@ -12,6 +12,7 @@ const Conversacion = require('../models/Conversacion');
 const Mensaje = require('../models/Mensaje');
 const { uploadChat } = require('../config/multer');
 const { sendStoredFile } = require('../utils/fileDelivery');
+const { sendChatPush } = require('../services/pushNotificationService');
 
 const router = express.Router();
 
@@ -337,6 +338,14 @@ router.post('/upload', (req, res, next) => {
     // Emitir via Socket.io
     const io = req.app.get('io');
     io.to(`conversacion_${conversacion_id}`).emit('new_message', mensajeCompleto);
+
+    // Push notification a participantes
+    sendChatPush({
+      conversacion,
+      mensajeCompleto,
+      senderUserId: usuario.id,
+      senderTipoUsuario: usuario.tipo_usuario
+    }).catch(err => console.error('Push error (upload):', err));
 
     console.log(`✅ Archivo subido: ${file.originalname} (${(file.size / 1024).toFixed(2)} KB)`);
 

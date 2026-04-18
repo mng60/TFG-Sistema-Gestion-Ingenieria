@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { Capacitor } from '@capacitor/core';
@@ -11,6 +11,8 @@ import Proyectos from './pages/Proyectos';
 import ProyectoCompleto from './pages/ProyectoCompleto';
 import Chat from './pages/Chat';
 import Perfil from './pages/Perfil';
+import InAppNotificationBanner from './components/InAppNotificationBanner';
+import { registerPushNotifications, unregisterPushToken } from './services/pushService';
 import './styles/App.css';
 
 function ProtectedRoute({ children }) {
@@ -92,6 +94,29 @@ function StatusBarManager() {
   return null;
 }
 
+function PushManager({ onNotification }) {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    // Expose navigate so pushNotificationActionPerformed can use it
+    window.__pushNavigateToChat = (conversacionId) => {
+      sessionStorage.setItem('push_open_conversacion_id', conversacionId);
+      navigate('/chat');
+    };
+
+    registerPushNotifications(onNotification);
+
+    return () => {
+      window.__pushNavigateToChat = null;
+    };
+  }, [isAuthenticated, navigate, onNotification]);
+
+  return null;
+}
+
 function BackButtonManager() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -152,6 +177,11 @@ function BackButtonManager() {
 
 function App() {
   const [splashDone, setSplashDone] = useState(false);
+  const [inAppNotification, setInAppNotification] = useState(null);
+
+  const handleNotification = useCallback((notification) => {
+    setInAppNotification(notification);
+  }, []);
 
   return (
     <AuthProvider>
@@ -162,6 +192,11 @@ function App() {
           <StatusBarManager />
           <BackButtonManager />
           <KeyboardManager />
+          <PushManager onNotification={handleNotification} />
+          <InAppNotificationBanner
+            notification={inAppNotification}
+            onDismiss={() => setInAppNotification(null)}
+          />
 
           <Routes>
             <Route path="/" element={<Navigate to="/login" />} />

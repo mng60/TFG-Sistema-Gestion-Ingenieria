@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const Mensaje = require('../models/Mensaje');
 const Conversacion = require('../models/Conversacion');
+const { sendChatPush } = require('../services/pushNotificationService');
 
 // Mapa de usuarios conectados: userKey -> Set(socketId)
 const connectedUsers = new Map();
@@ -125,6 +126,14 @@ const initializeSocket = (io) => {
 
         // Emitir a todos los participantes de la conversación
         io.to(`conversacion_${conversacion_id}`).emit('new_message', mensajeCompleto);
+
+        // Push notification a participantes
+        sendChatPush({
+          conversacion,
+          mensajeCompleto,
+          senderUserId: socket.userId,
+          senderTipoUsuario: socket.tipoUsuario
+        }).catch(err => console.error('Push error (socket):', err));
 
       } catch (error) {
         console.error('Error al enviar mensaje:', error);
