@@ -1,19 +1,24 @@
 import React, { useState } from 'react';
-import { Download, X } from 'lucide-react';
-import { downloadUrlToDevice } from '../../utils/nativeDownloads';
+import { Download, X, Check } from 'lucide-react';
+import { downloadUrlToDevice, getDownloadLocationLabel } from '../../utils/nativeDownloads';
 
 function ImageViewer({ imageUrl, imageName, downloadUrl, onClose }) {
   const [downloading, setDownloading] = useState(false);
+  const [savedLabel, setSavedLabel] = useState(null);
 
   const handleDownload = async (e) => {
     e.stopPropagation();
     setDownloading(true);
+    setSavedLabel(null);
     try {
-      await downloadUrlToDevice({
+      const result = await downloadUrlToDevice({
         url: downloadUrl || imageUrl,
         fileName: imageName || 'imagen',
         category: 'image'
       });
+      const label = getDownloadLocationLabel(result?.category || 'image');
+      setSavedLabel(label);
+      setTimeout(() => setSavedLabel(null), 3000);
     } catch (err) {
       console.error('Error al descargar imagen:', err);
       alert('Error al descargar la imagen');
@@ -30,9 +35,13 @@ function ImageViewer({ imageUrl, imageName, downloadUrl, onClose }) {
           <button
             className="btn-download-image"
             onClick={handleDownload}
-            disabled={downloading}
+            disabled={downloading || !!savedLabel}
           >
-            {downloading ? '⏳ Descargando...' : <Download size={20} />}
+            {downloading
+              ? '⏳'
+              : savedLabel
+                ? <><Check size={16} style={{ verticalAlign: 'middle' }} /> {savedLabel}</>
+                : <Download size={20} />}
           </button>
           <button className="btn-close-viewer" onClick={onClose}>
             <X size={29}/>

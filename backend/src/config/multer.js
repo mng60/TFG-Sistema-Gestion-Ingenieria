@@ -48,8 +48,8 @@ const createStorage = (folder) => {
       params: {
         folder: `tfg/${folder}`,
         resource_type: 'auto',
-        allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf', 'doc', 'docx',
-          'xls', 'xlsx', 'dwg', 'dxf', 'zip', 'rar', 'txt', 'mp3', 'wav', 'ogg', 'm4a', 'webm', 'mp4'],
+        // allowed_formats removed: it only works for image/video, not raw (docx, xlsx, dwg…).
+        // Format validation is handled by fileFilter before the upload reaches Cloudinary.
       },
     });
   }

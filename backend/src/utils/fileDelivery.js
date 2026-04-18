@@ -20,12 +20,14 @@ const parseCloudinaryUrl = (url) => {
   return { publicId, resourceType };
 };
 
-// Inserts fl_attachment directly into the stored URL — no SDK signing needed since
-// files are uploaded as type:upload (public). sign_url+expires_at+flags together
-// generate a broken signature in the Cloudinary Node SDK.
+// Inserts fl_attachment into the stored URL — no SDK signing needed (files are public type:upload).
+// Cloudinary only allows [a-zA-Z0-9_-] in attachment names; dots cause a 400 error.
+// Extension is stripped because Cloudinary appends the original resource format automatically.
 const getCloudinaryDownloadUrl = (url, filename) => {
-  const safeFilename = (filename || 'archivo').replace(/[^a-zA-Z0-9._-]/g, '_');
-  return url.replace('/upload/', `/upload/fl_attachment:${safeFilename}/`);
+  const baseName = (filename || 'archivo')
+    .replace(/\.[^.]+$/, '')         // strip extension (Cloudinary adds it from the resource format)
+    .replace(/[^a-zA-Z0-9_-]/g, '_'); // only alphanumeric, underscore, dash — no dots
+  return url.replace('/upload/', `/upload/fl_attachment:${baseName}/`);
 };
 
 const deleteCloudinaryFile = async (url) => {
