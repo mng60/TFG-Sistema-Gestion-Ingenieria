@@ -162,6 +162,15 @@ const deleteUser = async (req, res) => {
       });
     }
 
+    // Proteger cuenta de testing principal
+    const target = await User.findById(id);
+    if (target?.email === 'miguel@test.com') {
+      return res.status(403).json({
+        success: false,
+        message: 'Este usuario está protegido y no puede eliminarse'
+      });
+    }
+
     const deletedUser = await User.delete(id);
 
     if (!deletedUser) {

@@ -135,6 +135,11 @@ function Usuarios() {
       return;
     }
 
+    if (usuario.email === 'miguel@test.com') {
+      showToast('no puedes uwu', 'error');
+      return;
+    }
+
     setConfirmModal({
       title: '⚠️ Eliminar Usuario',
       message: `¿Eliminar al usuario "${usuario.nombre}"? Esta acción no se puede deshacer.`,
