@@ -1,5 +1,5 @@
 import api from './api';
-import { downloadAxiosBlobToDevice } from '../utils/nativeDownloads';
+import { downloadUrlToDevice } from '../utils/nativeDownloads';
 
 const documentoService = {
   getByProyecto: async (proyectoId) => {
@@ -13,10 +13,12 @@ const documentoService = {
   },
 
   descargar: async (documento) => {
-    const response = await api.get(`/documentos/${documento.id}/file`, {
-      responseType: 'blob'
+    const { data } = await api.get(`/documentos/${documento.id}/download`);
+    return downloadUrlToDevice({
+      url: data.downloadUrl,
+      fileName: documento.nombre,
+      category: 'document'
     });
-    return downloadAxiosBlobToDevice(response, documento.nombre, 'document');
   },
 
   setAccesoEmpleados: async (id, userIds) => {

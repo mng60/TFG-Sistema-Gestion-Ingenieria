@@ -20,19 +20,12 @@ const parseCloudinaryUrl = (url) => {
   return { publicId, resourceType };
 };
 
+// Inserts fl_attachment directly into the stored URL — no SDK signing needed since
+// files are uploaded as type:upload (public). sign_url+expires_at+flags together
+// generate a broken signature in the Cloudinary Node SDK.
 const getCloudinaryDownloadUrl = (url, filename) => {
-  const parsed = parseCloudinaryUrl(url);
-  if (!parsed) return url;
-  const { publicId, resourceType } = parsed;
   const safeFilename = (filename || 'archivo').replace(/[^a-zA-Z0-9._-]/g, '_');
-  return cloudinary.url(publicId, {
-    resource_type: resourceType,
-    type: 'upload',
-    sign_url: true,
-    expires_at: Math.floor(Date.now() / 1000) + 300,
-    flags: `attachment:${safeFilename}`,
-    secure: true,
-  });
+  return url.replace('/upload/', `/upload/fl_attachment:${safeFilename}/`);
 };
 
 const deleteCloudinaryFile = async (url) => {
