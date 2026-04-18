@@ -96,8 +96,8 @@ const resetPasswordTicket = async (req, res) => {
 
     await Ticket.resolver(id, req.user.id);
 
-    // Enviar nueva contraseña al email personal si está configurado
-    sendPasswordReset({ to: emailPersonal, nombre, newPassword, tipoUsuario: ticket.tipo_usuario }).catch(() => {});
+    // Enviar nueva contraseña al email_personal si existe, sino al email del ticket
+    sendPasswordReset({ to: emailPersonal || ticket.email, nombre, newPassword, tipoUsuario: ticket.tipo_usuario }).catch(() => {});
 
     res.json({ success: true, message: 'Contraseña reseteada y ticket resuelto' });
   } catch (error) {

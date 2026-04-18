@@ -43,10 +43,11 @@ const activarAccesoCliente = async (req, res) => {
 
     const clienteActivado = result.rows[0];
 
-    // Enviar email de bienvenida al email_personal si está configurado
-    if (cliente.email_personal) {
+    // Enviar email de bienvenida al email_personal si existe, sino al email de login
+    const destinoBienvenida = cliente.email_personal || cliente.email;
+    if (destinoBienvenida) {
       sendBienvenidaPortal({
-        to: cliente.email_personal,
+        to: destinoBienvenida,
         nombreEmpresa: cliente.nombre_empresa,
         emailLogin: cliente.email,
         password,
@@ -385,10 +386,10 @@ const aceptarMiPresupuesto = async (req, res) => {
       );
       const info = infoRow.rows[0];
       if (info) {
-        const adminsRes = await pool.query('SELECT email_personal FROM users WHERE rol = $1 AND email_personal IS NOT NULL', ['admin']);
-        adminsRes.rows.forEach(({ email_personal }) => {
+        const adminsRes = await pool.query('SELECT COALESCE(email_personal, email) AS dest FROM users WHERE rol = $1', ['admin']);
+        adminsRes.rows.forEach(({ dest }) => {
           sendPresupuestoAceptado({
-            to: email_personal,
+            to: dest,
             nombreEmpresa: info.nombre_empresa,
             nombreProyecto: info.proyecto_nombre,
             numeroPresupuesto: info.numero_presupuesto,
@@ -451,10 +452,10 @@ const rechazarMiPresupuesto = async (req, res) => {
       );
       const info = infoRow.rows[0];
       if (info) {
-        const adminsRes = await pool.query('SELECT email_personal FROM users WHERE rol = $1 AND email_personal IS NOT NULL', ['admin']);
-        adminsRes.rows.forEach(({ email_personal }) => {
+        const adminsRes = await pool.query('SELECT COALESCE(email_personal, email) AS dest FROM users WHERE rol = $1', ['admin']);
+        adminsRes.rows.forEach(({ dest }) => {
           sendPresupuestoRechazado({
-            to: email_personal,
+            to: dest,
             nombreEmpresa: info.nombre_empresa,
             nombreProyecto: info.proyecto_nombre,
             numeroPresupuesto: info.numero_presupuesto

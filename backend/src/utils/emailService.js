@@ -1,10 +1,8 @@
-const { Resend } = require('resend');
+const BREVO_API_KEY = process.env.BREVO_API_KEY;
+const SENDER_EMAIL = process.env.EMAIL_FROM_ADDRESS || 'bluearc.ingenieria@gmail.com';
+const SENDER_NAME  = process.env.EMAIL_FROM_NAME    || 'BlueArc Ingeniería';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-const FROM = process.env.EMAIL_FROM || 'BlueArc Ingeniería <onboarding@resend.dev>';
-
-const emailEnabled = () => !!process.env.RESEND_API_KEY;
+const emailEnabled = () => !!BREVO_API_KEY;
 
 async function sendMail({ to, subject, html }) {
   if (!emailEnabled()) {
@@ -13,12 +11,24 @@ async function sendMail({ to, subject, html }) {
   }
   if (!to) return;
   try {
-    const replyTo = process.env.EMAIL_REPLY_TO || undefined;
-    const { data, error } = await resend.emails.send({ from: FROM, to: [to], subject, html, ...(replyTo && { reply_to: replyTo }) });
-    if (error) {
-      console.error(`[EMAIL ERROR] No se pudo enviar a ${to}:`, error.message);
+    const replyTo = process.env.EMAIL_REPLY_TO;
+    const body = {
+      sender:      { name: SENDER_NAME, email: SENDER_EMAIL },
+      to:          [{ email: to }],
+      subject,
+      htmlContent: html,
+      ...(replyTo && { replyTo: { email: replyTo } })
+    };
+    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method:  'POST',
+      headers: { 'api-key': BREVO_API_KEY, 'Content-Type': 'application/json' },
+      body:    JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      console.error(`[EMAIL ERROR] No se pudo enviar a ${to}:`, data.message || res.status);
     } else {
-      console.log(`[EMAIL] Enviado a ${to}: ${subject} (id: ${data.id})`);
+      console.log(`[EMAIL] Enviado a ${to}: ${subject} (messageId: ${data.messageId})`);
     }
   } catch (err) {
     console.error(`[EMAIL ERROR] No se pudo enviar a ${to}:`, err.message);
