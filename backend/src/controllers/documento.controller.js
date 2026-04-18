@@ -2,6 +2,14 @@ const Documento = require('../models/Documento');
 const Proyecto = require('../models/Proyecto');
 const path = require('path');
 const fs = require('fs');
+const {
+  isRemoteFile,
+  getCloudinaryDownloadUrl,
+  deleteCloudinaryFile,
+  getLocalDownloadToken,
+  verifyLocalDownloadToken,
+  sendLocalFile,
+} = require('../utils/fileDelivery');
 
 // Obtener todos los documentos
 const getAllDocumentos = async (req, res) => {
@@ -156,39 +164,47 @@ const uploadDocumento = async (req, res) => {
   }
 };
 
-// Descargar documento
+// Descargar documento — devuelve { downloadUrl } para que el cliente descargue directamente
 const downloadDocumento = async (req, res) => {
   try {
     const { id } = req.params;
     const documento = await Documento.findById(id);
 
     if (!documento) {
-      return res.status(404).json({
-        success: false,
-        message: 'Documento no encontrado'
-      });
+      return res.status(404).json({ success: false, message: 'Documento no encontrado' });
     }
 
-    // Si es URL de Cloudinary, redirigir; si es local, descargar
-    if (documento.ruta_archivo.startsWith('http')) {
-      return res.redirect(documento.ruta_archivo);
+    if (isRemoteFile(documento.ruta_archivo)) {
+      const downloadUrl = getCloudinaryDownloadUrl(documento.ruta_archivo, documento.nombre);
+      return res.json({ downloadUrl });
     }
 
-    if (!fs.existsSync(documento.ruta_archivo)) {
-      return res.status(404).json({
-        success: false,
-        message: 'Archivo no encontrado en el servidor'
-      });
-    }
-
-    res.download(documento.ruta_archivo, documento.nombre);
+    const token = getLocalDownloadToken(id);
+    const base = `${req.protocol}://${req.get('host')}`;
+    res.json({ downloadUrl: `${base}/api/documentos/${id}/stream?t=${token}` });
   } catch (error) {
     console.error('Error en downloadDocumento:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al descargar documento',
-      error: error.message
-    });
+    res.status(500).json({ success: false, message: 'Error al generar enlace de descarga', error: error.message });
+  }
+};
+
+// Stream de archivo local protegido con token de un solo uso (solo para rutas locales)
+const streamDocumento = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { t } = req.query;
+
+    if (!t) return res.status(403).json({ success: false, message: 'Token requerido' });
+
+    verifyLocalDownloadToken(t, id);
+
+    const documento = await Documento.findById(id);
+    if (!documento) return res.status(404).json({ success: false, message: 'Documento no encontrado' });
+
+    await sendLocalFile(res, documento.ruta_archivo, documento.nombre);
+  } catch (error) {
+    console.error('Error en streamDocumento:', error);
+    res.status(error.status || 500).json({ success: false, message: error.message });
   }
 };
 
@@ -243,12 +259,12 @@ const deleteDocumento = async (req, res) => {
       });
     }
 
-    // Eliminar archivo físico (solo si es almacenamiento local)
-    if (!documento.ruta_archivo.startsWith('http') && fs.existsSync(documento.ruta_archivo)) {
+    if (isRemoteFile(documento.ruta_archivo)) {
+      await deleteCloudinaryFile(documento.ruta_archivo);
+    } else if (fs.existsSync(documento.ruta_archivo)) {
       fs.unlinkSync(documento.ruta_archivo);
     }
 
-    // Eliminar registro de BD
     await Documento.delete(id);
 
     res.json({
@@ -296,6 +312,7 @@ module.exports = {
   getDocumentosByProyecto,
   uploadDocumento,
   downloadDocumento,
+  streamDocumento,
   updateDocumento,
   deleteDocumento,
   getAccesoEmpleados,

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ImageViewer from './ImageViewer';
 import { formatearHora, allParticipantsRead } from './chatUtils';
+import { downloadUrlToDevice } from '../../utils/nativeDownloads';
 
 function MessageBubble({ mensaje, isOwn, conversacion }) {
 
@@ -57,19 +58,11 @@ function MessageBubble({ mensaje, isOwn, conversacion }) {
               e.stopPropagation();
               const url = getFullUrl(mensaje.archivo_url);
               try {
-                const token = localStorage.getItem('empleado_token');
-                const res = await fetch(url, {
-                  headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+                await downloadUrlToDevice({
+                  url,
+                  fileName: mensaje.archivo_nombre || 'archivo',
+                  category: 'document'
                 });
-                const blob = await res.blob();
-                const blobUrl = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = blobUrl;
-                link.download = mensaje.archivo_nombre || 'archivo';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(blobUrl);
               } catch (err) {
                 console.error('Error al descargar archivo:', err);
                 alert('Error al descargar el archivo');

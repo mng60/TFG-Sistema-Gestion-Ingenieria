@@ -2,6 +2,11 @@ const bcrypt = require('bcryptjs');
 const Cliente = require('../models/Cliente');
 const { generateToken } = require('../utils/jwt');
 const { sendBienvenidaPortal, sendPresupuestoAceptado, sendPresupuestoRechazado } = require('../utils/emailService');
+const {
+  isRemoteFile,
+  getCloudinaryDownloadUrl,
+  getLocalDownloadToken,
+} = require('../utils/fileDelivery');
 
 const PORTAL_URL = process.env.PORTAL_URL || 'http://localhost:3001';
 const formatMoneda = (v) => v ? new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(v) : '0,00 €';
@@ -534,24 +539,17 @@ const descargarMiDocumento = async (req, res) => {
 
     const documento = result.rows[0];
 
-    // Verificar que el archivo existe
-    const fs = require('fs');
-    if (!fs.existsSync(documento.ruta_archivo)) {
-      return res.status(404).json({
-        success: false,
-        message: 'Archivo no encontrado en el servidor'
-      });
+    if (isRemoteFile(documento.ruta_archivo)) {
+      const downloadUrl = getCloudinaryDownloadUrl(documento.ruta_archivo, documento.nombre);
+      return res.json({ downloadUrl });
     }
 
-    // Enviar archivo
-    res.download(documento.ruta_archivo, documento.nombre);
+    const token = getLocalDownloadToken(documento.id);
+    const base = `${req.protocol}://${req.get('host')}`;
+    res.json({ downloadUrl: `${base}/api/documentos/${documento.id}/stream?t=${token}` });
   } catch (error) {
     console.error('Error en descargarMiDocumento:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al descargar documento',
-      error: error.message
-    });
+    res.status(500).json({ success: false, message: 'Error al generar enlace de descarga', error: error.message });
   }
 };
 

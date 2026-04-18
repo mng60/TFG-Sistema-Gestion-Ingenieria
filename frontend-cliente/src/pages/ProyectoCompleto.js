@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Award, ClipboardList, Download, FileText, Image, MapPin, Ruler, Scroll, BarChart2 } from 'lucide-react';
 import api from '../services/api';
 import { formatearFecha, formatearMoneda, getAvatarInitial, getAvatarSrc } from '../utils/format';
+import { downloadFromUrl } from '../utils/download';
 import Toast from '../components/Toast';
 import '../styles/ProyectoCompleto.css';
 
@@ -88,16 +89,10 @@ function ProyectoCompleto() {
     }
   };
 
-  const descargarDocumento = async (docId, nombre) => {
+  const descargarDocumento = async (docId) => {
     try {
-      const response = await api.get(`/portal/documentos/${docId}/download`, { responseType: 'blob' });
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', nombre);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+      const { data } = await api.get(`/portal/documentos/${docId}/download`);
+      downloadFromUrl(data.downloadUrl);
     } catch {
       showToast('Error al descargar el documento', 'error');
     }
@@ -307,7 +302,7 @@ function ProyectoCompleto() {
                         <td>{formatearFecha(doc.created_at)}</td>
                         <td>{formatearTamano(doc.tamano_bytes)}</td>
                         <td>
-                          <button className="btn-download" onClick={() => descargarDocumento(doc.id, doc.nombre)}>
+                          <button className="btn-download" onClick={() => descargarDocumento(doc.id)}>
                             <Download size={13} style={{ verticalAlign: 'middle', marginRight: 4 }} />Descargar
                           </button>
                         </td>

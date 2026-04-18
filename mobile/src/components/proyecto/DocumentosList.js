@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Download, Eye, EyeOff, FileText, Upload, Users } from 'lucide-react';
 import documentoService from '../../services/documentoService';
 import { formatearFecha } from '../../utils/format';
+import { getDownloadLocationLabel } from '../../utils/nativeDownloads';
 import '../../styles/Modal.css';
 
 const fmtTamano = (bytes) => {
@@ -203,8 +204,8 @@ function DocumentosList({ proyectoId, documentos, empleadosProyecto = [], isAdmi
 
   const handleDescargar = async (doc) => {
     try {
-      await documentoService.descargar(doc);
-      showToast('Descargando...', 'success');
+      const result = await documentoService.descargar(doc);
+      showToast(`Guardado en ${getDownloadLocationLabel(result?.category)}`, 'success');
     } catch {
       showToast('Error al descargar', 'error');
     }

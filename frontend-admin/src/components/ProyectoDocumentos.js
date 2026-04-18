@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import DocumentoModal from './modals/DocumentoModal';
 import axios from 'axios';
 import { formatearFecha } from '../utils/format';
+import { downloadFromUrl } from '../utils/download';
 import { Upload, Download, Trash2, Eye, EyeOff, Users } from 'lucide-react';
 import '../styles/Modal.css';
 
@@ -125,19 +126,10 @@ function ProyectoDocumentos({
   const handleDescargar = async (documento) => {
     try {
       const token = localStorage.getItem('empleado_token');
-      const response = await axios.get(`${API_URL}/documentos/${documento.id}/download`, {
-        headers: { 'Authorization': `Bearer ${token}` },
-        responseType: 'blob'
+      const { data } = await axios.get(`${API_URL}/documentos/${documento.id}/download`, {
+        headers: { 'Authorization': `Bearer ${token}` }
       });
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', documento.nombre);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-      showToast('Documento descargado', 'success');
+      downloadFromUrl(data.downloadUrl);
     } catch {
       showToast('Error al descargar documento', 'error');
     }

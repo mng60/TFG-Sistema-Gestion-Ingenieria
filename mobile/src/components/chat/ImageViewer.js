@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Download, X } from 'lucide-react';
+import { downloadUrlToDevice } from '../../utils/nativeDownloads';
 
 function ImageViewer({ imageUrl, imageName, onClose }) {
   const [downloading, setDownloading] = useState(false);
@@ -8,19 +9,11 @@ function ImageViewer({ imageUrl, imageName, onClose }) {
     e.stopPropagation();
     setDownloading(true);
     try {
-      const token = localStorage.getItem('empleado_token');
-      const res = await fetch(imageUrl, {
-        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      await downloadUrlToDevice({
+        url: imageUrl,
+        fileName: imageName || 'imagen',
+        category: 'image'
       });
-      const blob = await res.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = imageName || 'imagen';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(blobUrl);
     } catch (err) {
       console.error('Error al descargar imagen:', err);
       alert('Error al descargar la imagen');

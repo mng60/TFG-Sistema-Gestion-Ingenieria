@@ -1,4 +1,5 @@
 import api from './api';
+import { downloadUrlToDevice } from '../utils/nativeDownloads';
 
 const documentoService = {
   getByProyecto: async (proyectoId) => {
@@ -12,17 +13,12 @@ const documentoService = {
   },
 
   descargar: async (documento) => {
-    const response = await api.get(`/documentos/${documento.id}/download`, {
-      responseType: 'blob'
+    const { data } = await api.get(`/documentos/${documento.id}/download`);
+    return downloadUrlToDevice({
+      url: data.downloadUrl,
+      fileName: documento.nombre,
+      category: 'document'
     });
-    const url = window.URL.createObjectURL(new Blob([response.data]));
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', documento.nombre);
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    window.URL.revokeObjectURL(url);
   },
 
   setAccesoEmpleados: async (id, userIds) => {

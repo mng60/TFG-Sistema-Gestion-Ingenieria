@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ImageViewer from './ImageViewer';
 import { FileText, Archive, Music, Image, FolderOpen } from 'lucide-react';
 import { formatearFechaCorta } from '../../utils/format';
+import { downloadUrlToDevice } from '../../utils/nativeDownloads';
 
 function ArchivosPanel({ conversacionId, onClose }) {
   const [archivos, setArchivos] = useState({ imagenes: [], documentos: [], audios: [] });
@@ -54,17 +55,19 @@ function ArchivosPanel({ conversacionId, onClose }) {
     return <FileText size={26} color="#7f8c8d" />;
   };
 
-  const handleDescargar = (archivo) => {
+  const handleDescargar = async (archivo) => {
     const url = getFullUrl(archivo.archivo_url);
-    
-    // Crear link temporal y clickearlo
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = archivo.archivo_nombre;
-    link.target = '_blank';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+
+    try {
+      await downloadUrlToDevice({
+        url,
+        fileName: archivo.archivo_nombre,
+        category: archivo.tipo_mensaje === 'audio' ? 'audio' : 'document'
+      });
+    } catch (error) {
+      console.error('Error al descargar archivo del chat:', error);
+      alert('Error al descargar el archivo');
+    }
   };
 
   const totalArchivos = archivos.imagenes.length + archivos.documentos.length + archivos.audios.length;

@@ -6,6 +6,7 @@ const {
   getDocumentosByProyecto,
   uploadDocumento,
   downloadDocumento,
+  streamDocumento,
   updateDocumento,
   deleteDocumento,
   getAccesoEmpleados,
@@ -33,7 +34,10 @@ const documentoUpdateValidation = [
     .withMessage('es_publico debe ser true o false')
 ];
 
-// Todas las rutas requieren autenticación
+// Stream de archivo local — protegido con JWT de descarga, no requiere Bearer token
+router.get('/:id/stream', streamDocumento);
+
+// Todas las demás rutas requieren autenticación
 router.use(authMiddleware);
 
 // GET /api/documentos - Obtener todos los documentos
