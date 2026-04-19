@@ -5,6 +5,25 @@ import api from './api';
 let currentToken = null;
 let listenersRegistered = false;
 
+export const clearDeliveredChatNotifications = async (conversacionId = null) => {
+  if (!Capacitor.isNativePlatform()) return;
+
+  try {
+    const delivered = await PushNotifications.getDeliveredNotifications();
+    const notificationsToRemove = (delivered.notifications || []).filter((notification) => {
+      if (notification.data?.type !== 'chat') return false;
+      if (!conversacionId) return true;
+      return String(notification.data?.conversacion_id) === String(conversacionId);
+    });
+
+    if (!notificationsToRemove.length) return;
+
+    await PushNotifications.removeDeliveredNotifications(notificationsToRemove);
+  } catch (err) {
+    console.error('Error limpiando notificaciones push:', err);
+  }
+};
+
 export const registerPushNotifications = async (onForegroundNotification) => {
   if (!Capacitor.isNativePlatform()) return;
 
@@ -21,48 +40,55 @@ export const registerPushNotifications = async (onForegroundNotification) => {
       return;
     }
 
-    await PushNotifications.register();
+    if (!listenersRegistered) {
+      listenersRegistered = true;
 
-    if (listenersRegistered) return;
-    listenersRegistered = true;
-
-    await PushNotifications.addListener('registration', async (tokenData) => {
-      currentToken = tokenData.value;
-      try {
-        await api.post('/notifications/fcm-token', { token: currentToken });
-        console.log('FCM token registrado en backend');
-      } catch (err) {
-        console.error('Error registrando FCM token:', err);
-      }
-    });
-
-    await PushNotifications.addListener('registrationError', (err) => {
-      console.error('Error de registro push:', err.error);
-    });
-
-    // Notificación recibida con app en primer plano → banner in-app
-    await PushNotifications.addListener('pushNotificationReceived', (notification) => {
-      if (onForegroundNotification) {
-        onForegroundNotification({
-          title: notification.title || notification.data?.title,
-          body: notification.body || notification.data?.body,
-          data: notification.data
-        });
-      }
-    });
-
-    // Usuario toca notificación del sistema (app en background o cerrada)
-    await PushNotifications.addListener('pushNotificationActionPerformed', (action) => {
-      const data = action.notification.data;
-      if (data?.type === 'chat' && data?.conversacion_id) {
-        sessionStorage.setItem('push_open_conversacion_id', data.conversacion_id);
-        // Si la app ya está en primer plano, hacer navigate al chat
-        if (window.__pushNavigateToChat) {
-          window.__pushNavigateToChat(data.conversacion_id);
+      await PushNotifications.addListener('registration', async (tokenData) => {
+        currentToken = tokenData.value;
+        try {
+          await api.post('/notifications/fcm-token', { token: currentToken });
+          console.log('FCM token registrado en backend');
+        } catch (err) {
+          console.error('Error registrando FCM token:', err);
         }
-      }
+      });
+
+      await PushNotifications.addListener('registrationError', (err) => {
+        console.error('Error de registro push:', err.error);
+      });
+
+      await PushNotifications.addListener('pushNotificationReceived', (notification) => {
+        if (onForegroundNotification) {
+          onForegroundNotification({
+            title: notification.title || notification.data?.title,
+            body: notification.body || notification.data?.body,
+            data: notification.data
+          });
+        }
+      });
+
+      await PushNotifications.addListener('pushNotificationActionPerformed', (action) => {
+        const data = action.notification.data;
+        if (data?.type === 'chat' && data?.conversacion_id) {
+          clearDeliveredChatNotifications(data.conversacion_id);
+          sessionStorage.setItem('push_open_conversacion_id', data.conversacion_id);
+          if (window.__pushNavigateToChat) {
+            window.__pushNavigateToChat(data.conversacion_id);
+          }
+        }
+      });
+    }
+
+    await PushNotifications.createChannel({
+      id: 'chat_messages',
+      name: 'Mensajes de chat',
+      description: 'Notificaciones de nuevos mensajes del chat',
+      importance: 5,
+      visibility: 1,
+      sound: 'default'
     });
 
+    await PushNotifications.register();
   } catch (err) {
     console.error('Error configurando push notifications:', err);
   }

@@ -20,19 +20,24 @@ const sendPushToUsers = async (recipients, notification, data = {}) => {
 
     for (const token of tokens) {
       try {
-        await messaging.send({
+        const message = {
           token,
-          notification,
           data: stringData,
           android: {
-            priority: 'high',
-            notification: {
-              channelId: 'chat_messages',
-              priority: 'high',
-              sound: 'default'
-            }
+            priority: 'high'
           }
-        });
+        };
+
+        if (notification) {
+          message.notification = notification;
+          message.android.notification = {
+            channelId: 'chat_messages',
+            priority: 'high',
+            sound: 'default'
+          };
+        }
+
+        await messaging.send(message);
       } catch (err) {
         if (
           err.code === 'messaging/invalid-registration-token' ||
@@ -69,9 +74,16 @@ const sendChatPush = async ({ conversacion, mensajeCompleto, senderUserId, sende
 
   await sendPushToUsers(
     recipients.map(p => ({ userId: p.user_id, tipoUsuario: p.tipo_usuario })),
-    { title, body },
+    null,
     {
       type: 'chat',
+      title,
+      body,
+      sender_name: senderName,
+      message_body: body,
+      message_type: mensajeCompleto.tipo_mensaje || 'texto',
+      message_id: String(mensajeCompleto.id || ''),
+      message_created_at: String(mensajeCompleto.created_at || ''),
       conversacion_id: String(conversacion.id),
       conversacion_tipo: conversacion.tipo || 'directo',
       conversacion_nombre: conversacion.nombre || ''

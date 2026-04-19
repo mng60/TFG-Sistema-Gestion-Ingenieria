@@ -12,6 +12,7 @@ function ChatLayout() {
   const [conversacionActiva, setConversacionActiva] = useState(null);
   const conversacionActivaIdRef = useRef(null);
   const activeViewRef = useRef('list');
+  const syncTimeoutRef = useRef(null);
   const [showNuevoModal, setShowNuevoModal] = useState(false);
   const [toast, setToast] = useState(null);
   // Mobile: 'list' | 'window'
@@ -21,9 +22,59 @@ function ChatLayout() {
     activeViewRef.current = activeView;
   }, [activeView]);
 
+  const cargarConversaciones = useCallback(async () => {
+    try {
+      const hostname = window.location.hostname;
+      const API_URL = process.env.REACT_APP_API_URL || `http://${hostname}:5000/api`;
+      const token = localStorage.getItem('empleado_token');
+      const res = await fetch(`${API_URL}/chat/conversaciones`, {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: 'no-store'
+      });
+      const data = await res.json();
+      if (data.success) {
+        setConversaciones(data.conversaciones || []);
+      }
+    } catch (e) {
+      console.error('Error al cargar conversaciones:', e);
+    }
+  }, []);
+
+  const broadcastUnreadCount = useCallback((nextConversaciones) => {
+    const total = (nextConversaciones || []).reduce(
+      (sum, c) => sum + (parseInt(c.mensajes_no_leidos, 10) || 0),
+      0
+    );
+
+    window.dispatchEvent(new CustomEvent('chat-unread-updated', {
+      detail: { total }
+    }));
+  }, []);
+
+  const scheduleConversationSync = useCallback(() => {
+    if (syncTimeoutRef.current) {
+      clearTimeout(syncTimeoutRef.current);
+    }
+
+    syncTimeoutRef.current = setTimeout(() => {
+      cargarConversaciones();
+      syncTimeoutRef.current = null;
+    }, 250);
+  }, [cargarConversaciones]);
+
   useEffect(() => {
     cargarConversaciones();
+  }, [cargarConversaciones]);
+
+  useEffect(() => () => {
+    if (syncTimeoutRef.current) {
+      clearTimeout(syncTimeoutRef.current);
+    }
   }, []);
+
+  useEffect(() => {
+    broadcastUnreadCount(conversaciones);
+  }, [broadcastUnreadCount, conversaciones]);
 
   useEffect(() => {
     window.history.replaceState(
@@ -36,30 +87,50 @@ function ChatLayout() {
 
     const handlePopState = () => {
       if (activeViewRef.current === 'window') {
+        conversacionActivaIdRef.current = null;
+        setConversacionActiva(null);
         setActiveView('list');
+        scheduleConversationSync();
       }
     };
 
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
+  }, [scheduleConversationSync]);
 
   useEffect(() => {
     if (!socket || conversaciones.length === 0) return;
-    socket.emit('join_conversations', conversaciones.map((c) => c.id));
-  }, [socket, conversaciones.length]);
+
+    const joinRooms = () => {
+      const conversationIds = conversaciones.map((c) => c.id).filter(Boolean);
+      if (!conversationIds.length) return;
+      socket.emit('join_conversations', conversationIds);
+    };
+
+    if (socket.connected) {
+      joinRooms();
+    }
+
+    socket.on('connect', joinRooms);
+    return () => socket.off('connect', joinRooms);
+  }, [socket, conversaciones]);
 
   // Badge: listener registrado una sola vez por socket, usa ref para evitar stale closure
   useEffect(() => {
     if (!socket) return;
     const handleNewMessage = (mensaje) => {
-      if (mensaje.conversacion_id !== conversacionActivaIdRef.current) {
-        setConversaciones(prev => prev.map(c =>
-          c.id === mensaje.conversacion_id
-            ? { ...c, mensajes_no_leidos: (c.mensajes_no_leidos || 0) + 1 }
-            : c
-        ));
-      }
+      setConversaciones(prev => prev.map(c =>
+        c.id === mensaje.conversacion_id
+          ? {
+              ...c,
+              ultimo_mensaje: mensaje,
+              updated_at: mensaje.created_at,
+              mensajes_no_leidos: mensaje.conversacion_id !== conversacionActivaIdRef.current
+                ? (c.mensajes_no_leidos || 0) + 1
+                : 0
+            }
+          : c
+      ));
     };
     socket.on('new_message', handleNewMessage);
     return () => socket.off('new_message', handleNewMessage);
@@ -68,21 +139,6 @@ function ChatLayout() {
   const showToast = useCallback((message, type = 'success') => {
     setToast({ message, type });
   }, []);
-
-  const cargarConversaciones = async () => {
-    try {
-      const hostname = window.location.hostname;
-      const API_URL = process.env.REACT_APP_API_URL || `http://${hostname}:5000/api`;
-      const token = localStorage.getItem('empleado_token');
-      const res = await fetch(`${API_URL}/chat/conversaciones`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await res.json();
-      if (data.success) setConversaciones(data.conversaciones || []);
-    } catch (e) {
-      console.error('Error al cargar conversaciones:', e);
-    }
-  };
 
   const handleSelectConversacion = useCallback((conv) => {
     if (activeViewRef.current !== 'window') {
@@ -106,7 +162,12 @@ function ChatLayout() {
     }
 
     conversacionActivaIdRef.current = conv?.id || null;
-    setConversacionActiva(conv);
+    setConversacionActiva(conv ? { ...conv, mensajes_no_leidos: 0 } : null);
+    setConversaciones((prev) => prev.map((c) =>
+      c.id === conv?.id
+        ? { ...c, mensajes_no_leidos: 0 }
+        : c
+    ));
     setActiveView('window');
   }, []);
 
@@ -116,7 +177,10 @@ function ChatLayout() {
       return;
     }
 
+    conversacionActivaIdRef.current = null;
+    setConversacionActiva(null);
     setActiveView('list');
+    scheduleConversationSync();
   };
 
   const handleConversacionEliminada = useCallback(() => {
@@ -124,14 +188,14 @@ function ChatLayout() {
     setConversacionActiva(null);
     setActiveView('list');
     cargarConversaciones();
-  }, []);
+  }, [cargarConversaciones]);
 
-  const handleConversacionCreada = (nuevaConv) => {
+  const handleConversacionCreada = useCallback((nuevaConv) => {
     setShowNuevoModal(false);
     cargarConversaciones();
     setConversacionActiva(nuevaConv);
     setActiveView('window');
-  };
+  }, [cargarConversaciones]);
 
   const handleOpenDirectChat = useCallback((participant) => {
     if (activeViewRef.current !== 'window') {
@@ -171,7 +235,24 @@ function ChatLayout() {
   const handleConversacionEfimeraCreada = useCallback((realConv) => {
     setConversacionActiva(realConv);
     cargarConversaciones();
-  }, []);
+  }, [cargarConversaciones]);
+
+  const handleConversationRead = useCallback((conversacionId, readAt) => {
+    setConversaciones((prev) => prev.map((c) => {
+      if (c.id !== conversacionId) return c;
+
+      return {
+        ...c,
+        mensajes_no_leidos: 0,
+        participantes: (c.participantes || []).map((p) =>
+          p.user_id === empleado.id && p.tipo_usuario === 'empleado'
+            ? { ...p, last_read: readAt }
+            : p
+        )
+      };
+    }));
+    scheduleConversationSync();
+  }, [empleado?.id, scheduleConversationSync]);
 
   // Abrir conversación específica al llegar desde una push notification
   useEffect(() => {
@@ -215,6 +296,7 @@ function ChatLayout() {
           socket={socket}
           currentUser={empleado}
           onReloadConversaciones={cargarConversaciones}
+          onConversationRead={handleConversationRead}
           onConversacionEliminada={handleConversacionEliminada}
           showToast={showToast}
           onBack={handleBack}

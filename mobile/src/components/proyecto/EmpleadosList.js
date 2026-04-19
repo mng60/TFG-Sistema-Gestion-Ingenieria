@@ -6,10 +6,21 @@ import ConfirmModal from '../common/ConfirmModal';
 import { getAvatarInitial, getAvatarSrc } from '../../utils/format';
 import '../../styles/Modal.css';
 
+const ROLES_PROYECTO = [
+  'Responsable de Proyecto',
+  'Ingeniero Eléctrico',
+  'Técnico Electricista',
+  'Jefe de Obra',
+  'Técnico de Instalaciones',
+  'Supervisor',
+  'Auxiliar Técnico',
+  'Administrativo',
+];
+
 function AsignarModal({ proyectoId, empleadosAsignados, onClose, onSuccess }) {
   const [empleados, setEmpleados] = useState([]);
   const [seleccionado, setSeleccionado] = useState(null);
-  const [rolProyecto, setRolProyecto] = useState('técnico');
+  const [rolProyecto, setRolProyecto] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -21,7 +32,7 @@ function AsignarModal({ proyectoId, empleadosAsignados, onClose, onSuccess }) {
   const empleadosFiltrados = empleados.filter(emp => !idsAsignados.has(emp.id));
 
   const handleAsignar = async () => {
-    if (!seleccionado) return;
+    if (!seleccionado || !rolProyecto) return;
     setLoading(true);
     try {
       await proyectoService.asignarEmpleado(proyectoId, {
@@ -45,13 +56,11 @@ function AsignarModal({ proyectoId, empleadosAsignados, onClose, onSuccess }) {
         </div>
         <div className="modal-form">
           <div className="form-group">
-            <label>Rol en el proyecto</label>
-            <input
-              type="text"
-              value={rolProyecto}
-              onChange={(e) => setRolProyecto(e.target.value)}
-              placeholder="ej. técnico, supervisor..."
-            />
+            <label>Rol en el proyecto *</label>
+            <select value={rolProyecto} onChange={(e) => setRolProyecto(e.target.value)} required>
+              <option value="">Seleccionar rol...</option>
+              {ROLES_PROYECTO.map(r => <option key={r} value={r}>{r}</option>)}
+            </select>
           </div>
           <div className="form-group">
             <label>Seleccionar empleado</label>
@@ -91,7 +100,7 @@ function AsignarModal({ proyectoId, empleadosAsignados, onClose, onSuccess }) {
         </div>
         <div className="modal-actions">
           <button className="btn-secondary" onClick={onClose}>Cancelar</button>
-          <button className="btn-primary" onClick={handleAsignar} disabled={!seleccionado || loading}>
+          <button className="btn-primary" onClick={handleAsignar} disabled={!seleccionado || !rolProyecto || loading}>
             <Plus size={15} /> {loading ? 'Asignando...' : 'Asignar'}
           </button>
         </div>
@@ -100,7 +109,7 @@ function AsignarModal({ proyectoId, empleadosAsignados, onClose, onSuccess }) {
   );
 }
 
-function EmpleadosList({ proyectoId, empleados, isAdmin, onReload, showToast }) {
+function EmpleadosList({ proyectoId, empleados, isAdmin, estado, onReload, showToast }) {
   const [showAsignar, setShowAsignar] = useState(false);
   const [confirmModal, setConfirmModal] = useState(null);
 
@@ -126,7 +135,7 @@ function EmpleadosList({ proyectoId, empleados, isAdmin, onReload, showToast }) 
     <div>
       <div className="tab-section-header">
         <h3>Equipo ({empleados.length})</h3>
-        {isAdmin && (
+        {isAdmin && estado !== 'completado' && estado !== 'cancelado' && (
           <button className="btn-asignar" onClick={() => setShowAsignar(true)}
             style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
             <Plus size={14} /> Asignar

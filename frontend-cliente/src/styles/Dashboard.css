@@ -171,6 +171,18 @@
   font-size: 1.1rem;
 }
 
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .page-header h1 {
+    font-size: 1.35rem;
+  }
+}
+
 @media (max-width: 600px) {
   .proyecto-card {
     flex-direction: column;

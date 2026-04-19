@@ -105,7 +105,7 @@ function Contacto() {
                   <label>Nombre *</label>
                   <input type="text" required placeholder="Tu nombre"
                     value={formData.nombre}
-                    onChange={e => setFormData({ ...formData, nombre: e.target.value })} />
+                    onChange={e => setFormData({ ...formData, nombre: e.target.value.replace(/[0-9]/g, '') })} />
                 </div>
                 <div className="form-group">
                   <label>Empresa</label>
@@ -123,9 +123,9 @@ function Contacto() {
                 </div>
                 <div className="form-group">
                   <label>Teléfono *</label>
-                  <input type="tel" required placeholder="+34 600 000 000"
+                  <input type="tel" required placeholder="+34 600 000 000" inputMode="tel" maxLength="15"
                     value={formData.telefono}
-                    onChange={e => setFormData({ ...formData, telefono: e.target.value })} />
+                    onChange={e => setFormData({ ...formData, telefono: e.target.value.replace(/[^0-9+\-\s]/g, '') })} />
                 </div>
               </div>
               <div className="form-group">

@@ -12,7 +12,10 @@ import ProyectoCompleto from './pages/ProyectoCompleto';
 import Chat from './pages/Chat';
 import Perfil from './pages/Perfil';
 import InAppNotificationBanner from './components/InAppNotificationBanner';
-import { registerPushNotifications, unregisterPushToken } from './services/pushService';
+import {
+  clearDeliveredChatNotifications,
+  registerPushNotifications
+} from './services/pushService';
 import './styles/App.css';
 
 function ProtectedRoute({ children }) {
@@ -78,8 +81,6 @@ function StatusBarManager() {
       try {
         await StatusBar.show();
 
-        // Chat tiene fondo claro → iconos oscuros (Style.Light)
-        // Login y resto de app tienen fondo oscuro → iconos blancos (Style.Dark)
         await StatusBar.setStyle({
           style: isChat ? Style.Light : Style.Dark
         });
@@ -97,11 +98,11 @@ function StatusBarManager() {
 function PushManager({ onNotification }) {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (!isAuthenticated) return;
 
-    // Expose navigate so pushNotificationActionPerformed can use it
     window.__pushNavigateToChat = (conversacionId) => {
       sessionStorage.setItem('push_open_conversacion_id', conversacionId);
       navigate('/chat');
@@ -113,6 +114,29 @@ function PushManager({ onNotification }) {
       window.__pushNavigateToChat = null;
     };
   }, [isAuthenticated, navigate, onNotification]);
+
+  useEffect(() => {
+    if (!isAuthenticated || location.pathname !== '/chat') return;
+    clearDeliveredChatNotifications();
+  }, [isAuthenticated, location.pathname]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !Capacitor.isNativePlatform()) return;
+
+    let listenerHandle;
+
+    CapacitorApp.addListener('appStateChange', ({ isActive }) => {
+      if (isActive) {
+        clearDeliveredChatNotifications();
+      }
+    }).then((handle) => {
+      listenerHandle = handle;
+    });
+
+    return () => {
+      listenerHandle?.remove();
+    };
+  }, [isAuthenticated]);
 
   return null;
 }

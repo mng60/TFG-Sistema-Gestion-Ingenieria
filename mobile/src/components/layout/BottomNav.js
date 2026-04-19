@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { FolderOpen, MessagesSquare, CircleUserRound } from 'lucide-react';
@@ -8,8 +8,31 @@ import { getAvatarSrc } from '../../utils/format';
 function BottomNav() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { empleado } = useAuth();
+  const { empleado, socket } = useAuth();
   const [mensajesNoLeidos, setMensajesNoLeidos] = useState(0);
+
+  const cargarNoLeidos = useCallback(async () => {
+    if (location.pathname === '/chat') {
+      setMensajesNoLeidos(0);
+      return;
+    }
+    try {
+      const API_URL = process.env.REACT_APP_API_URL || `http://${window.location.hostname}:5000/api`;
+      const token = localStorage.getItem('empleado_token');
+      const res = await fetch(`${API_URL}/chat/conversaciones`, {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: 'no-store'
+      });
+      const data = await res.json();
+      if (data.success) {
+        const total = data.conversaciones.reduce(
+          (sum, c) => sum + (parseInt(c.mensajes_no_leidos, 10) || 0),
+          0
+        );
+        setMensajesNoLeidos(total);
+      }
+    } catch (_) {}
+  }, [location.pathname]);
 
   useEffect(() => {
     if (location.pathname === '/chat') {
@@ -19,28 +42,38 @@ function BottomNav() {
     cargarNoLeidos();
     const interval = setInterval(cargarNoLeidos, 15000);
     return () => clearInterval(interval);
+  }, [cargarNoLeidos, location.pathname]);
+
+  useEffect(() => {
+    const handleUnreadUpdated = (event) => {
+      if (location.pathname === '/chat') {
+        setMensajesNoLeidos(0);
+        return;
+      }
+
+      const total = parseInt(event.detail?.total, 10) || 0;
+      setMensajesNoLeidos(total);
+    };
+
+    window.addEventListener('chat-unread-updated', handleUnreadUpdated);
+    return () => window.removeEventListener('chat-unread-updated', handleUnreadUpdated);
   }, [location.pathname]);
 
-  const cargarNoLeidos = async () => {
-    if (location.pathname === '/chat') {
-      setMensajesNoLeidos(0);
-      return;
-    }
-    try {
-      const API_URL = process.env.REACT_APP_API_URL || `http://${window.location.hostname}:5000/api`;
-      const token = localStorage.getItem('empleado_token');
-      const res = await fetch(`${API_URL}/chat/conversaciones`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await res.json();
-      if (data.success) {
-        const total = data.conversaciones.reduce(
-          (sum, c) => sum + (parseInt(c.mensajes_no_leidos) || 0), 0
-        );
-        setMensajesNoLeidos(total);
-      }
-    } catch (_) {}
-  };
+  useEffect(() => {
+    if (!socket || location.pathname === '/chat') return undefined;
+
+    const refreshUnread = () => {
+      cargarNoLeidos();
+    };
+
+    socket.on('new_message', refreshUnread);
+    socket.on('messages_read', refreshUnread);
+
+    return () => {
+      socket.off('new_message', refreshUnread);
+      socket.off('messages_read', refreshUnread);
+    };
+  }, [cargarNoLeidos, socket, location.pathname]);
 
   const isActive = (path) => {
     if (path === '/proyectos') {

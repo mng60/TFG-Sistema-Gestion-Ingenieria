@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import ImageViewer from './ImageViewer';
+import AudioMessage from './AudioMessage';
 import { formatearHora, allParticipantsRead } from './chatUtils';
 import { downloadUrlToDevice } from '../../utils/nativeDownloads';
 
@@ -110,15 +111,7 @@ function MessageBubble({ mensaje, isOwn, conversacion }) {
       case 'audio':
         return (
           <div className="message-audio">
-            <audio 
-              controls 
-              src={getFullUrl(mensaje.archivo_url)}
-              onError={(e) => {
-                console.error('Error al cargar audio:', mensaje.archivo_url);
-              }}
-            >
-              Tu navegador no soporta audio.
-            </audio>
+            <AudioMessage src={getFullUrl(mensaje.archivo_url)} />
           </div>
         );
       

@@ -298,12 +298,23 @@ const asignarEmpleado = async (req, res) => {
     const { id } = req.params;
     const { user_id, rol_proyecto } = req.body;
 
+    if (!rol_proyecto?.trim()) {
+      return res.status(400).json({ success: false, message: 'El rol en el proyecto es obligatorio' });
+    }
+
     // Verificar que el proyecto existe
     const proyecto = await Proyecto.findById(id);
     if (!proyecto) {
       return res.status(404).json({
         success: false,
         message: 'Proyecto no encontrado'
+      });
+    }
+
+    if (proyecto.estado === 'completado' || proyecto.estado === 'cancelado') {
+      return res.status(400).json({
+        success: false,
+        message: 'No se pueden asignar empleados a un proyecto completado o cancelado'
       });
     }
 

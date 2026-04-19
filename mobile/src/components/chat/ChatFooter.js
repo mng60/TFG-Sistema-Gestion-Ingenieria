@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Mic, Square, SendHorizontal, Paperclip } from 'lucide-react';
 import AttachmentMenu from './AttachmentMenu';
 
-function ChatFooter({ onSendMessage, onTyping, onSendFile, showToast }) {
+function ChatFooter({ onSendMessage, onTyping, onSendFile, showToast, onInputFocus }) {
   const [mensaje, setMensaje] = useState('');
   const [showAttachmentMenu, setShowAttachmentMenu] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -26,8 +26,15 @@ function ChatFooter({ onSendMessage, onTyping, onSendFile, showToast }) {
     };
   }, []);
 
+  const adjustTextareaHeight = (element) => {
+    if (!element) return;
+    element.style.height = 'auto';
+    element.style.height = `${Math.min(element.scrollHeight, 120)}px`;
+  };
+
   const handleInputChange = (e) => {
     setMensaje(e.target.value);
+    adjustTextareaHeight(e.target);
 
     if (e.target.value.length > 0 && !isTyping) {
       setIsTyping(true);
@@ -57,6 +64,9 @@ function ChatFooter({ onSendMessage, onTyping, onSendFile, showToast }) {
       setIsTyping(false);
       onTyping(false);
       if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      if (inputRef.current) {
+        inputRef.current.style.height = 'auto';
+      }
       inputRef.current?.focus();
     }
   };
@@ -224,6 +234,10 @@ function ChatFooter({ onSendMessage, onTyping, onSendFile, showToast }) {
               value={mensaje}
               onChange={handleInputChange}
               onKeyPress={handleKeyPress}
+              onFocus={() => {
+                adjustTextareaHeight(inputRef.current);
+                onInputFocus?.();
+              }}
               placeholder={uploading ? 'Subiendo archivo...' : 'Escribe un mensaje...'}
               rows="1"
               className="message-input"

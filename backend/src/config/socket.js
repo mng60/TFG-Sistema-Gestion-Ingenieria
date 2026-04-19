@@ -12,6 +12,7 @@ const addUserConnection = (userKey, socketId) => {
   if (!connectedUsers.has(userKey)) {
     connectedUsers.set(userKey, new Set());
   }
+
   const sockets = connectedUsers.get(userKey);
   const wasOffline = sockets.size === 0;
   sockets.add(socketId);
@@ -21,16 +22,18 @@ const addUserConnection = (userKey, socketId) => {
 const removeUserConnection = (userKey, socketId) => {
   const sockets = connectedUsers.get(userKey);
   if (!sockets) return false;
+
   sockets.delete(socketId);
   if (sockets.size === 0) {
     connectedUsers.delete(userKey);
     return true;
   }
+
   return false;
 };
 
 const initializeSocket = (io) => {
-  // Middleware de autenticación para Socket.io
+  // Middleware de autenticacion para Socket.io
   io.use(async (socket, next) => {
     try {
       const token = socket.handshake.auth.token;
@@ -39,7 +42,6 @@ const initializeSocket = (io) => {
         return next(new Error('Token no proporcionado'));
       }
 
-      // Verificar token JWT
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       socket.userId = decoded.id;
       socket.tipoUsuario = decoded.rol ? 'empleado' : 'cliente';
@@ -47,21 +49,19 @@ const initializeSocket = (io) => {
 
       next();
     } catch (error) {
-      console.error('Error de autenticación Socket.io:', error);
-      next(new Error('Autenticación fallida'));
+      console.error('Error de autenticacion Socket.io:', error);
+      next(new Error('Autenticacion fallida'));
     }
   });
 
   io.on('connection', (socket) => {
-    console.log(`✅ Usuario conectado: ${socket.userId} (${socket.tipoUsuario})`);
+    console.log(`Usuario conectado: ${socket.userId} (${socket.tipoUsuario})`);
 
-    // Registrar usuario conectado
     const userKey = `${socket.userId}_${socket.tipoUsuario}`;
     socket.userKey = userKey;
 
     const becameOnline = addUserConnection(userKey, socket.id);
 
-    // Notificar a otros solo si este usuario pasó de offline a online
     if (becameOnline) {
       socket.broadcast.emit('user_online', {
         userId: socket.userId,
@@ -69,43 +69,50 @@ const initializeSocket = (io) => {
       });
     }
 
-    // Enviar al recién conectado la lista actual de online
     socket.emit('online_users', getOnlineUserKeys());
 
-    // Unirse a las conversaciones del usuario
     socket.on('join_conversations', async (conversacionesIds) => {
       try {
-        conversacionesIds.forEach(id => {
+        conversacionesIds.forEach((id) => {
           socket.join(`conversacion_${id}`);
         });
+
         console.log(`Usuario ${socket.userId} unido a ${conversacionesIds.length} conversaciones`);
       } catch (error) {
         console.error('Error al unirse a conversaciones:', error);
       }
     });
 
-    // Enviar mensaje
-    socket.on('send_message', async (data) => {
+    socket.on('send_message', async (data, ack) => {
       try {
-        const { conversacion_id, mensaje, tipo_mensaje = 'texto' } = data;
+        const {
+          conversacion_id,
+          mensaje,
+          tipo_mensaje = 'texto',
+          client_temp_id = null
+        } = data;
 
-        // Verificar que el usuario sea participante
         const conversacion = await Conversacion.findById(conversacion_id);
         if (!conversacion) {
-          socket.emit('error', { message: 'Conversación no encontrada' });
+          socket.emit('error', { message: 'Conversacion no encontrada' });
+          if (typeof ack === 'function') {
+            ack({ success: false, message: 'Conversacion no encontrada' });
+          }
           return;
         }
 
         const isParticipante = conversacion.participantes.some(
-          p => p.user_id === socket.userId && p.tipo_usuario === socket.tipoUsuario
+          (p) => p.user_id === socket.userId && p.tipo_usuario === socket.tipoUsuario
         );
 
         if (!isParticipante) {
-          socket.emit('error', { message: 'No tienes acceso a esta conversación' });
+          socket.emit('error', { message: 'No tienes acceso a esta conversacion' });
+          if (typeof ack === 'function') {
+            ack({ success: false, message: 'No tienes acceso a esta conversacion' });
+          }
           return;
         }
 
-        // Guardar mensaje en BD
         const nuevoMensaje = await Mensaje.create({
           conversacion_id,
           user_id: socket.userId,
@@ -114,34 +121,37 @@ const initializeSocket = (io) => {
           tipo_mensaje
         });
 
-        // Obtener nombre del remitente
         const participante = conversacion.participantes.find(
-          p => p.user_id === socket.userId && p.tipo_usuario === socket.tipoUsuario
+          (p) => p.user_id === socket.userId && p.tipo_usuario === socket.tipoUsuario
         );
 
         const mensajeCompleto = {
           ...nuevoMensaje,
-          remitente_nombre: participante?.nombre || 'Usuario'
+          remitente_nombre: participante?.nombre || 'Usuario',
+          client_temp_id
         };
 
-        // Emitir a todos los participantes de la conversación
         io.to(`conversacion_${conversacion_id}`).emit('new_message', mensajeCompleto);
 
-        // Push notification a participantes
+        if (typeof ack === 'function') {
+          ack({ success: true, mensaje: mensajeCompleto });
+        }
+
         sendChatPush({
           conversacion,
           mensajeCompleto,
           senderUserId: socket.userId,
           senderTipoUsuario: socket.tipoUsuario
-        }).catch(err => console.error('Push error (socket):', err));
-
+        }).catch((err) => console.error('Push error (socket):', err));
       } catch (error) {
         console.error('Error al enviar mensaje:', error);
         socket.emit('error', { message: 'Error al enviar mensaje' });
+        if (typeof ack === 'function') {
+          ack({ success: false, message: 'Error al enviar mensaje' });
+        }
       }
     });
 
-    // Usuario escribiendo
     socket.on('typing', (data) => {
       const { conversacion_id, isTyping } = data;
       socket.to(`conversacion_${conversacion_id}`).emit('user_typing', {
@@ -152,11 +162,9 @@ const initializeSocket = (io) => {
       });
     });
 
-    // Marcar como leído
     socket.on('mark_read', async (data) => {
       try {
         const { conversacion_id } = data;
-
         const now = new Date().toISOString();
 
         const updatedRead = await Conversacion.markAsReadAt(
@@ -166,7 +174,6 @@ const initializeSocket = (io) => {
           now
         );
 
-        // Notificar a otros participantes
         io.to(`conversacion_${conversacion_id}`).emit('messages_read', {
           conversacion_id,
           user_id: socket.userId,
@@ -174,16 +181,14 @@ const initializeSocket = (io) => {
           timestamp: updatedRead?.last_read || now
         });
       } catch (error) {
-        console.error('Error al marcar como leído:', error);
+        console.error('Error al marcar como leido:', error);
       }
     });
 
-    // Desconexión
     socket.on('disconnect', () => {
-      console.log(`❌ Usuario desconectado: ${socket.userId} (${socket.tipoUsuario})`);
+      console.log(`Usuario desconectado: ${socket.userId} (${socket.tipoUsuario})`);
       const becameOffline = removeUserConnection(socket.userKey, socket.id);
 
-      // Notificar a otros solo si ya no tiene ningún socket activo
       if (becameOffline) {
         socket.broadcast.emit('user_offline', {
           userId: socket.userId,
@@ -193,12 +198,10 @@ const initializeSocket = (io) => {
     });
   });
 
-  // Emitir estado online de usuarios
   const onlineUsersInterval = setInterval(() => {
     io.emit('online_users', getOnlineUserKeys());
   }, 30000);
 
-  // Limpiar al cerrar
   process.on('SIGTERM', () => clearInterval(onlineUsersInterval));
 };
 

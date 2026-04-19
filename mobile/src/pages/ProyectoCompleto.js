@@ -165,6 +165,7 @@ function ProyectoCompleto() {
               proyectoId={id}
               empleados={empleados}
               isAdmin={isAdmin()}
+              estado={proyecto?.estado}
               onReload={cargarEmpleados}
               showToast={showToast}
             />

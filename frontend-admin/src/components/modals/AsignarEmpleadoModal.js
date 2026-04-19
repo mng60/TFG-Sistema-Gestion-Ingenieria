@@ -2,12 +2,20 @@ import React, { useState } from 'react';
 import proyectoService from '../../services/proyectoService';
 import '../../styles/Modal.css';
 
+const ROLES_PROYECTO = [
+  'Responsable de Proyecto',
+  'Ingeniero Eléctrico',
+  'Técnico Electricista',
+  'Jefe de Obra',
+  'Técnico de Instalaciones',
+  'Supervisor',
+  'Auxiliar Técnico',
+  'Administrativo',
+];
+
 function AsignarEmpleadoModal({ proyectoId, usuarios, empleadosProyecto = [], onClose, onSuccess, onError }) {
   const idsAsignados = new Set(empleadosProyecto.map(e => e.user_id || e.id));
-  const [formData, setFormData] = useState({
-    user_id: '',
-    rol_proyecto: ''
-  });
+  const [formData, setFormData] = useState({ user_id: '', rol_proyecto: '' });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -15,7 +23,6 @@ function AsignarEmpleadoModal({ proyectoId, usuarios, empleadosProyecto = [], on
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       await proyectoService.asignarEmpleado(proyectoId, formData);
       onSuccess();
@@ -47,14 +54,10 @@ function AsignarEmpleadoModal({ proyectoId, usuarios, empleadosProyecto = [], on
 
           <div className="form-group">
             <label>Rol en el Proyecto *</label>
-            <input
-              type="text"
-              name="rol_proyecto"
-              value={formData.rol_proyecto}
-              onChange={handleChange}
-              placeholder="Ej: Ingeniero eléctrico principal"
-              required
-            />
+            <select name="rol_proyecto" value={formData.rol_proyecto} onChange={handleChange} required>
+              <option value="">Seleccionar rol...</option>
+              {ROLES_PROYECTO.map(r => <option key={r} value={r}>{r}</option>)}
+            </select>
           </div>
 
           <div className="modal-actions">

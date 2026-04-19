@@ -542,49 +542,54 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 250px;
 }
 
-.message-audio audio {
-  width: 250px;
-  max-width: 100%;
-  height: 32px;
-  outline: none;
+.audio-player {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
 }
 
-.message-audio audio::-webkit-media-controls-panel {
-  background-color: rgba(255, 255, 255, 0.9);
-  border-radius: 8px;
-}
-
-.btn-play-audio {
-  background: #667eea;
-  color: white;
-  border: none;
+.audio-player-btn {
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  cursor: pointer;
-  font-size: 1.2rem;
+  border: none;
+  background: #1b3a4b;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.audio-waveform {
+.audio-player-track {
   flex: 1;
-  height: 30px;
-  background: #e9ecef;
-  border-radius: 15px;
-  position: relative;
-  overflow: hidden;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.audio-progress {
-  height: 100%;
-  background: #667eea;
-  width: 30%;
+.audio-player-slider {
+  width: 100%;
+  margin: 0;
+  accent-color: #4db6a8;
 }
 
-.audio-duration {
-  font-size: 0.85rem;
-  color: #7f8c8d;
+.audio-player-time {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: #55606d;
+}
+
+.audio-player-icon {
+  color: #55606d;
+  flex-shrink: 0;
 }
 
 /* Indicador de escribiendo */
@@ -1570,9 +1575,16 @@ body.keyboard-open .chat-layout-mobile {
 
 .chat-window-screen .chat-messages {
   padding-top: 14px;
+  padding-bottom: 18px;
   overscroll-behavior: contain;
+  scroll-padding-bottom: 110px;
 }
 
 .chat-window-screen .chat-footer {
   padding-bottom: 10px;
+}
+
+body.keyboard-open .chat-window-screen .chat-messages {
+  padding-bottom: 28px;
+  scroll-padding-bottom: 150px;
 }

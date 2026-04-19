@@ -1002,6 +1002,17 @@
     width: 100%;
   }
 
+  .attachment-menu {
+    min-width: unset;
+    width: calc(100vw - 48px);
+    max-width: 320px;
+  }
+
+  .message-audio audio {
+    width: 100%;
+    min-width: unset;
+  }
+
   .chat-window {
     display: none;
   }

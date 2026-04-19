@@ -4,7 +4,7 @@ import ChatHeaderGrupo from './ChatHeaderGrupo';
 import ChatFooter from './ChatFooter';
 import MessageBubble from './MessageBubble';
 
-function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones, onConversacionEliminada, showToast, onBack, onlineUsers = new Set(), onOpenDirectChat, onConversacionCreada }) {
+function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones, onConversationRead, onConversacionEliminada, showToast, onBack, onlineUsers = new Set(), onOpenDirectChat, onConversacionCreada }) {
   const [mensajes, setMensajes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
@@ -13,11 +13,63 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
   const messagesContainerRef = useRef(null);
   const conversacionIdRef = useRef(null);
   const [conversacionLocal, setConversacionLocal] = useState(conversacion);
+  const syncFallbackTimeoutRef = useRef(null);
+
+  const upsertMensaje = (mensajeNuevo) => {
+    if (!mensajeNuevo) return;
+
+    setMensajes((prev) => {
+      const indexById = mensajeNuevo.id != null
+        ? prev.findIndex((msg) => String(msg.id) === String(mensajeNuevo.id))
+        : -1;
+
+      const indexByTempId = mensajeNuevo.client_temp_id
+        ? prev.findIndex((msg) => msg.client_temp_id && msg.client_temp_id === mensajeNuevo.client_temp_id)
+        : -1;
+
+      const existingIndex = indexById >= 0 ? indexById : indexByTempId;
+
+      if (existingIndex >= 0) {
+        const next = [...prev];
+        next[existingIndex] = {
+          ...next[existingIndex],
+          ...mensajeNuevo,
+          pending: false
+        };
+        return next;
+      }
+
+      return [...prev, mensajeNuevo];
+    });
+  };
+
+  const scheduleMessagesReload = () => {
+    if (syncFallbackTimeoutRef.current) {
+      clearTimeout(syncFallbackTimeoutRef.current);
+    }
+
+    syncFallbackTimeoutRef.current = setTimeout(() => {
+      cargarMensajes();
+      syncFallbackTimeoutRef.current = null;
+    }, 1200);
+  };
+
+  const handleComposerFocus = () => {
+    requestAnimationFrame(() => scrollToBottom(false));
+    setTimeout(() => scrollToBottom(false), 100);
+    setTimeout(() => scrollToBottom(false), 250);
+  };
 
   // Sincronizar conversacionLocal cuando el padre actualiza la conversación activa
   useEffect(() => {
     setConversacionLocal(conversacion || null);
   }, [conversacion]);
+
+  useEffect(() => () => {
+    if (syncFallbackTimeoutRef.current) {
+      clearTimeout(syncFallbackTimeoutRef.current);
+    }
+  }, []);
 
   // Cargar mensajes cuando cambia la conversación
   useEffect(() => {
@@ -39,7 +91,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
 
     const handleNewMessage = (mensaje) => {
       if (mensaje.conversacion_id === conversacion.id) {
-        setMensajes(prev => [...prev, mensaje]);
+        upsertMensaje(mensaje);
         scrollToBottom();
         marcarComoLeido();
       }
@@ -81,6 +133,20 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
     };
   }, [socket, conversacion?.id, currentUser?.id]);
 
+  useEffect(() => {
+    const viewport = window.visualViewport;
+    if (!viewport) return undefined;
+
+    const handleViewportResize = () => {
+      if (document.body.classList.contains('keyboard-open')) {
+        setTimeout(() => scrollToBottom(false), 60);
+      }
+    };
+
+    viewport.addEventListener('resize', handleViewportResize);
+    return () => viewport.removeEventListener('resize', handleViewportResize);
+  }, [mensajes.length]);
+
   const handleSendFile = async (file, tipoMensaje) => {
     if (!conversacion) return;
 
@@ -106,6 +172,12 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
       const data = await response.json();
 
       if (data.success) {
+        if (data.mensaje) {
+          upsertMensaje(data.mensaje);
+          scrollToBottom();
+        } else {
+          scheduleMessagesReload();
+        }
         // El mensaje se enviará via Socket.io desde el backend
       } else {
         throw new Error(data.message || 'Error al subir archivo');
@@ -189,6 +261,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
             )
           };
         });
+        onConversationRead?.(conversacion.id, readAt);
       }
     } catch (error) {
       console.error('❌ Error al cargar mensajes:', error);
@@ -217,6 +290,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
         )
       };
     });
+    onConversationRead?.(conversacion.id, now);
   };
 
   const handleSendMessage = async (mensaje, tipoMensaje = 'texto') => {
@@ -237,7 +311,11 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
           const realConv = data.conversacion;
           if (onConversacionCreada) onConversacionCreada(realConv);
           socket.emit('join_conversations', [realConv.id]);
-          socket.emit('send_message', { conversacion_id: realConv.id, mensaje, tipo_mensaje: tipoMensaje });
+          socket.emit(
+            'send_message',
+            { conversacion_id: realConv.id, mensaje, tipo_mensaje: tipoMensaje },
+            () => {}
+          );
         }
       } catch (error) {
         console.error('Error al crear conversación efímera:', error);
@@ -245,11 +323,31 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
       return;
     }
 
-    socket.emit('send_message', {
-      conversacion_id: conversacion.id,
-      mensaje,
-      tipo_mensaje: tipoMensaje
-    });
+    const clientTempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+    socket.emit(
+      'send_message',
+      {
+        conversacion_id: conversacion.id,
+        mensaje,
+        tipo_mensaje: tipoMensaje,
+        client_temp_id: clientTempId
+      },
+      (response) => {
+        if (response?.success && response.mensaje) {
+          upsertMensaje({
+            ...response.mensaje,
+            client_temp_id: response.mensaje.client_temp_id || clientTempId
+          });
+          scrollToBottom();
+          return;
+        }
+
+        scheduleMessagesReload();
+      }
+    );
+
+    scheduleMessagesReload();
   };
 
   const handleTyping = (isTyping) => {
@@ -341,6 +439,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
         onTyping={handleTyping}
         onSendFile={handleSendFile}
         showToast={showToast}
+        onInputFocus={handleComposerFocus}
       />
     </div>
   );

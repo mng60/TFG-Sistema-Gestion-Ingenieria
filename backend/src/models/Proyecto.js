@@ -254,24 +254,20 @@ class Proyecto {
     }
   }
 
-  // Asignar empleado a proyecto
+  // Asignar empleado a proyecto (upsert — permite reasignar tras desasignar)
   static async asignarEmpleado(proyectoId, userId, rolProyecto) {
-    try {
-      const query = `
-        INSERT INTO proyecto_empleados (proyecto_id, user_id, rol_proyecto)
-        VALUES ($1, $2, $3)
-        RETURNING *
-      `;
-      
-      const result = await pool.query(query, [proyectoId, userId, rolProyecto]);
-      return result.rows[0];
-    } catch (error) {
-      // Error de duplicado (empleado ya asignado)
-      if (error.code === '23505') {
-        throw new Error('El empleado ya está asignado a este proyecto');
-      }
-      throw error;
-    }
+    const query = `
+      INSERT INTO proyecto_empleados (proyecto_id, user_id, rol_proyecto)
+      VALUES ($1, $2, $3)
+      ON CONFLICT (proyecto_id, user_id) DO UPDATE
+        SET activo = true,
+            rol_proyecto = EXCLUDED.rol_proyecto,
+            fecha_asignacion = CURRENT_TIMESTAMP,
+            fecha_desasignacion = NULL
+      RETURNING *
+    `;
+    const result = await pool.query(query, [proyectoId, userId, rolProyecto]);
+    return result.rows[0];
   }
 
   // Desasignar empleado de proyecto

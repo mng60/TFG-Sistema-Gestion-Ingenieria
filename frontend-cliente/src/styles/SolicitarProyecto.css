@@ -253,7 +253,8 @@
     padding: 18px;
   }
 
-  .solicitud-row {
+  .solicitud-row,
+  .solicitud-row--compact {
     grid-template-columns: 1fr;
   }
 

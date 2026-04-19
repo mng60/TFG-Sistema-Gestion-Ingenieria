@@ -5,7 +5,7 @@ import usuarioService from '../services/usuarioService';
 import Toast from '../components/Toast';
 import ConfirmModal from '../components/ConfirmModal';
 import '../styles/GestionPages.css';
-import { Search, Plus, Pencil, Trash2 } from 'lucide-react'
+import { Eye, EyeOff, Search, Plus, Pencil, Trash2 } from 'lucide-react'
 
 function Usuarios() {
   const { empleado, isAdmin } = useEmpleadoAuth();
@@ -18,6 +18,7 @@ function Usuarios() {
   const [modalMode, setModalMode] = useState('crear');
   const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
   const [toast, setToast] = useState(null);
+  const [showPass, setShowPass] = useState(false);
   const [confirmModal, setConfirmModal] = useState(null);
 
   const [formData, setFormData] = useState({
@@ -80,6 +81,7 @@ function Usuarios() {
       telefono: '',
       email_personal: ''
     });
+    setShowPass(false);
     setShowModal(true);
   };
 
@@ -94,14 +96,15 @@ function Usuarios() {
       telefono: usuario.telefono || '',
       email_personal: usuario.email_personal || ''
     });
+    setShowPass(false);
     setShowModal(true);
   };
 
   const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    let val = e.target.value;
+    if (e.target.name === 'telefono') val = val.replace(/[^0-9+\-\s]/g, '');
+    else if (e.target.name === 'nombre') val = val.replace(/[0-9]/g, '');
+    setFormData({ ...formData, [e.target.name]: val });
   };
 
   const handleSubmit = async (e) => {
@@ -306,15 +309,22 @@ function Usuarios() {
                 <label>
                   {modalMode === 'crear' ? 'Contraseña *' : 'Contraseña (dejar vacío para no cambiar)'}
                 </label>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  required={modalMode === 'crear'}
-                  placeholder="Mínimo 6 caracteres"
-                  minLength="6"
-                />
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type={showPass ? 'text' : 'password'}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    required={modalMode === 'crear'}
+                    placeholder="Mínimo 6 caracteres"
+                    minLength="6"
+                    style={{ width: '100%', paddingRight: 38, boxSizing: 'border-box' }}
+                  />
+                  <button type="button" onClick={() => setShowPass(v => !v)} tabIndex={-1}
+                    style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#7f8c8d', padding: 0, display: 'flex' }}>
+                    {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
               </div>
 
               <div className="form-group">
@@ -337,8 +347,9 @@ function Usuarios() {
                   name="telefono"
                   value={formData.telefono}
                   onChange={handleInputChange}
-                  placeholder="612345678"
-                  maxLength="9"
+                  placeholder="600 000 000"
+                  maxLength="15"
+                  inputMode="tel"
                 />
               </div>
 

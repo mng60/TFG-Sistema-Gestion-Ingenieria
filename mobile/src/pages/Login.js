@@ -49,7 +49,7 @@ function Login() {
     setOlvideLoading(true);
 
     try {
-      await api.post('/tickets', { tipo: 'olvido_password', email: olvideEmail });
+      await api.post('/tickets', { tipo_usuario: 'empleado', email: olvideEmail, mensaje: 'Solicitud de recuperación de contraseña desde la app móvil.' });
       setOlvideMsg('Solicitud enviada. Un administrador restablecera tu contrasena en breve.');
     } catch {
       setOlvideMsg('Error al enviar la solicitud. Intentalo de nuevo.');

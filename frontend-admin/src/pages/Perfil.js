@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useEmpleadoAuth } from '../context/EmpleadoAuthContext';
 import axios from 'axios';
-import { Camera, Save, Lock, User } from 'lucide-react';
+import { Camera, Eye, EyeOff, Save, Lock, User } from 'lucide-react';
 import { getAvatarSrc } from '../utils/format';
 import '../styles/GestionPages.css';
 
@@ -21,6 +21,9 @@ function Perfil() {
   const [savingInfo, setSavingInfo] = useState(false);
   const [savingPass, setSavingPass] = useState(false);
   const [uploadingFoto, setUploadingFoto] = useState(false);
+  const [showPass1, setShowPass1] = useState(false);
+  const [showPass2, setShowPass2] = useState(false);
+  const [showPass3, setShowPass3] = useState(false);
 
   const showToast = (msg, type = 'success') => {
     setToast({ msg, type });
@@ -161,11 +164,11 @@ function Perfil() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
                   <div className="form-group">
                     <label>Nombre *</label>
-                    <input value={form.nombre} onChange={e => setForm({ ...form, nombre: e.target.value })} required />
+                    <input type="text" value={form.nombre} onChange={e => setForm({ ...form, nombre: e.target.value.replace(/[0-9]/g, '') })} required />
                   </div>
                   <div className="form-group">
                     <label>Teléfono</label>
-                    <input value={form.telefono} onChange={e => setForm({ ...form, telefono: e.target.value })} placeholder="Ej: +34 600 000 000" />
+                    <input type="tel" inputMode="tel" value={form.telefono} onChange={e => setForm({ ...form, telefono: e.target.value.replace(/[^0-9+\-\s]/g, '') })} placeholder="Ej: +34 600 000 000" maxLength="15" />
                   </div>
                   <div className="form-group">
                     <label>Email de acceso</label>
@@ -201,15 +204,30 @@ function Perfil() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 20 }}>
                   <div className="form-group">
                     <label>Contraseña actual *</label>
-                    <input type="password" value={passForm.currentPassword} onChange={e => setPassForm({ ...passForm, currentPassword: e.target.value })} required />
+                    <div style={{ position: 'relative' }}>
+                      <input type={showPass1 ? 'text' : 'password'} value={passForm.currentPassword} onChange={e => setPassForm({ ...passForm, currentPassword: e.target.value })} required style={{ width: '100%', paddingRight: 38, boxSizing: 'border-box' }} />
+                      <button type="button" onClick={() => setShowPass1(v => !v)} tabIndex={-1} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#7f8c8d', padding: 0, display: 'flex' }}>
+                        {showPass1 ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
                   </div>
                   <div className="form-group">
                     <label>Nueva contraseña *</label>
-                    <input type="password" value={passForm.newPassword} onChange={e => setPassForm({ ...passForm, newPassword: e.target.value })} required />
+                    <div style={{ position: 'relative' }}>
+                      <input type={showPass2 ? 'text' : 'password'} value={passForm.newPassword} onChange={e => setPassForm({ ...passForm, newPassword: e.target.value })} required style={{ width: '100%', paddingRight: 38, boxSizing: 'border-box' }} />
+                      <button type="button" onClick={() => setShowPass2(v => !v)} tabIndex={-1} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#7f8c8d', padding: 0, display: 'flex' }}>
+                        {showPass2 ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
                   </div>
                   <div className="form-group">
                     <label>Confirmar contraseña *</label>
-                    <input type="password" value={passForm.confirmPassword} onChange={e => setPassForm({ ...passForm, confirmPassword: e.target.value })} required />
+                    <div style={{ position: 'relative' }}>
+                      <input type={showPass3 ? 'text' : 'password'} value={passForm.confirmPassword} onChange={e => setPassForm({ ...passForm, confirmPassword: e.target.value })} required style={{ width: '100%', paddingRight: 38, boxSizing: 'border-box' }} />
+                      <button type="button" onClick={() => setShowPass3(v => !v)} tabIndex={-1} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#7f8c8d', padding: 0, display: 'flex' }}>
+                        {showPass3 ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
                   </div>
                 </div>
                 <button type="submit" className="btn-primary" disabled={savingPass} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>

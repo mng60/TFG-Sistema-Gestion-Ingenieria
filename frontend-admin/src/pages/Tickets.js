@@ -5,6 +5,8 @@ import {
   CalendarClock,
   CheckCheck,
   Clock,
+  Eye,
+  EyeOff,
   Globe,
   KeyRound,
   Mail,
@@ -80,6 +82,7 @@ function getTipoBadge(ticket) {
 function ResetPasswordModal({ ticket, onClose, onSuccess, showToast }) {
   const [newPassword, setNewPassword] = useState('');
   const [saving, setSaving] = useState(false);
+  const [showPass, setShowPass] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -118,14 +121,25 @@ function ResetPasswordModal({ ticket, onClose, onSuccess, showToast }) {
           </p>
           <div className="form-group">
             <label>Nueva contrasena *</label>
-            <input
-              type="text"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Minimo 6 caracteres"
-              required
-              autoFocus
-            />
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showPass ? 'text' : 'password'}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Minimo 6 caracteres"
+                required
+                autoFocus
+                style={{ width: '100%', paddingRight: 38, boxSizing: 'border-box' }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPass(v => !v)}
+                style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#7f8c8d', padding: 0, display: 'flex' }}
+                tabIndex={-1}
+              >
+                {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
           </div>
           <p style={{ fontSize: '0.82rem', color: '#e67e22', marginTop: -8 }}>
             Comparte la nueva contrasena por el canal acordado con el cliente.

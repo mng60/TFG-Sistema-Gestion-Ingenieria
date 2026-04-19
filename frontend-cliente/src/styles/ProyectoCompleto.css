@@ -492,10 +492,11 @@
     flex-direction: column;
     align-items: flex-start;
   }
+  .proyecto-header-info h1 { font-size: 1.35rem; }
   .chat-proyecto-btn { width: 100%; text-align: center; }
-  .tabs-container { overflow-x: auto; }
+  .tabs-container { overflow-x: auto; top: 56px; }
   .tab { white-space: nowrap; }
   .info-grid { grid-template-columns: 1fr; }
   .empleados-grid { grid-template-columns: 1fr; }
-  .tab-panel { padding: 20px; }
+  .tab-panel { padding: 20px 16px; }
 }

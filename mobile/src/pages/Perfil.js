@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import MobileLayout from '../components/layout/MobileLayout';
 import api from '../services/api';
 import { getAvatarInitial, getAvatarSrc } from '../utils/format';
-import { Camera, Save, Lock, LogOut, ChevronDown, ChevronUp } from 'lucide-react';
+import { Camera, Eye, EyeOff, Save, Lock, LogOut, ChevronDown, ChevronUp } from 'lucide-react';
 import '../styles/Perfil.css';
 
 function FieldGroup({ label, children }) {
@@ -28,6 +28,9 @@ function Perfil() {
   });
   const [passForm, setPassForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
   const [showPass, setShowPass] = useState(false);
+  const [showPwd1, setShowPwd1] = useState(false);
+  const [showPwd2, setShowPwd2] = useState(false);
+  const [showPwd3, setShowPwd3] = useState(false);
   const [toast, setToast] = useState(null);
   const [savingInfo, setSavingInfo] = useState(false);
   const [savingPass, setSavingPass] = useState(false);
@@ -150,16 +153,20 @@ function Perfil() {
           <FieldGroup label="Nombre *">
             <input
               className="perfil-input"
+              type="text"
               value={form.nombre}
-              onChange={e => setForm({ ...form, nombre: e.target.value })}
+              onChange={e => setForm({ ...form, nombre: e.target.value.replace(/[0-9]/g, '') })}
             />
           </FieldGroup>
           <FieldGroup label="Teléfono">
             <input
               className="perfil-input"
+              type="tel"
+              inputMode="tel"
               value={form.telefono}
-              onChange={e => setForm({ ...form, telefono: e.target.value })}
+              onChange={e => setForm({ ...form, telefono: e.target.value.replace(/[^0-9+\-\s]/g, '') })}
               placeholder="+34 600 000 000"
+              maxLength="15"
             />
           </FieldGroup>
           <FieldGroup label="Email de acceso">
@@ -191,16 +198,34 @@ function Perfil() {
           {showPass && (
             <div style={{ marginTop: 16 }}>
               <FieldGroup label="Contraseña actual *">
-                <input className="perfil-input" type="password" value={passForm.currentPassword}
-                  onChange={e => setPassForm({ ...passForm, currentPassword: e.target.value })} />
+                <div style={{ position: 'relative' }}>
+                  <input className="perfil-input" type={showPwd1 ? 'text' : 'password'} value={passForm.currentPassword}
+                    onChange={e => setPassForm({ ...passForm, currentPassword: e.target.value })} style={{ paddingRight: 38 }} />
+                  <button type="button" onClick={() => setShowPwd1(v => !v)} tabIndex={-1}
+                    style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#7f8c8d', padding: 0, display: 'flex' }}>
+                    {showPwd1 ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
               </FieldGroup>
               <FieldGroup label="Nueva contraseña *">
-                <input className="perfil-input" type="password" value={passForm.newPassword}
-                  onChange={e => setPassForm({ ...passForm, newPassword: e.target.value })} placeholder="Mínimo 6 caracteres" />
+                <div style={{ position: 'relative' }}>
+                  <input className="perfil-input" type={showPwd2 ? 'text' : 'password'} value={passForm.newPassword}
+                    onChange={e => setPassForm({ ...passForm, newPassword: e.target.value })} placeholder="Mínimo 6 caracteres" style={{ paddingRight: 38 }} />
+                  <button type="button" onClick={() => setShowPwd2(v => !v)} tabIndex={-1}
+                    style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#7f8c8d', padding: 0, display: 'flex' }}>
+                    {showPwd2 ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
               </FieldGroup>
               <FieldGroup label="Confirmar contraseña *">
-                <input className="perfil-input" type="password" value={passForm.confirmPassword}
-                  onChange={e => setPassForm({ ...passForm, confirmPassword: e.target.value })} />
+                <div style={{ position: 'relative' }}>
+                  <input className="perfil-input" type={showPwd3 ? 'text' : 'password'} value={passForm.confirmPassword}
+                    onChange={e => setPassForm({ ...passForm, confirmPassword: e.target.value })} style={{ paddingRight: 38 }} />
+                  <button type="button" onClick={() => setShowPwd3(v => !v)} tabIndex={-1}
+                    style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#7f8c8d', padding: 0, display: 'flex' }}>
+                    {showPwd3 ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
               </FieldGroup>
               <button onClick={handleSavePass} disabled={savingPass} className="perfil-btn">
                 <Lock size={16} /> {savingPass ? 'Cambiando...' : 'Cambiar contraseña'}

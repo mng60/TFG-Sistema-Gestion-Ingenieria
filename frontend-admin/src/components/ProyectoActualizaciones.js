@@ -193,6 +193,7 @@ function ProyectoActualizaciones({ proyectoId, actualizaciones, isAdmin, onReloa
                   type="date"
                   name="fecha_sugerida"
                   value={formData.fecha_sugerida}
+                  min={new Date().toISOString().split('T')[0]}
                   onChange={handleChange}
                 />
               </div>

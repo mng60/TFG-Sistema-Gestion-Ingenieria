@@ -135,9 +135,14 @@ function Clientes() {
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
+    let filtered = value;
+    if (name === 'telefono') filtered = value.replace(/[^0-9+\-\s]/g, '');
+    else if (name === 'codigo_postal') filtered = value.replace(/[^0-9]/g, '').slice(0, 5);
+    else if (name === 'cif') filtered = value.toUpperCase().slice(0, 9);
+    else if (name === 'persona_contacto') filtered = value.replace(/[0-9]/g, '');
     setFormData({
       ...formData,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : filtered
     });
   };
 
@@ -376,6 +381,8 @@ function Clientes() {
                     name="telefono"
                     value={formData.telefono}
                     onChange={handleInputChange}
+                    inputMode="tel"
+                    placeholder="600 000 000"
                   />
                 </div>
 
@@ -406,6 +413,9 @@ function Clientes() {
                     name="codigo_postal"
                     value={formData.codigo_postal}
                     onChange={handleInputChange}
+                    inputMode="numeric"
+                    maxLength="5"
+                    placeholder="03001"
                   />
                 </div>
 

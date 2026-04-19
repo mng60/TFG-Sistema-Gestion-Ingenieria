@@ -110,6 +110,7 @@ function ActualizacionesMobile({ proyectoId, actualizaciones, isAdmin, empleadoI
               <input
                 type="date"
                 value={formData.fecha_sugerida}
+                min={new Date().toISOString().split('T')[0]}
                 onChange={(e) => setFormData((prev) => ({ ...prev, fecha_sugerida: e.target.value }))}
               />
             </div>
