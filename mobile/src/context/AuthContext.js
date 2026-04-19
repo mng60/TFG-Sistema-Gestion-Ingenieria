@@ -31,6 +31,15 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
+    const handleUnauthorized = () => {
+      setEmpleado(null);
+    };
+
+    window.addEventListener('auth:unauthorized', handleUnauthorized);
+    return () => window.removeEventListener('auth:unauthorized', handleUnauthorized);
+  }, []);
+
+  useEffect(() => {
     if (!empleado) {
       setSocket(prev => { if (prev) prev.close(); return null; });
       setOnlineUsers(new Set());

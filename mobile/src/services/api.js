@@ -24,7 +24,12 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem('empleado_token');
       localStorage.removeItem('empleado');
-      window.location.href = '/login';
+      window.dispatchEvent(new CustomEvent('auth:unauthorized', {
+        detail: {
+          status: 401,
+          url: error.config?.url || null
+        }
+      }));
     }
     return Promise.reject(error);
   }

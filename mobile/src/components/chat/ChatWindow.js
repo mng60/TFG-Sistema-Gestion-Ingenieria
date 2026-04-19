@@ -13,7 +13,6 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
   const messagesContainerRef = useRef(null);
   const conversacionIdRef = useRef(null);
   const [conversacionLocal, setConversacionLocal] = useState(conversacion);
-  const syncFallbackTimeoutRef = useRef(null);
 
   const upsertMensaje = (mensajeNuevo) => {
     if (!mensajeNuevo) return;
@@ -43,15 +42,10 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
     });
   };
 
-  const scheduleMessagesReload = () => {
-    if (syncFallbackTimeoutRef.current) {
-      clearTimeout(syncFallbackTimeoutRef.current);
-    }
+  const removeMensajeTemporal = (clientTempId) => {
+    if (!clientTempId) return;
 
-    syncFallbackTimeoutRef.current = setTimeout(() => {
-      cargarMensajes();
-      syncFallbackTimeoutRef.current = null;
-    }, 1200);
+    setMensajes((prev) => prev.filter((msg) => msg.client_temp_id !== clientTempId));
   };
 
   const handleComposerFocus = () => {
@@ -64,12 +58,6 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
   useEffect(() => {
     setConversacionLocal(conversacion || null);
   }, [conversacion]);
-
-  useEffect(() => () => {
-    if (syncFallbackTimeoutRef.current) {
-      clearTimeout(syncFallbackTimeoutRef.current);
-    }
-  }, []);
 
   // Cargar mensajes cuando cambia la conversación
   useEffect(() => {
@@ -175,8 +163,6 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
         if (data.mensaje) {
           upsertMensaje(data.mensaje);
           scrollToBottom();
-        } else {
-          scheduleMessagesReload();
         }
         // El mensaje se enviará via Socket.io desde el backend
       } else {
@@ -324,6 +310,21 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
     }
 
     const clientTempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const optimisticMessage = {
+      id: null,
+      conversacion_id: conversacion.id,
+      user_id: currentUser.id,
+      tipo_usuario: 'empleado',
+      mensaje,
+      tipo_mensaje: tipoMensaje,
+      remitente_nombre: currentUser.nombre || 'Tu',
+      created_at: new Date().toISOString(),
+      client_temp_id: clientTempId,
+      pending: true
+    };
+
+    upsertMensaje(optimisticMessage);
+    scrollToBottom();
 
     socket.emit(
       'send_message',
@@ -343,11 +344,10 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
           return;
         }
 
-        scheduleMessagesReload();
+        removeMensajeTemporal(clientTempId);
+        showToast?.(response?.message || 'No se pudo enviar el mensaje', 'error');
       }
     );
-
-    scheduleMessagesReload();
   };
 
   const handleTyping = (isTyping) => {
@@ -414,7 +414,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
           <>
             {mensajes.map(mensaje => (
               <MessageBubble
-                key={mensaje.id}
+                key={mensaje.id ?? mensaje.client_temp_id}
                 mensaje={mensaje}
                 isOwn={mensaje.user_id === currentUser.id && mensaje.tipo_usuario === 'empleado'}
                 conversacion={conversacionLocal}
