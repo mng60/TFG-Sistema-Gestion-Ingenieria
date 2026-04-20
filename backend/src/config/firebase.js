@@ -3,6 +3,21 @@ const path = require('path');
 
 let firebaseApp = null;
 
+const normalizePrivateKey = (privateKey) => {
+  if (!privateKey) return privateKey;
+
+  let normalized = privateKey.trim();
+
+  if (
+    normalized.startsWith('"') &&
+    normalized.endsWith('"')
+  ) {
+    normalized = normalized.slice(1, -1);
+  }
+
+  return normalized.replace(/\\n/g, '\n');
+};
+
 const getServiceAccountFromEnv = () => {
   const projectId = process.env.FIREBASE_PROJECT_ID;
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
@@ -12,10 +27,20 @@ const getServiceAccountFromEnv = () => {
     return null;
   }
 
+  if (privateKey.includes('/n') && !privateKey.includes('\\n') && !privateKey.includes('\n')) {
+    console.warn('FIREBASE_PRIVATE_KEY parece usar /n en vez de \\n');
+  }
+
+  const normalizedPrivateKey = normalizePrivateKey(privateKey);
+
+  if (!normalizedPrivateKey.includes('BEGIN PRIVATE KEY')) {
+    console.warn('FIREBASE_PRIVATE_KEY no contiene el encabezado esperado de una clave PEM');
+  }
+
   return {
     projectId,
     clientEmail,
-    privateKey: privateKey.replace(/\\n/g, '\n')
+    privateKey: normalizedPrivateKey
   };
 };
 
@@ -38,6 +63,7 @@ const initializeFirebase = () => {
       serviceAccount = require(resolved);
     }
 
+    console.log('Inicializando Firebase Admin SDK con credenciales de', serviceAccount.projectId);
     firebaseApp = admin.initializeApp({
       credential: admin.credential.cert(serviceAccount)
     });
