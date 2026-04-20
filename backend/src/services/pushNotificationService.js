@@ -81,7 +81,7 @@ const sendChatPush = async ({ conversacion, mensajeCompleto, senderUserId, sende
       body,
       sender_name: senderName,
       message_body: body,
-      message_type: mensajeCompleto.tipo_mensaje || 'texto',
+      chat_message_type: mensajeCompleto.tipo_mensaje || 'texto',
       message_id: String(mensajeCompleto.id || ''),
       message_created_at: String(mensajeCompleto.created_at || ''),
       conversacion_id: String(conversacion.id),
