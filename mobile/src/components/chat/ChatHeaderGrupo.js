@@ -4,9 +4,8 @@ import ConfirmModal from '../common/ConfirmModal';
 import { ArrowLeft } from 'lucide-react';
 import { getAvatarInitial } from '../../utils/format';
 
-function ChatHeaderGrupo({ conversacion, currentUser, onConversacionEliminada, showToast, onBack, onOpenDirectChat }) {
+function ChatHeaderGrupo({ conversacion, currentUser, onConversacionEliminada, showToast, onBack, onOpenDirectChat, showInfoPanel, onOpenInfoPanel, onCloseInfoPanel }) {
   const [showMenu, setShowMenu] = useState(false);
-  const [showInfoPanel, setShowInfoPanel] = useState(false);
   const [confirmModal, setConfirmModal] = useState(null);
 
   const handleMenuAction = (action) => {
@@ -14,7 +13,7 @@ function ChatHeaderGrupo({ conversacion, currentUser, onConversacionEliminada, s
 
     switch (action) {
       case 'info':
-        setShowInfoPanel(true);
+        onOpenInfoPanel?.();
         break;
       case 'silenciar':
         break;
@@ -134,7 +133,7 @@ function ChatHeaderGrupo({ conversacion, currentUser, onConversacionEliminada, s
         <InfoPanelGrupo
           conversacion={conversacion}
           currentUser={currentUser}
-          onClose={() => setShowInfoPanel(false)}
+          onClose={onCloseInfoPanel}
           onConversacionEliminada={onConversacionEliminada}
           showToast={showToast}
           onOpenDirectChat={onOpenDirectChat}

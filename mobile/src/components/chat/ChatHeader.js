@@ -5,9 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import ConfirmModal from '../common/ConfirmModal';
 import { ArrowLeft } from 'lucide-react';
 
-function ChatHeader({ conversacion, currentUser, onConversacionEliminada, onBack, onlineUsers = new Set() }) {
+function ChatHeader({ conversacion, currentUser, onConversacionEliminada, onBack, onlineUsers = new Set(), showInfoPanel, onOpenInfoPanel, onCloseInfoPanel }) {
   const [showMenu, setShowMenu] = useState(false);
-  const [showInfoPanel, setShowInfoPanel] = useState(false);
   const [confirmModal, setConfirmModal] = useState(null);
   const navigate = useNavigate();
 
@@ -26,7 +25,7 @@ function ChatHeader({ conversacion, currentUser, onConversacionEliminada, onBack
 
     switch (action) {
       case 'info':
-        setShowInfoPanel(true);
+        onOpenInfoPanel?.();
         break;
       case 'proyectos':
         // Si es cliente, filtrar por sus proyectos
@@ -161,7 +160,7 @@ function ChatHeader({ conversacion, currentUser, onConversacionEliminada, onBack
           participant={otherParticipant}
           conversacion={conversacion}
           currentUser={currentUser}
-          onClose={() => setShowInfoPanel(false)}
+          onClose={onCloseInfoPanel}
         />
       )}
 

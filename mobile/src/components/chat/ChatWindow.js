@@ -4,7 +4,7 @@ import ChatHeaderGrupo from './ChatHeaderGrupo';
 import ChatFooter from './ChatFooter';
 import MessageBubble from './MessageBubble';
 
-function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones, onConversationRead, onConversacionEliminada, showToast, onBack, onlineUsers = new Set(), onOpenDirectChat, onConversacionCreada }) {
+function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones, onConversationRead, onConversacionEliminada, showToast, onBack, onlineUsers = new Set(), onOpenDirectChat, onConversacionCreada, showInfoPanel, onOpenInfoPanel, onCloseInfoPanel }) {
   const [mensajes, setMensajes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
@@ -63,6 +63,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
   useEffect(() => {
     if (!conversacion) {
       setMensajes([]);
+      conversacionIdRef.current = null;
       return;
     }
 
@@ -377,6 +378,9 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
           showToast={showToast}
           onBack={onBack}
           onOpenDirectChat={onOpenDirectChat}
+          showInfoPanel={showInfoPanel}
+          onOpenInfoPanel={onOpenInfoPanel}
+          onCloseInfoPanel={onCloseInfoPanel}
         />
       ) : (
         <ChatHeader
@@ -385,6 +389,9 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
           onConversacionEliminada={onConversacionEliminada}
           onBack={onBack}
           onlineUsers={onlineUsers}
+          showInfoPanel={showInfoPanel}
+          onOpenInfoPanel={onOpenInfoPanel}
+          onCloseInfoPanel={onCloseInfoPanel}
         />
       )}
 

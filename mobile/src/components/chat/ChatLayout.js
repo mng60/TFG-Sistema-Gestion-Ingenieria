@@ -17,10 +17,16 @@ function ChatLayout() {
   const [toast, setToast] = useState(null);
   // Mobile: 'list' | 'window'
   const [activeView, setActiveView] = useState('list');
+  const [showInfoPanel, setShowInfoPanel] = useState(false);
+  const showInfoPanelRef = useRef(false);
 
   useEffect(() => {
     activeViewRef.current = activeView;
   }, [activeView]);
+
+  useEffect(() => {
+    showInfoPanelRef.current = showInfoPanel;
+  }, [showInfoPanel]);
 
   const cargarConversaciones = useCallback(async () => {
     try {
@@ -86,6 +92,10 @@ function ChatLayout() {
     );
 
     const handlePopState = () => {
+      if (showInfoPanelRef.current) {
+        setShowInfoPanel(false);
+        return;
+      }
       if (activeViewRef.current === 'window') {
         conversacionActivaIdRef.current = null;
         setConversacionActiva(null);
@@ -162,6 +172,7 @@ function ChatLayout() {
     }
 
     conversacionActivaIdRef.current = conv?.id || null;
+    setShowInfoPanel(false);
     setConversacionActiva(conv ? { ...conv, mensajes_no_leidos: 0 } : null);
     setConversaciones((prev) => prev.map((c) =>
       c.id === conv?.id
@@ -171,7 +182,20 @@ function ChatLayout() {
     setActiveView('window');
   }, []);
 
+  const handleOpenInfoPanel = useCallback(() => {
+    window.history.pushState({ ...(window.history.state || {}), chatView: 'info' }, '');
+    setShowInfoPanel(true);
+  }, []);
+
+  const handleCloseInfoPanel = useCallback(() => {
+    window.history.back();
+  }, []);
+
   const handleBack = () => {
+    if (showInfoPanelRef.current) {
+      window.history.back();
+      return;
+    }
     if (activeViewRef.current === 'window') {
       window.history.back();
       return;
@@ -303,6 +327,9 @@ function ChatLayout() {
           onlineUsers={onlineUsers}
           onOpenDirectChat={handleOpenDirectChat}
           onConversacionCreada={handleConversacionEfimeraCreada}
+          showInfoPanel={showInfoPanel}
+          onOpenInfoPanel={handleOpenInfoPanel}
+          onCloseInfoPanel={handleCloseInfoPanel}
         />
       </div>
 
