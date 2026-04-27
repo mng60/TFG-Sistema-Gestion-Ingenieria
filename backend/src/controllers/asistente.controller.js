@@ -60,6 +60,25 @@ function detectarEasterEgg(texto) {
   return e ? e[0] : null;
 }
 
+// ── Saludos y conversación simple (sin LLM) ───────────────────────────────────
+const RESPUESTAS_CONVERSACIONALES = [
+  { re: /^(hola|hey|ey|hi|hello|buenas?|buen[oa]s? (dias?|tardes?|noches?))[\s!.]*$/,
+    r: ['Hola. Cuentame en que puedo ayudarte.', 'Hola. ¿En qué puedo ayudarte?', 'Hi! How can I help you?'] },
+  { re: /^(gracias|thanks?|thank you|merci|danke|molt[eo] gra[cz]|grac?ias)[\s!.]*$/i,
+    r: ['A ti. Si necesitas algo mas, aqui estoy.', 'De nada, para lo que necesites.'] },
+  { re: /^(ok|vale|perfecto|genial|entendido|de acuerdo|claro|understood)[\s!.]*$/i,
+    r: ['Perfecto. ¿Algo más en lo que pueda ayudarte?', 'De acuerdo. Si tienes otra duda, adelante.'] },
+  { re: /^(adios|bye|hasta luego|nos vemos|chao|ciao)[\s!.]*$/i,
+    r: ['Hasta luego. Si mas adelante necesitas algo, aqui estare.', 'Bye! Come back anytime.'] },
+];
+
+function respuestaConversacional(texto) {
+  for (const { re, r } of RESPUESTAS_CONVERSACIONALES) {
+    if (re.test(texto)) return r[Math.floor(Math.random() * r.length)];
+  }
+  return null;
+}
+
 // ── Fecha y hora (sin LLM) ────────────────────────────────────────────────────
 function esFechaHora(t) {
   return /que dia es|que fecha|que hora es|que horas son|en que mes|que dia de la semana|fecha de hoy|hoy que dia|dia de hoy|hora actual|hora ahora|que ano|dia y hora/.test(t);
@@ -161,6 +180,9 @@ const preguntar = async (req, res) => {
     const t         = norm(pregunta);
 
     // Respuestas sin LLM (instantáneas, no cuentan contra el rate limit)
+    const conv = respuestaConversacional(t);
+    if (conv) return res.json({ success: true, respuesta: conEgg(conv) });
+
     if (esFechaHora(t))        return res.json({ success: true, respuesta: conEgg(respuestaFechaHora(t)) });
     if (esTiempo(t))           return res.json({ success: true, respuesta: conEgg(await respuestaTiempo()) });
     if (esCalculadoraSolar(t)) return res.json({ success: true, respuesta: conEgg(respuestaCalculadoraSolar(t)) });

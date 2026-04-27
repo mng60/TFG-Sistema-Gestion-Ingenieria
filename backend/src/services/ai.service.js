@@ -1,51 +1,42 @@
-// Servicio IA — Gemini 2.0 Flash via Google AI Studio
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions';
-const GEMINI_MODEL   = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+// Servicio IA — Groq (Llama 3.3 70B), OpenAI-compatible
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const GROQ_MODEL   = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
+
 const AI_TEMPERATURE = 0.1;
 
-async function callGemini(messages) {
-  const response = await fetch(GEMINI_API_URL, {
+async function callGroq(messages, maxTokens) {
+  const response = await fetch(GROQ_API_URL, {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${process.env.GEMINI_API_KEY}`,
+      'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ model: GEMINI_MODEL, messages, max_tokens: 500, temperature: AI_TEMPERATURE }),
+    body: JSON.stringify({ model: GROQ_MODEL, messages, max_tokens: maxTokens, temperature: AI_TEMPERATURE }),
     signal: AbortSignal.timeout(15000)
   });
-
   const data = await response.json();
-  if (!response.ok) throw new Error(data.error?.message || `Gemini error ${response.status}`);
-  return data.choices[0].message.content.trim();
-}
-
-// Reintenta una vez si Gemini devuelve 429 (rate limit del plan gratuito: 15 rpm)
-async function callGeminiWithRetry(messages) {
-  try {
-    return await callGemini(messages);
-  } catch (err) {
-    if (err.message.includes('429')) {
-      await new Promise((r) => setTimeout(r, 5000));
-      return callGemini(messages);
-    }
-    throw err;
+  if (!response.ok) {
+    const msg = data.error?.message || `error ${response.status}`;
+    throw Object.assign(new Error(msg), { status: response.status });
   }
+  return data.choices[0].message.content.trim();
 }
 
 // history: array de { role: 'user'|'assistant', content: string }
 async function ask(systemPrompt, userMessage, history = []) {
+  if (!process.env.GROQ_API_KEY) {
+    throw new Error('No hay proveedor de IA configurado (GROQ_API_KEY)');
+  }
   const messages = [
     { role: 'system', content: systemPrompt },
     ...history,
     { role: 'user', content: userMessage }
   ];
-  return callGeminiWithRetry(messages);
+  return callGroq(messages, 500);
 }
 
-// Traduce un texto al idioma detectado en la pregunta del usuario
 async function traducirSiNecesario(texto, preguntaOriginal) {
-  const esEspanol = /^[a-záéíóúüñ\s\d¿¡.,!?;:()\-"']+$/i.test(preguntaOriginal) ||
-    /\b(como|cuando|donde|cuanto|que|cual|quien|cuantos|precio|luz|solar|hoy|ahora|franja|hora)\b/i.test(preguntaOriginal);
+  const esEspanol = /\b(como|cuando|donde|cuanto|que|cual|quien|precio|luz|solar|hoy|ahora|franja|hora|tiempo|cuanto)\b/i.test(preguntaOriginal);
   if (esEspanol) return texto;
   return ask(
     'Translate the following text to the same language as the user question. Keep numbers, units and time values exactly as they are. Output only the translated text.',
@@ -54,7 +45,7 @@ async function traducirSiNecesario(texto, preguntaOriginal) {
 }
 
 async function isAvailable() {
-  return Boolean(process.env.GEMINI_API_KEY);
+  return Boolean(process.env.GROQ_API_KEY);
 }
 
 module.exports = { ask, traducirSiNecesario, isAvailable };
