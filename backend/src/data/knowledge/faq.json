@@ -1,75 +1,42 @@
 [
   {
-    "id": "faq_plazo_general",
-    "categoria": "faq",
-    "ambito": "bluearc",
-    "titulo": "Plazos orientativos de ejecucion",
-    "contenido": "Los plazos dependen del tipo de trabajo y de la tramitacion necesaria. Como orientacion, un cambio de cuadro puede resolverse en 1 o 2 dias, una instalacion completa en vivienda suele requerir 1 a 2 semanas y un proyecto industrial puede extenderse varias semanas o meses. En autoconsumo, a la obra hay que sumar la parte administrativa y de distribuidora cuando aplique.",
-    "keywords": ["plazo", "tiempo", "cuanto tarda", "duracion", "dias", "semanas", "meses", "ejecucion"],
-    "fecha_revision": "2026-03-31"
+    "id": "faq_plazos",
+    "titulo": "Plazos de ejecución habituales",
+    "contenido": "Cambio o renovación de cuadro eléctrico: 1-2 días. Instalación eléctrica completa en vivienda: 3-7 días. Reforma parcial de local: 2-4 días. Instalación solar fotovoltaica en vivienda: 2-3 días de obra, más 2-4 semanas de tramitación administrativa con la distribuidora. Proyecto industrial complejo: 2-8 semanas según alcance. La visita técnica previa la realizamos en 48-72 h desde el primer contacto."
   },
   {
-    "id": "faq_garantia",
-    "categoria": "faq",
-    "ambito": "bluearc",
-    "titulo": "Garantias de mano de obra y materiales",
-    "contenido": "BlueArc ofrece garantia sobre la mano de obra y emplea materiales con garantia del fabricante. La duracion concreta puede variar segun el equipo instalado y el tipo de actuacion. En instalaciones solares, paneles e inversores suelen tener garantias especificas del fabricante que se detallan en el presupuesto o la ficha tecnica.",
-    "keywords": ["garantia", "averia", "fallo", "materiales", "mano de obra", "paneles", "inversor", "defecto"],
-    "fecha_revision": "2026-03-31"
-  },
-  {
-    "id": "faq_empresa_instaladora",
-    "categoria": "faq",
-    "ambito": "bluearc",
-    "titulo": "Empresa instaladora habilitada",
-    "contenido": "Para emitir certificados, tramitar legalizaciones y ejecutar instalaciones dentro del ambito reglamentario, debe intervenir una empresa instaladora habilitada en baja tension. BlueArc trabaja dentro de ese marco y adapta la tramitacion al tipo de instalacion y al procedimiento aplicable en Murcia.",
-    "keywords": ["instalador autorizado", "empresa habilitada", "certificado", "cie", "boletin", "legalizacion", "quien puede hacerlo"],
-    "fecha_revision": "2026-03-31"
-  },
-  {
-    "id": "faq_subvenciones_variable",
-    "categoria": "faq",
-    "ambito": "murcia",
-    "titulo": "Subvenciones y ayudas: informacion sujeta a convocatoria",
-    "contenido": "Las ayudas para autoconsumo y eficiencia energetica cambian con las convocatorias y presupuestos disponibles. En Murcia han existido programas vinculados al autoconsumo y al almacenamiento, pero su disponibilidad y cuantia deben verificarse en cada momento. BlueArc puede orientar al cliente y revisar si hay lineas abiertas en el momento de preparar el proyecto.",
-    "keywords": ["subvenciones", "ayudas", "murcia", "autoconsumo", "next generation", "idae", "eficiencia energetica", "convocatoria"],
-    "fuente_url": "https://sede.carm.es/web/pagina?IDCONTENIDO=3683&IDTIPO=240&RASTRO=c%24m40229",
-    "fecha_revision": "2026-03-31"
+    "id": "faq_presupuesto_gratis",
+    "titulo": "Visita técnica y presupuesto",
+    "contenido": "La visita técnica y el presupuesto son completamente gratuitos y sin compromiso. Tras la visita entregamos un presupuesto detallado por escrito en menos de 48 h. El presupuesto incluye materiales, mano de obra y tramitación. No hay letra pequeña: lo que está en el presupuesto es lo que pagas, salvo que durante la ejecución aparezca alguna incidencia no visible previamente, que siempre te comunicamos antes de proceder."
   },
   {
     "id": "faq_urgencias",
-    "categoria": "faq",
-    "ambito": "bluearc",
-    "titulo": "Averias y urgencias electricas",
-    "contenido": "Si hay una averia urgente, BlueArc puede atender incidencias electricas y priorizar intervenciones de seguridad. En casos con olor a quemado, humo, chisporroteos o riesgo para personas, lo correcto es cortar suministro si puede hacerse con seguridad y contactar de inmediato con un profesional. No es recomendable manipular el cuadro o conductores activos sin personal cualificado.",
-    "keywords": ["urgencia", "averia", "sin luz", "chispa", "olor a quemado", "cuadro", "emergencia electrica", "peligro"],
-    "fecha_revision": "2026-03-31"
+    "titulo": "Averías y urgencias eléctricas",
+    "contenido": "Atendemos urgencias eléctricas de lunes a sábado hasta las 21:00 h. El tiempo de respuesta habitual es de menos de 3 horas en el área metropolitana de Murcia y menos de 4-5 horas en el resto de la región. Si hay olor a quemado, chisporroteos, humo o riesgo para personas, corta el suministro desde el interruptor general si puedes hacerlo con seguridad y llama de inmediato. No manipules el cuadro ni conductores sin un técnico."
+  },
+  {
+    "id": "faq_subvenciones",
+    "titulo": "Ayudas y subvenciones disponibles",
+    "contenido": "En la Región de Murcia han existido ayudas para instalaciones de autoconsumo solar y puntos de recarga de vehículo eléctrico, a través de convocatorias de la CARM y de programas estatales del IDAE. La disponibilidad y cuantía cambia con cada convocatoria. En BlueArc te orientamos sobre las líneas abiertas en el momento de preparar tu proyecto y gestionamos la documentación necesaria para solicitarlas."
+  },
+  {
+    "id": "faq_empresa_habilitada",
+    "titulo": "Habilitación y certificaciones de BlueArc",
+    "contenido": "BlueArc Ingeniería está inscrita como empresa instaladora habilitada en baja tensión (categoría especialista) en el Registro de Instaladores de la Consejería de Industria de la Región de Murcia. Podemos emitir certificados de instalación eléctrica (CIE), tramitar legalizaciones y firmar proyectos de baja tensión. Disponemos de seguro de responsabilidad civil y todos nuestros técnicos tienen la habilitación individual correspondiente."
+  },
+  {
+    "id": "faq_solar_murcia",
+    "titulo": "Por qué Murcia es ideal para el autoconsumo solar",
+    "contenido": "Murcia es una de las provincias con mayor irradiación solar de España, con más de 300 días de sol al año y una media de 1.800-2.000 horas de sol anuales. Esto hace que una instalación solar aquí genere entre un 20 y un 30 % más de energía que en el norte de España con la misma potencia instalada. El retorno de la inversión en una vivienda unifamiliar suele estar entre 6 y 9 años, y en empresa con buen consumo diurno entre 4 y 7 años."
   },
   {
     "id": "faq_portal_cliente",
-    "categoria": "faq",
-    "ambito": "bluearc",
-    "titulo": "Acceso al portal de clientes",
-    "contenido": "Los clientes pueden disponer de un portal privado para revisar el estado del proyecto, presupuestos, documentos y comunicaciones. El acceso se facilita cuando el proyecto o servicio lo requiere. Si un cliente aun no tiene acceso, puede solicitarlo por los canales de contacto de BlueArc.",
-    "keywords": ["portal cliente", "login", "area cliente", "acceso", "documentos", "presupuestos", "seguimiento"],
-    "fecha_revision": "2026-03-31"
+    "titulo": "Portal de clientes de BlueArc",
+    "contenido": "Disponemos de un portal privado para clientes donde puedes consultar el estado de tu proyecto, ver y descargar presupuestos y documentos, y comunicarte directamente con el equipo. El acceso se facilita cuando el proyecto lo requiere. Si aún no tienes acceso y lo necesitas, contáctanos por email o teléfono y te lo activamos en el mismo día."
   },
   {
-    "id": "faq_murcia_ventaja_solar",
-    "categoria": "faq",
-    "ambito": "murcia",
-    "titulo": "Por que Murcia suele ser favorable para autoconsumo solar",
-    "contenido": "Murcia tiene buenas condiciones de irradiacion solar y eso suele favorecer la rentabilidad del autoconsumo fotovoltaico. Aun asi, la produccion real depende de orientacion, sombras, inclinacion, potencia instalada y perfil de consumo. Por eso BlueArc realiza estudio previo antes de dar una propuesta tecnica o economica.",
-    "keywords": ["murcia", "solar", "rentabilidad", "autoconsumo", "irradiacion", "placas", "amortizacion", "produccion"],
-    "fecha_revision": "2026-03-31"
-  },
-  {
-    "id": "faq_fuera_de_murcia",
-    "categoria": "faq",
-    "ambito": "bluearc",
-    "titulo": "Consultas fuera de la Region de Murcia",
-    "contenido": "La base de conocimiento del asistente esta priorizada para normativa y tramitacion aplicable en la Region de Murcia. Si BlueArc amplia actividad a otras comunidades, la informacion regional debera actualizarse o ampliarse con nuevas fuentes locales. Para consultas fuera de Murcia, la respuesta automatica debe tomarse solo como orientacion general y no como criterio definitivo de tramitacion.",
-    "keywords": ["fuera de murcia", "otra comunidad", "espana", "otra region", "otra provincia", "expansion", "tramites fuera"],
-    "fecha_revision": "2026-03-31"
+    "id": "faq_factura",
+    "titulo": "Facturación e IVA",
+    "contenido": "Todos los precios que te damos en el asistente o en los presupuestos orientativos son sin IVA. El IVA aplicable es el general del 21 %, salvo en obras de renovación en viviendas particulares donde puede aplicarse el tipo reducido del 10 % si se cumplen los requisitos legales (vivienda de uso privado, sin materiales que superen el 40 % del total). En el presupuesto formal siempre indicamos el IVA aplicable."
   }
 ]

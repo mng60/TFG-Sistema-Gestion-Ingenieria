@@ -2,25 +2,31 @@
   {
     "id": "empresa_descripcion",
     "titulo": "Sobre BlueArc Ingeniería",
-    "contenido": "BlueArc Ingeniería es una empresa especializada en ingeniería eléctrica ubicada en la Región de Murcia. Ofrecemos servicios de instalaciones eléctricas en baja y media tensión, proyectos fotovoltaicos, legalización de instalaciones y mantenimiento eléctrico. Trabajamos con clientes residenciales, comerciales e industriales.",
-    "keywords": ["empresa", "quiénes", "somos", "bluearc", "ingeniería", "murcia", "qué hacéis", "dedicáis"]
+    "contenido": "BlueArc Ingeniería es una empresa de ingeniería eléctrica con sede en Murcia capital, fundada en 2015. Contamos con un equipo de 12 profesionales entre ingenieros, técnicos y administrativos. Estamos habilitados como empresa instaladora de baja tensión (categoría especialista) y disponemos de seguro de responsabilidad civil. Trabajamos con clientes residenciales, comerciales e industriales en toda la Región de Murcia."
   },
   {
     "id": "empresa_zona",
     "titulo": "Zona de actuación",
-    "contenido": "BlueArc Ingeniería trabaja principalmente en la Región de Murcia: Murcia capital, Cartagena, Lorca, Molina de Segura, Alcantarilla, Totana, Mazarrón, San Javier, Águilas y toda la región. Para proyectos fuera de la zona habitual, consultamos sin compromiso.",
-    "keywords": ["zona", "donde", "trabajan", "murcia", "cartagena", "lorca", "molina", "alcantarilla", "cobertura", "actuación", "desplazamiento"]
+    "contenido": "Cubrimos toda la Región de Murcia sin coste de desplazamiento adicional: Murcia capital, Cartagena, Lorca, Molina de Segura, Alcantarilla, Totana, Mazarrón, San Javier, Águilas, Yecla, Caravaca de la Cruz y pedanías. Para proyectos fuera de la región consultamos sin compromiso y valoramos caso a caso."
   },
   {
     "id": "empresa_contacto",
-    "titulo": "Contacto y horario",
-    "contenido": "Puedes contactar con BlueArc Ingeniería a través del formulario de contacto en nuestra web, por email en bluearc.ingenieria@gmail.com o por teléfono en el +34 900 123 456. Atendemos de lunes a viernes de 8:00 a 18:00. También puedes solicitar una visita técnica gratuita sin compromiso.",
-    "keywords": ["contacto", "teléfono", "email", "correo", "llamar", "horario", "atención", "contactar", "hablar", "visita", "cita"]
+    "titulo": "Contacto, horario y respuesta",
+    "contenido": "Puedes contactarnos por el formulario web, por email en bluearc.ingenieria@gmail.com o llamando al +34 968 45 23 10. Atendemos de lunes a viernes de 8:00 a 18:00 h. Respondemos solicitudes de presupuesto en menos de 24 h en días laborables. Para urgencias eléctricas disponemos de línea de guardia de lunes a sábado hasta las 21:00 h."
   },
   {
     "id": "empresa_proceso",
     "titulo": "Cómo trabajamos",
-    "contenido": "Nuestro proceso: primero realizamos una visita técnica gratuita para evaluar el trabajo. Luego preparamos un presupuesto detallado en menos de 48 horas. Una vez aprobado, ejecutamos el proyecto con materiales de primera calidad. Finalmente tramitamos toda la documentación y legalizaciones necesarias ante la Consejería de Industria de la Región de Murcia.",
-    "keywords": ["proceso", "cómo", "funciona", "trabajan", "visita", "pasos", "tramite", "documentacion", "como trabajais"]
+    "contenido": "Nuestro proceso es: (1) Contacto inicial y recogida de información básica. (2) Visita técnica gratuita en 48-72 h. (3) Presupuesto detallado en menos de 48 h tras la visita. (4) Ejecución del proyecto con materiales de primera calidad. (5) Pruebas y verificaciones finales. (6) Tramitación de toda la documentación y legalizaciones ante la Consejería de Industria de la Región de Murcia. Entregamos siempre memoria técnica y garantía por escrito."
+  },
+  {
+    "id": "empresa_garantias",
+    "titulo": "Garantías y calidad",
+    "contenido": "Ofrecemos 2 años de garantía sobre mano de obra en todas nuestras instalaciones. Los materiales llevan la garantía del fabricante: habitualmente 10 años en paneles solares, 5 años en inversores y 2 años en material eléctrico general. Trabajamos con marcas contrastadas: Schneider Electric y ABB en cuadros y protecciones, LONGi y JA Solar en paneles fotovoltaicos, SMA y Fronius en inversores, y Victron Energy en sistemas con baterías."
+  },
+  {
+    "id": "empresa_pagos",
+    "titulo": "Formas de pago",
+    "contenido": "Aceptamos transferencia bancaria, tarjeta y domiciliación. En obras de importe superior a 3.000 € aplicamos un esquema de pagos: 30 % a la firma del contrato, 40 % al inicio de los trabajos y 30 % a la entrega con documentación. En instalaciones solares podemos orientarte sobre financiación bancaria con entidades con las que colaboramos habitualmente."
   }
 ]
