@@ -1,256 +1,117 @@
 const path = require('path');
-const fs = require('fs');
+const fs   = require('fs');
 const { ask, isAvailable } = require('../services/ai.service');
-const {
-  construirRespuestaPrecio
-} = require('./helpers/asistentePrecio.helper');
-const {
-  esConsultaEnergiaActual,
-  construirRespuestaEnergia
-} = require('./helpers/asistenteEnergia.helper');
-const {
-  esConsultaNormativa,
-  construirRespuestaNormativa
-} = require('./helpers/asistenteNormativa.helper');
-const {
-  normalizar,
-  normalizarTextoPlano,
-  expandirConSinonimos,
-  truncar
-} = require('./helpers/asistenteTexto.helper');
-const {
-  extraerPreguntaSinSaludo,
-  esConsultaFechaHora,
-  construirRespuestaFechaHora,
-  esConsultaTiempo,
-  construirRespuestaTiempo,
-  esConsultaCalculadoraSolar,
-  construirRespuestaCalculadoraSolar,
-  esConsultaCapacidades,
-  construirRespuestaCapacidades,
-  detectarEasterEgg,
-} = require('./helpers/asistenteGeneral.helper');
+const { esConsultaEnergiaActual, construirRespuestaEnergia } = require('./helpers/asistenteEnergia.helper');
 
-let knowledgeBase = [];
-
-function loadKnowledge() {
+// ── Conocimiento embebido en el system prompt ─────────────────────────────────
+function cargarConocimiento() {
   const dir = path.join(__dirname, '../data/knowledge');
-  const files = fs.readdirSync(dir).filter((f) => f.endsWith('.json'));
+  const entradas = fs.readdirSync(dir)
+    .filter((f) => f.endsWith('.json'))
+    .flatMap((f) => JSON.parse(fs.readFileSync(path.join(dir, f), 'utf-8')));
+  return entradas.map((e) => `### ${e.titulo}\n${e.contenido}`).join('\n\n');
+}
 
-  for (const file of files) {
-    const data = JSON.parse(fs.readFileSync(path.join(dir, file), 'utf-8'));
-    knowledgeBase = knowledgeBase.concat(data);
+const CONOCIMIENTO = cargarConocimiento();
+console.log(`[AsistenteIA] Conocimiento: ${CONOCIMIENTO.length} caracteres`);
+
+// ── Utilidades ────────────────────────────────────────────────────────────────
+const DIAS  = ['domingo','lunes','martes','miercoles','jueves','viernes','sabado'];
+const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+
+function getMadridDate() {
+  return new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Madrid' }));
+}
+
+function norm(texto) {
+  return String(texto || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+}
+
+function detectarEasterEgg(texto) {
+  const j = texto.match(/\b(xd|uwu|ewe|owo)\b/i);
+  if (j) return j[1].toLowerCase();
+  const e = texto.match(/(?<![a-z])(?::\)|;\)|:D|:P|:\(|:o|:O|\^_\^|>_<|<3)(?![a-z])/i);
+  return e ? e[0] : null;
+}
+
+// ── Fecha y hora (sin LLM — respuesta instantánea) ────────────────────────────
+function esFechaHora(t) {
+  return /que dia es|que fecha|que hora es|que horas son|en que mes|que dia de la semana|fecha de hoy|hoy que dia|dia de hoy|hora actual|hora ahora|que ano|dia y hora/.test(t);
+}
+
+function respuestaFechaHora(t) {
+  const now = getMadridDate();
+  const h = String(now.getHours()).padStart(2, '0');
+  const m = String(now.getMinutes()).padStart(2, '0');
+  if (/que hora es|hora actual|hora ahora|que horas son/.test(t))
+    return `Son las ${h}:${m} h (hora de Madrid).`;
+  if (/en que mes/.test(t))
+    return `Estamos en ${MESES[now.getMonth()]} de ${now.getFullYear()}.`;
+  return `Hoy es ${DIAS[now.getDay()]} ${now.getDate()} de ${MESES[now.getMonth()]} de ${now.getFullYear()}. Son las ${h}:${m} h.`;
+}
+
+// ── Tiempo meteorológico (sin LLM — datos en tiempo real) ────────────────────
+function esTiempo(t) {
+  return /que tiempo hace|como esta el tiempo|va a llover|hace frio|hace calor|temperatura.*hoy|tiempo.*hoy|tiempo.*murcia|clima.*murcia|llueve|lluvia.*hoy|sol.*hoy|nublado|viento.*hoy/.test(t);
+}
+
+async function respuestaTiempo() {
+  const key = process.env.OPENWEATHER_API_KEY;
+  if (!key) return 'No tengo acceso al tiempo ahora mismo. Consulta tu app del tiempo.';
+  try {
+    const r = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=Murcia,ES&appid=${key}&units=metric&lang=es`);
+    if (!r.ok) throw new Error();
+    const d = await r.json();
+    return `Ahora en Murcia: ${d.weather[0].description}, ${Math.round(d.main.temp)} °C (sensacion ${Math.round(d.main.feels_like)} °C), humedad ${d.main.humidity}%, viento ${Math.round(d.wind.speed * 3.6)} km/h.`;
+  } catch {
+    return 'No he podido obtener el tiempo ahora mismo. Intentalo en unos minutos.';
   }
-
-  console.log(`[AsistenteIA] Base de conocimiento: ${knowledgeBase.length} entradas`);
 }
 
-loadKnowledge();
+// ── Calculadora solar (sin LLM — aritmética pura) ────────────────────────────
+const W_PANEL = 430, M2_PANEL = 1.9;
 
-function esPreguntaPrecio(texto) {
-  return /cuanto|cuesta|coste|precio|presupuesto|vale|tarifa/.test(normalizarTextoPlano(texto));
+function esCalculadoraSolar(t) {
+  return (
+    (/cuantos paneles|cuantas placas|cuantos kw|cuanta potencia|cuanto kwp/.test(t) && /necesito|para|tengo|quiero|caben/.test(t)) ||
+    (/cuantos m2|cuantos metros|superficie.*solar|tejado.*para/.test(t) && /panel|placa|solar|kwp/.test(t))
+  );
 }
 
-// Heurística ligera: si ≥2 palabras inglesas comunes → inglés
-function esEnIngles(texto) {
-  const t = texto.toLowerCase();
-  const marcadores = ['what', 'when', 'how', 'which', 'where', 'electricity', 'price', 'cheapest', 'peak', 'tariff', 'today', 'right now', 'current', 'off-peak'];
-  return marcadores.filter((m) => t.includes(m)).length >= 2;
-}
-
-function esPreguntaSobreTema(texto) {
-  const t = normalizarTextoPlano(texto);
-  const tieneTema =
-    /solar|fotovoltaic|placas|paneles|autoconsumo/.test(t) ||
-    /cuadro electrico|cambiar el cuadro|cuadro de luz|magnetotermic|diferencial/.test(t) ||
-    /\bcie\b|boletin electrico|certificado electrico|legalizacion electrica/.test(t) ||
-    /instalacion electrica|reforma electrica|cableado electrico/.test(t) ||
-    /mantenimiento electrico|averia electrica|urgencia electrica/.test(t) ||
-    /nave industrial|instalacion (en|para) (nave|empresa|local|negocio)/.test(t);
-  const tieneIntencion =
-    /instalar|colocar|poner|montar|necesito|quiero|quisiera|queremos|me interesa|nos interesa/.test(t);
-  return tieneTema && tieneIntencion;
-}
-
-function esPreguntaConversacional(pregunta) {
-  const texto = normalizarTextoPlano(pregunta).trim();
-  return /puedo hacerte otra pregunta|te puedo hacer otra pregunta|otra pregunta|sigues ahi|estas ahi|puedes ayudarme|me puedes ayudar|puedes ayudar|me ayudas|gracias|muchas gracias|vale|perfecto|ok|genial|adios|hasta luego|chao|nos vemos|me voy|^hola|^hey|^ey\b|^buenas|^buenos dias|^buenas tardes|^buenas noches/.test(texto);
-}
-
-function construirRespuestaConversacional(pregunta) {
-  const texto = normalizarTextoPlano(pregunta).trim();
-
-  if (/puedo hacerte otra pregunta|te puedo hacer otra pregunta|otra pregunta/.test(texto)) {
-    return 'Claro, preguntame lo que necesites y te ayudo encantado.';
+function respuestaCalculadoraSolar(t) {
+  const mKw = t.match(/(\d+(?:[.,]\d+)?)\s*kw/);
+  const mM2 = t.match(/(\d+(?:[.,]\d+)?)\s*(?:m2|metros cuadrados)/);
+  const mP  = t.match(/(\d+)\s*(?:paneles|placas)/);
+  if (mKw) {
+    const kw = parseFloat(mKw[1].replace(',', '.'));
+    const p  = Math.ceil(kw * 1000 / W_PANEL);
+    return `Para ${kw} kWp necesitas unos ${p} paneles de ${W_PANEL} W, que ocupan aprox. ${(p * M2_PANEL).toFixed(1)} m² (orientativo, sin IVA). Con una visita rapida ajustamos el dimensionado a tu consumo real.`;
   }
-
-  if (/sigues ahi|estas ahi/.test(texto)) {
-    return 'Si, sigo aqui. Dime y lo vemos.';
+  if (mM2) {
+    const m2 = parseFloat(mM2[1].replace(',', '.'));
+    const p  = Math.floor(m2 / M2_PANEL);
+    return `Con ${m2} m² caben unos ${p} paneles, equivalentes a ${((p * W_PANEL) / 1000).toFixed(2)} kWp. Contacta con nosotros y lo estudiamos a fondo.`;
   }
-
-  if (/puedes ayudarme|me puedes ayudar|puedes ayudar|me ayudas/.test(texto)) {
-    return 'Claro. Cuentame tu duda y te ayudo en lo que pueda.';
+  if (mP) {
+    const n = parseInt(mP[1]);
+    return `${n} paneles de ${W_PANEL} W = ${((n * W_PANEL) / 1000).toFixed(2)} kWp, unos ${(n * M2_PANEL).toFixed(1)} m² de tejado. Orientativo; el estudio real ajusta segun consumo y orientacion.`;
   }
-
-  if (/^hola|^hey|^hola caracola|^bon dia|^bona tarda|^ey\b|^buenas|^buenos dias|^buenas tardes|^buenas noches/.test(texto)) {
-    return 'Hola. Cuentame en que puedo ayudarte y lo vemos.';
-  }
-
-  if (/gracias|muchas gracias/.test(texto)) {
-    return 'A ti. Si quieres, puedes hacerme otra pregunta y seguimos.';
-  }
-
-  if (/vale|perfecto|ok|genial/.test(texto)) {
-    return 'Perfecto. Si quieres, seguimos con otra duda.';
-  }
-
-  if (/adios|hasta luego|chao|nos vemos|me voy/.test(texto)) {
-    return 'Hasta luego. Si mas adelante necesitas algo, aqui estare para ayudarte.';
-  }
-
-  return null;
+  return 'Para orientarte necesito saber la potencia que buscas (en kW) o los m² de tejado disponibles.';
 }
 
-function esMensajeReinicioConversacion(texto = '') {
-  const plano = normalizarTextoPlano(texto).trim();
-  return /puedo hacerte otra pregunta|te puedo hacer otra pregunta|otra pregunta|nueva pregunta|cambio de tema/.test(plano);
-}
+// ── System prompt con todo el conocimiento embebido ───────────────────────────
+const SYSTEM_PROMPT = `Eres Blue, el asistente virtual de BlueArc Ingeniería, empresa de ingeniería eléctrica de la Región de Murcia.
+Responde en el mismo idioma en que te escriba el usuario, con tono cercano, directo y profesional, como un técnico de confianza.
+Responde en un máximo de 2-3 frases claras. Sin listas, guiones ni títulos.
+Si hablas de precios, siempre como orientativo y sin IVA. No inventes datos, precios, plazos ni trámites que no estén en el conocimiento.
+Si te falta algún dato importante, pídelo con naturalidad: "si me dices..." o "si me cuentas...".
+Si no tienes información suficiente, recomienda contactar: "usa el formulario de contacto" o "contacta con nosotros".
 
-function obtenerMensajesUsuarioRecientes(historial = [], limite = 5) {
-  const indiceUltimoReinicio = [...historial]
-    .map((msg, index) => ({ msg, index }))
-    .filter(({ msg }) => msg && msg.from === 'user' && typeof msg.text === 'string' && esMensajeReinicioConversacion(msg.text))
-    .map(({ index }) => index)
-    .pop();
+## CONOCIMIENTO DE BLUEARC INGENIERÍA
 
-  const historialActivo = typeof indiceUltimoReinicio === 'number'
-    ? historial.slice(indiceUltimoReinicio + 1)
-    : historial;
+${CONOCIMIENTO}`;
 
-  return historialActivo
-    .filter((msg) => msg && msg.from === 'user' && typeof msg.text === 'string')
-    .slice(-limite);
-}
-
-function esSeguimientoDePrecio(pregunta, historial = []) {
-  const texto = normalizarTextoPlano(pregunta);
-  const pareceSeguimiento = /m2|metros|cubierta|terraza|tejado|techo|plana|inclinada|zonas comunes|comunes|baterias|sin baterias|con baterias|repartir|viviendas|seria|serian|solo para|parcial|integral|cuadro|local|nave|vivienda|casa|piso|oficina|bar|tienda|boletin|cie|ambas opciones|las dos opciones|ambos casos|con y sin|precio de ambas|precio de los dos|dos opciones|baremo|alguna recomendacion|que me recomiendas|que opcion recomiendas|que harias|y esa opcion|esa opcion|esa otra|antigua|vieja|funciona|defectos|arreglar|corregir|adaptar cableado|merece la pena|recomendarias|sustituir|sin tocar|solo el cuadro|solo cambiar|sin cableado|sin cie/.test(texto);
-  if (!pareceSeguimiento) return false;
-
-  const mensajesUsuario = obtenerMensajesUsuarioRecientes(historial, 4);
-  const hayContextoPrecio = mensajesUsuario.some((msg) => {
-    const previo = normalizarTextoPlano(msg.text);
-    return esPreguntaPrecio(previo) || /baremo|presupuesto|orientacion/.test(previo);
-  });
-
-  if (hayContextoPrecio) return true;
-
-  const ultimoMensajeAsistente = [...historial]
-    .reverse()
-    .find((msg) => msg && msg.from === 'bot' && typeof msg.text === 'string');
-
-  if (!ultimoMensajeAsistente) return false;
-
-  const textoBot = normalizarTextoPlano(ultimoMensajeAsistente.text);
-  return /rango orientativo|baremo|m2 utiles|zonas comunes|repartir entre viviendas|sin iva|baterias|te lo ajusto|te lo afino|te oriento mejor|ambas opciones|con o sin|cubierta|plana o inclinada/.test(textoBot);
-}
-
-function construirPreguntaCompuesta(pregunta, historial = []) {
-  const mensajesUsuario = obtenerMensajesUsuarioRecientes(historial, 6)
-    .map((msg) => msg.text.trim())
-    .filter(Boolean);
-
-  if (mensajesUsuario.length === 0) return pregunta;
-  return [...mensajesUsuario, pregunta].join('. ');
-}
-
-function limitarFrases(texto, maxFrases = 3) {
-  const frases = texto
-    .replace(/\s+/g, ' ')
-    .trim()
-    .match(/[^.!?]+[.!?]?/g);
-
-  if (!frases) return texto.trim();
-  return frases.slice(0, maxFrases).join(' ').trim();
-}
-
-function sanearRespuestaModelo(texto) {
-  return texto
-    .replace(/\n+/g, ' ')
-    .replace(/#{2,}.*$/gim, '')
-    .replace(/instruccion[^.!?]*[.!?]?/gi, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-const SCORE_MIN = 3;
-
-function buscarContexto(pregunta, topN = 3) {
-  const tokensBase = normalizar(pregunta);
-  const tokens = expandirConSinonimos(tokensBase);
-
-  const puntuados = knowledgeBase.map((entrada) => {
-    let score = 0;
-    const tituloTokens = normalizar(entrada.titulo);
-    const contenidoTokens = normalizar(entrada.contenido);
-    const matchedKeywords = new Set();
-
-    for (const token of tokens) {
-      if (tituloTokens.includes(token)) score += 3;
-      if (contenidoTokens.includes(token)) score += 1;
-    }
-
-    for (const kw of (entrada.keywords || [])) {
-      const kwTokens = normalizar(kw);
-      if (kwTokens.some((kt) => tokens.has(kt))) {
-        matchedKeywords.add(kw);
-      }
-    }
-
-    score += matchedKeywords.size * 2;
-
-    return { entrada, score };
-  });
-
-  return puntuados
-    .filter((p) => p.score >= SCORE_MIN)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, topN)
-    .map((p) => ({
-      entrada: p.entrada,
-      score: p.score,
-      fragmento: `### ${p.entrada.titulo}\n${truncar(p.entrada.contenido)}`
-    }));
-}
-
-const cache = new Map();
-const CACHE_MAX = 50;
-
-function claveCache(pregunta) {
-  return normalizar(pregunta).join('_');
-}
-
-function guardarEnCache(clave, respuesta) {
-  if (cache.size >= CACHE_MAX) {
-    cache.delete(cache.keys().next().value);
-  }
-  cache.set(clave, respuesta);
-}
-
-const SYSTEM_PROMPT = `Eres el asistente virtual de BlueArc Ingenieria, empresa de ingenieria electrica de la Region de Murcia.
-Ayudas con dudas sobre servicios electricos, precios orientativos y normativa tecnica.
-Responde siempre en el mismo idioma en que te escriba el usuario, con tono cercano, directo y profesional, como si fuera un tecnico de confianza explicando algo a un cliente.
-Responde en un maximo de 2 frases claras. No uses listas, guiones ni titulos.
-Basa la respuesta unicamente en el contexto proporcionado.
-Si te falta algun dato importante para responder bien, pidelo con naturalidad: por ejemplo, "si me dices..." o "si me cuentas...".
-No inventes importes, equipos, inversores, baterias, tramites, marcas, IVA ni plazos si no aparecen en el contexto.
-Si hablas de precios, dejalo siempre como orientativo y sin IVA.
-No uses expresiones como "base de conocimientos", "contexto proporcionado", "segun la informacion que tengo" ni ningun lenguaje tecnico interno.
-Si no tienes informacion suficiente, recomienda contactar o una visita tecnica con cercania: "lo vemos mejor si contactas con nosotros" o "con una visita rapida te lo aclaramos".
-Di siempre "contacta con nosotros" o "usa el formulario de contacto", nunca "busquen a la empresa" ni formas frias.`;
-
-const RESPUESTA_SIN_CONTEXTO = 'Eso no lo tengo bien cubierto por aqui. Lo mejor es comentarlo directamente; usa el formulario de contacto y lo vemos contigo sin compromiso.';
-
+// ── Endpoint principal ────────────────────────────────────────────────────────
 const preguntar = async (req, res) => {
   try {
     const { pregunta, historial = [] } = req.body;
@@ -258,111 +119,25 @@ const preguntar = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Pregunta demasiado corta' });
     }
 
-    // Easter egg: detectar antes de procesar nada
     const easterEgg = detectarEasterEgg(pregunta);
-    const conEgg = (texto) => easterEgg ? `${texto} ${easterEgg}` : texto;
+    const conEgg    = (texto) => easterEgg ? `${texto} ${easterEgg}` : texto;
+    const t         = norm(pregunta);
 
-    // Bug fix: "hola, cuanto cuesta..." → extraer solo "cuanto cuesta..."
-    const preguntaReal = extraerPreguntaSinSaludo(pregunta);
-    const preguntaBase = preguntaReal || pregunta;
-
-    // Sentido común: fecha/hora — no se cachea (cambia cada minuto)
-    if (esConsultaFechaHora(preguntaBase)) {
-      return res.json({ success: true, respuesta: conEgg(construirRespuestaFechaHora(preguntaBase)) });
+    if (esFechaHora(t))        return res.json({ success: true, respuesta: conEgg(respuestaFechaHora(t)) });
+    if (esTiempo(t))           return res.json({ success: true, respuesta: conEgg(await respuestaTiempo()) });
+    if (esCalculadoraSolar(t)) return res.json({ success: true, respuesta: conEgg(respuestaCalculadoraSolar(t)) });
+    if (esConsultaEnergiaActual(pregunta)) {
+      return res.json({ success: true, respuesta: conEgg(await construirRespuestaEnergia(pregunta)) });
     }
 
-    // Sentido común: tiempo meteorológico — no se cachea
-    if (esConsultaTiempo(preguntaBase)) {
-      const respTiempo = await construirRespuestaTiempo();
-      return res.json({ success: true, respuesta: conEgg(respTiempo) });
-    }
+    // Historial de conversación para contexto multi-turno en Gemini
+    const history = historial
+      .filter((m) => m?.text?.length > 0)
+      .slice(-10)
+      .map((m) => ({ role: m.from === 'user' ? 'user' : 'assistant', content: m.text }));
 
-    // Sentido común: capacidades del asistente
-    if (esConsultaCapacidades(preguntaBase)) {
-      return res.json({ success: true, respuesta: conEgg(construirRespuestaCapacidades()) });
-    }
-
-    // Sentido común: calculadora solar básica
-    if (esConsultaCalculadoraSolar(preguntaBase)) {
-      return res.json({ success: true, respuesta: conEgg(construirRespuestaCalculadoraSolar(preguntaBase)) });
-    }
-
-    // Saludo puro (sin pregunta real adjunta)
-    if (!preguntaReal) {
-      const respuestaConversacional = construirRespuestaConversacional(pregunta);
-      if (respuestaConversacional) {
-        return res.json({ success: true, respuesta: conEgg(respuestaConversacional) });
-      }
-    }
-
-    const esSeguimientoPrecio = esSeguimientoDePrecio(preguntaBase, historial);
-    const preguntaAnalizada = esSeguimientoPrecio
-      ? construirPreguntaCompuesta(preguntaBase, historial)
-      : preguntaBase;
-
-    const clave = esSeguimientoPrecio ? null : claveCache(preguntaAnalizada);
-    if (clave && cache.has(clave)) {
-      console.log('[AsistenteIA] Cache hit');
-      return res.json({ success: true, respuesta: conEgg(cache.get(clave)) });
-    }
-
-    if (esConsultaEnergiaActual(preguntaBase)) {
-      const respuestaEnergia = await construirRespuestaEnergia(preguntaBase);
-      if (esEnIngles(preguntaBase)) {
-        try {
-          const traducida = await ask(
-            'You are a translator. Translate the following Spanish text to English. Keep all numbers, units (€/kWh, h) and time values exactly as they are. Output only the translated text, nothing else.',
-            respuestaEnergia
-          );
-          return res.json({ success: true, respuesta: conEgg(traducida) });
-        } catch (_) {}
-      }
-      return res.json({ success: true, respuesta: conEgg(respuestaEnergia) });
-    }
-
-    const resultados = buscarContexto(preguntaAnalizada);
-
-    if (resultados.length === 0) {
-      console.log('[AsistenteIA] Sin contexto suficiente, respuesta directa');
-      return res.json({ success: true, respuesta: conEgg(RESPUESTA_SIN_CONTEXTO) });
-    }
-
-    const debeResolverComoPrecio =
-      esPreguntaPrecio(preguntaAnalizada) ||
-      esSeguimientoPrecio ||
-      esPreguntaSobreTema(preguntaAnalizada) ||
-      /alguna recomendacion|que me recomiendas|que opcion recomiendas|que harias|merece.*la pena|merecer.*la pena|recomendarias/.test(normalizarTextoPlano(preguntaAnalizada));
-
-    if (!debeResolverComoPrecio && esConsultaNormativa(preguntaBase, preguntaAnalizada)) {
-      const respuestaNormativa = construirRespuestaNormativa({
-        preguntaActual: preguntaBase,
-        preguntaAnalizada,
-        knowledgeBase
-      });
-      if (respuestaNormativa) {
-        if (clave) guardarEnCache(clave, respuestaNormativa);
-        return res.json({ success: true, respuesta: conEgg(respuestaNormativa) });
-      }
-    }
-
-    if (debeResolverComoPrecio) {
-      const respuestaPrecio = construirRespuestaPrecio({
-        preguntaActual: preguntaBase,
-        preguntaAnalizada,
-        historialUsuario: obtenerMensajesUsuarioRecientes(historial, 6).map((msg) => msg.text),
-        resultados,
-        knowledgeBase
-      });
-      if (clave) guardarEnCache(clave, respuestaPrecio);
-      return res.json({ success: true, respuesta: conEgg(respuestaPrecio) });
-    }
-
-    const contexto = `Informacion relevante:\n\n${resultados.map((r) => r.fragmento).join('\n\n')}`;
-    const respuesta = await ask(`${SYSTEM_PROMPT}\n\n${contexto}`, preguntaAnalizada);
-    const respuestaFinal = limitarFrases(sanearRespuestaModelo(respuesta), 2);
-
-    if (clave) guardarEnCache(clave, respuestaFinal);
-    res.json({ success: true, respuesta: conEgg(respuestaFinal) });
+    const respuesta = await ask(SYSTEM_PROMPT, pregunta, history);
+    res.json({ success: true, respuesta: conEgg(respuesta) });
   } catch (error) {
     console.error('[AsistenteIA] Error:', error.message);
     res.status(503).json({ success: false, message: 'Asistente no disponible' });

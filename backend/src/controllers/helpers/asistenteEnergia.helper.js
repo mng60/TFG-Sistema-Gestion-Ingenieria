@@ -1,5 +1,8 @@
 const DatoMercado = require('../../models/DatoMercado');
-const { normalizarTextoPlano } = require('./asistenteTexto.helper');
+
+function normalizarTextoPlano(texto) {
+  return String(texto || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+}
 
 // Fecha/hora en zona Europe/Madrid (evita error UTC en Railway/servidores remotos)
 function getMadridDate() {
