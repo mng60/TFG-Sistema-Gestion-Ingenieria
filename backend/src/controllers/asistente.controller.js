@@ -3,17 +3,43 @@ const fs   = require('fs');
 const { ask, traducirSiNecesario, isAvailable } = require('../services/ai.service');
 const { esConsultaEnergiaActual, construirRespuestaEnergia } = require('./helpers/asistenteEnergia.helper');
 
-// ── Conocimiento embebido en el system prompt ─────────────────────────────────
-function cargarConocimiento() {
+// ── Conocimiento por categoría (cargado una vez al arrancar) ──────────────────
+function cargarPorCategoria() {
   const dir = path.join(__dirname, '../data/knowledge');
-  const entradas = fs.readdirSync(dir)
-    .filter((f) => f.endsWith('.json'))
-    .flatMap((f) => JSON.parse(fs.readFileSync(path.join(dir, f), 'utf-8')));
-  return entradas.map((e) => `### ${e.titulo}\n${e.contenido}`).join('\n\n');
+  const categorias = {};
+  for (const f of fs.readdirSync(dir).filter((f) => f.endsWith('.json'))) {
+    const nombre = f.replace('.json', '');
+    const entradas = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf-8'));
+    categorias[nombre] = entradas.map((e) => `### ${e.titulo}\n${e.contenido}`).join('\n\n');
+  }
+  return categorias;
 }
 
-const CONOCIMIENTO = cargarConocimiento();
-console.log(`[AsistenteIA] Conocimiento: ${CONOCIMIENTO.length} caracteres`);
+const KB = cargarPorCategoria();
+
+// Palabras clave por categoría para seleccionar contexto relevante
+const KB_KEYWORDS = {
+  empresa:      /empresa|bluearc|quien|quienes|somos|contacto|horario|telefono|email|zona|donde|trabajan|proceso|garantia|pago|factura|iva|habilitad|certif|seguro/,
+  servicios:    /instala|electr|solar|fotovolt|plac|panel|cuadro|mantenimient|averia|urgencia|legaliz|cie|boletin|domotica|led|ilumina|wallbox|cargador|coche electr|industrial|nave|trifas|reforma|cableado/,
+  presupuestos: /precio|cuanto|cuesta|coste|presupuest|euros|tarifa|orientativ|cuadro|solar|residencial|local|comercial|nave|vivienda|m2|metros/,
+  faq:          /plazo|tarda|tiempo.*obra|garantia|subvenci|ayuda|portal|cliente|murcia.*sol|rentab|amortiz|urgencia|impuesto|iva reducido/,
+};
+
+function seleccionarContexto(t) {
+  const seleccionadas = Object.entries(KB_KEYWORDS)
+    .filter(([, re]) => re.test(t))
+    .map(([cat]) => cat);
+
+  // Siempre incluir empresa como fallback (info básica de contacto)
+  if (!seleccionadas.includes('empresa')) seleccionadas.unshift('empresa');
+
+  // Máximo 2 categorías para mantener el prompt corto
+  return seleccionadas
+    .slice(0, 2)
+    .map((cat) => KB[cat])
+    .filter(Boolean)
+    .join('\n\n');
+}
 
 // ── Utilidades ────────────────────────────────────────────────────────────────
 const DIAS  = ['domingo','lunes','martes','miercoles','jueves','viernes','sabado'];
@@ -34,7 +60,7 @@ function detectarEasterEgg(texto) {
   return e ? e[0] : null;
 }
 
-// ── Fecha y hora (sin LLM — respuesta instantánea) ────────────────────────────
+// ── Fecha y hora (sin LLM) ────────────────────────────────────────────────────
 function esFechaHora(t) {
   return /que dia es|que fecha|que hora es|que horas son|en que mes|que dia de la semana|fecha de hoy|hoy que dia|dia de hoy|hora actual|hora ahora|que ano|dia y hora/.test(t);
 }
@@ -50,9 +76,9 @@ function respuestaFechaHora(t) {
   return `Hoy es ${DIAS[now.getDay()]} ${now.getDate()} de ${MESES[now.getMonth()]} de ${now.getFullYear()}. Son las ${h}:${m} h.`;
 }
 
-// ── Tiempo meteorológico (sin LLM — datos en tiempo real) ────────────────────
+// ── Tiempo meteorológico (sin LLM) ────────────────────────────────────────────
 function esTiempo(t) {
-  return /que tiempo hace|como esta el tiempo|va a llover|hace frio|hace calor|temperatura.*hoy|tiempo.*hoy|tiempo.*murcia|clima.*murcia|llueve|lluvia.*hoy|sol.*hoy|nublado|viento.*hoy/.test(t);
+  return /que tiempo hace|como esta el tiempo|va a llover|hace frio|hace calor|temperatura|tiempo.*(hoy|manana|murcia)|clima.*murcia|llueve|lluvia|sol.*(hoy|manana)|nublado|viento/.test(t);
 }
 
 async function respuestaTiempo() {
@@ -62,13 +88,13 @@ async function respuestaTiempo() {
     const r = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=Murcia,ES&appid=${key}&units=metric&lang=es`);
     if (!r.ok) throw new Error();
     const d = await r.json();
-    return `Ahora en Murcia: ${d.weather[0].description}, ${Math.round(d.main.temp)} °C (sensacion ${Math.round(d.main.feels_like)} °C), humedad ${d.main.humidity}%, viento ${Math.round(d.wind.speed * 3.6)} km/h.`;
+    return `Ahora en Murcia: ${d.weather[0].description}, ${Math.round(d.main.temp)} °C (sensacion ${Math.round(d.main.feels_like)} °C), humedad ${d.main.humidity}%, viento ${Math.round(d.wind.speed * 3.6)} km/h. Para el pronostico de manana consulta tu app del tiempo.`;
   } catch {
     return 'No he podido obtener el tiempo ahora mismo. Intentalo en unos minutos.';
   }
 }
 
-// ── Calculadora solar (sin LLM — aritmética pura) ────────────────────────────
+// ── Calculadora solar (sin LLM) ───────────────────────────────────────────────
 const W_PANEL = 430, M2_PANEL = 1.9;
 
 function esCalculadoraSolar(t) {
@@ -99,9 +125,9 @@ function respuestaCalculadoraSolar(t) {
   return 'Para orientarte necesito saber la potencia que buscas (en kW) o los m² de tejado disponibles.';
 }
 
-// ── Caché en memoria (evita llamadas repetidas a Gemini) ──────────────────────
+// ── Caché en memoria ──────────────────────────────────────────────────────────
 const cache = new Map();
-const CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutos
+const CACHE_TTL_MS = 30 * 60 * 1000;
 
 function cacheGet(key) {
   const entry = cache.get(key);
@@ -115,21 +141,17 @@ function cacheSet(key, value) {
   cache.set(key, { value, ts: Date.now() });
 }
 
-function cacheKey(pregunta) {
-  return String(pregunta).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim();
+function cacheKey(t) {
+  return t.replace(/\s+/g, ' ').trim();
 }
 
-// ── System prompt con todo el conocimiento embebido ───────────────────────────
-const SYSTEM_PROMPT = `Eres Blue, el asistente virtual de BlueArc Ingeniería, empresa de ingeniería eléctrica de la Región de Murcia.
+// ── System prompt base (sin conocimiento — se añade por petición) ─────────────
+const BASE_PROMPT = `Eres Blue, el asistente virtual de BlueArc Ingeniería, empresa de ingeniería eléctrica de la Región de Murcia.
 Responde en el mismo idioma en que te escriba el usuario, con tono cercano, directo y profesional, como un técnico de confianza.
 Responde en un máximo de 2-3 frases claras. Sin listas, guiones ni títulos.
-Si hablas de precios, siempre como orientativo y sin IVA. No inventes datos, precios, plazos ni trámites que no estén en el conocimiento.
-Si te falta algún dato importante, pídelo con naturalidad: "si me dices..." o "si me cuentas...".
-Si no tienes información suficiente, recomienda contactar: "usa el formulario de contacto" o "contacta con nosotros".
-
-## CONOCIMIENTO DE BLUEARC INGENIERÍA
-
-${CONOCIMIENTO}`;
+Si hablas de precios, siempre como orientativo y sin IVA. No inventes datos, precios ni plazos que no estén en el conocimiento.
+Si te falta algún dato, pídelo con naturalidad: "si me dices..." o "si me cuentas...".
+Si no tienes información suficiente, recomienda: "usa el formulario de contacto" o "contacta con nosotros".`;
 
 // ── Endpoint principal ────────────────────────────────────────────────────────
 const preguntar = async (req, res) => {
@@ -143,6 +165,7 @@ const preguntar = async (req, res) => {
     const conEgg    = (texto) => easterEgg ? `${texto} ${easterEgg}` : texto;
     const t         = norm(pregunta);
 
+    // Respuestas sin LLM (instantáneas, no cuentan contra el rate limit)
     if (esFechaHora(t))        return res.json({ success: true, respuesta: conEgg(respuestaFechaHora(t)) });
     if (esTiempo(t))           return res.json({ success: true, respuesta: conEgg(await respuestaTiempo()) });
     if (esCalculadoraSolar(t)) return res.json({ success: true, respuesta: conEgg(respuestaCalculadoraSolar(t)) });
@@ -152,8 +175,8 @@ const preguntar = async (req, res) => {
       return res.json({ success: true, respuesta: conEgg(respTraducida) });
     }
 
-    // Caché: preguntas sin historial activo se cachean 30 min
-    const key = cacheKey(pregunta);
+    // Caché para preguntas sin conversación activa
+    const key = cacheKey(t);
     const hayHistorial = historial.some((m) => m?.text?.length > 0);
     if (!hayHistorial) {
       const cached = cacheGet(key);
@@ -163,13 +186,16 @@ const preguntar = async (req, res) => {
       }
     }
 
-    // Historial de conversación para contexto multi-turno en Gemini
+    // Seleccionar solo el conocimiento relevante (~500-800 tokens vs 3500 antes)
+    const contexto = seleccionarContexto(t);
+    const systemPrompt = `${BASE_PROMPT}\n\n## CONOCIMIENTO\n\n${contexto}`;
+
     const history = historial
       .filter((m) => m?.text?.length > 0)
-      .slice(-10)
+      .slice(-8)
       .map((m) => ({ role: m.from === 'user' ? 'user' : 'assistant', content: m.text }));
 
-    const respuesta = await ask(SYSTEM_PROMPT, pregunta, history);
+    const respuesta = await ask(systemPrompt, pregunta, history);
     if (!hayHistorial) cacheSet(key, respuesta);
     res.json({ success: true, respuesta: conEgg(respuesta) });
   } catch (error) {
