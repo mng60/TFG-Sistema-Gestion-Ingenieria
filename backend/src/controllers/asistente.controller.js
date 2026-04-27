@@ -99,6 +99,26 @@ function respuestaCalculadoraSolar(t) {
   return 'Para orientarte necesito saber la potencia que buscas (en kW) o los m² de tejado disponibles.';
 }
 
+// ── Caché en memoria (evita llamadas repetidas a Gemini) ──────────────────────
+const cache = new Map();
+const CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutos
+
+function cacheGet(key) {
+  const entry = cache.get(key);
+  if (!entry) return null;
+  if (Date.now() - entry.ts > CACHE_TTL_MS) { cache.delete(key); return null; }
+  return entry.value;
+}
+
+function cacheSet(key, value) {
+  if (cache.size >= 200) cache.delete(cache.keys().next().value);
+  cache.set(key, { value, ts: Date.now() });
+}
+
+function cacheKey(pregunta) {
+  return String(pregunta).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim();
+}
+
 // ── System prompt con todo el conocimiento embebido ───────────────────────────
 const SYSTEM_PROMPT = `Eres Blue, el asistente virtual de BlueArc Ingeniería, empresa de ingeniería eléctrica de la Región de Murcia.
 Responde en el mismo idioma en que te escriba el usuario, con tono cercano, directo y profesional, como un técnico de confianza.
@@ -132,6 +152,17 @@ const preguntar = async (req, res) => {
       return res.json({ success: true, respuesta: conEgg(respTraducida) });
     }
 
+    // Caché: preguntas sin historial activo se cachean 30 min
+    const key = cacheKey(pregunta);
+    const hayHistorial = historial.some((m) => m?.text?.length > 0);
+    if (!hayHistorial) {
+      const cached = cacheGet(key);
+      if (cached) {
+        console.log('[AsistenteIA] Cache hit');
+        return res.json({ success: true, respuesta: conEgg(cached) });
+      }
+    }
+
     // Historial de conversación para contexto multi-turno en Gemini
     const history = historial
       .filter((m) => m?.text?.length > 0)
@@ -139,6 +170,7 @@ const preguntar = async (req, res) => {
       .map((m) => ({ role: m.from === 'user' ? 'user' : 'assistant', content: m.text }));
 
     const respuesta = await ask(SYSTEM_PROMPT, pregunta, history);
+    if (!hayHistorial) cacheSet(key, respuesta);
     res.json({ success: true, respuesta: conEgg(respuesta) });
   } catch (error) {
     console.error('[AsistenteIA] Error:', error.message);
