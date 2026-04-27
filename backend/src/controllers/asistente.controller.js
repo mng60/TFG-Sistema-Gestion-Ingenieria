@@ -97,7 +97,7 @@ function respuestaFechaHora(t) {
 
 // ── Tiempo meteorológico (sin LLM) ────────────────────────────────────────────
 function esTiempo(t) {
-  return /que tiempo hace|como esta el tiempo|va a llover|hace frio|hace calor|temperatura|tiempo.*(hoy|manana|murcia)|clima.*murcia|llueve|lluvia|sol.*(hoy|manana)|nublado|viento/.test(t);
+  return /que tiempo hace|como esta el tiempo|(hoy|manana|ahora).*(tiempo|lluv|temperatura|nublad|viento|calor|frio)|tiempo.*(hoy|manana|murcia|hace|hara)|clima.*(murcia|hoy|manana)|va a llover|hace frio|hace calor|temperatura.*murcia|llueve|lluvia|nublado|pronostico.*tiempo|weather|forecast/.test(t);
 }
 
 async function respuestaTiempo() {
@@ -165,7 +165,7 @@ function cacheKey(t) {
 }
 
 // ── System prompt base (sin conocimiento — se añade por petición) ─────────────
-const BASE_PROMPT = `Eres Blue, asistente de BlueArc Ingeniería (ingeniería eléctrica, Murcia). Responde en el idioma del usuario, tono cercano y profesional. Máx 2-3 frases, sin listas. Precios: siempre orientativos y sin IVA. No inventes datos. Sin info suficiente: pide detalles o deriva al formulario de contacto.`;
+const BASE_PROMPT = `Eres Blue, asistente de BlueArc Ingeniería (ingeniería eléctrica, Murcia). REGLA OBLIGATORIA: detecta el idioma del último mensaje del usuario y responde SIEMPRE en ese mismo idioma (inglés si escribe en inglés, español si escribe en español, etc.). Tono cercano y profesional. Máx 2-3 frases, sin listas. Precios: siempre orientativos y sin IVA. No inventes datos. Sin info suficiente: pide detalles o deriva al formulario de contacto.`;
 
 // ── Endpoint principal ────────────────────────────────────────────────────────
 const preguntar = async (req, res) => {
