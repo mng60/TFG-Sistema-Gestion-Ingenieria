@@ -1,42 +1,7 @@
 [
   {
-    "id": "servicio_baja_tension",
-    "titulo": "Instalaciones eléctricas en viviendas y locales",
-    "contenido": "Realizamos instalaciones eléctricas completas y reformas en viviendas, pisos, locales comerciales y oficinas. Incluye diseño del cuadro eléctrico, cableado, puntos de luz, enchufes, circuitos especiales (cocina, climatización, lavadora) y conexión a la red. Trabajamos conforme al REBT y tramitamos el CIE al finalizar. Tiempo de ejecución habitual: 2-5 días en vivienda estándar."
-  },
-  {
-    "id": "servicio_industrial",
-    "titulo": "Instalaciones eléctricas industriales",
-    "contenido": "Diseño e instalación de sistemas eléctricos para naves industriales, fábricas, talleres y almacenes. Incluye cuadros de distribución, líneas de fuerza trifásicas, alumbrado industrial LED, SAIs, grupos electrógenos, sistemas de protección y puesta a tierra industrial. Gestionamos la legalización completa ante Industria. Experiencia en sectores hortofrutícola, agroalimentario y logístico, muy presentes en la Región de Murcia."
-  },
-  {
-    "id": "servicio_fotovoltaica",
-    "titulo": "Instalaciones solares fotovoltaicas",
-    "contenido": "Diseñamos, instalamos y legalizamos sistemas de autoconsumo fotovoltaico para hogares, comunidades de vecinos y empresas. Realizamos estudio energético previo gratuito, selección de paneles (LONGi, JA Solar) e inversores (SMA, Fronius), instalación completa y tramitación del punto de conexión con la distribuidora. También instalamos sistemas con baterías de acumulación (Victron Energy, BYD). Murcia tiene una de las mejores irradiaciones solares de Europa, con medias de 1.800-2.000 horas de sol al año, lo que hace muy rentable el autoconsumo."
-  },
-  {
-    "id": "servicio_legalizacion",
-    "titulo": "Legalización eléctrica y CIE",
-    "contenido": "Tramitamos el Certificado de Instalación Eléctrica (CIE o boletín eléctrico) para dar de alta la luz, aumentar potencia, legalizar instalaciones antiguas o tras reformas. Gestionamos todo el papeleo con la distribuidora (Iberdrola en Murcia) y la Consejería de Industria. Plazo habitual de tramitación completa: 2-4 semanas desde la emisión del certificado."
-  },
-  {
-    "id": "servicio_recarga_vehiculo",
-    "titulo": "Puntos de recarga de vehículo eléctrico",
-    "contenido": "Instalamos cargadores para vehículo eléctrico (wallbox) en garajes privados, comunidades de propietarios y flotas de empresa. Trabajamos con equipos de marcas como Wallbox, Zaptec y ABB. Gestionamos la instalación según la ITC-BT-52 y la solicitud de ayudas disponibles para recarga. Tiempo de instalación habitual: 1 día."
-  },
-  {
-    "id": "servicio_mantenimiento",
-    "titulo": "Mantenimiento eléctrico y urgencias",
-    "contenido": "Ofrecemos contratos de mantenimiento preventivo anual para viviendas, locales y empresas. Incluye revisión del cuadro, medición de aislamientos, comprobación de protecciones y termografía en instalaciones industriales. Atendemos averías y urgencias de lunes a sábado hasta las 21:00 h en toda la Región de Murcia. Tiempo de respuesta a urgencias: menos de 3 horas en el área metropolitana de Murcia."
-  },
-  {
-    "id": "servicio_domotica",
-    "titulo": "Domótica e instalaciones inteligentes",
-    "contenido": "Instalamos sistemas de automatización del hogar y la empresa: control de iluminación, climatización, persianas y seguridad desde el móvil. Trabajamos con sistemas KNX (para proyectos de alto rendimiento) y soluciones WiFi/Zigbee compatibles con Alexa y Google Home (más económicas para viviendas). Presupuesto a medida según el alcance del proyecto."
-  },
-  {
-    "id": "servicio_iluminacion",
-    "titulo": "Iluminación LED y eficiencia energética",
-    "contenido": "Proyectos de iluminación eficiente con tecnología LED para viviendas, locales, naves y espacios exteriores. Realizamos auditorías energéticas que habitualmente permiten reducir el consumo eléctrico entre un 40 % y un 65 %. Orientamos sobre las ayudas disponibles para proyectos de eficiencia energética en la Región de Murcia. Garantizamos los equipos LED instalados durante 3 años."
+    "id": "servicios",
+    "titulo": "Servicios de BlueArc Ingeniería",
+    "contenido": "Baja tensión (vivienda/local/oficina): instalación completa, reforma, cuadro eléctrico, cableado, circuitos especiales; conforme REBT+ITC-BT; plazo 2-5 días. Industrial (nave/fábrica/taller): cuadros distribución, fuerza trifásica, alumbrado LED industrial, SAIs, grupos electrógenos, protecciones; sector hortofrutícola y agroalimentario habitual en Murcia. Solar fotovoltaica: autoconsumo residencial y empresarial; estudio energético gratuito; paneles LONGi/JA Solar, inversores SMA/Fronius, baterías Victron/BYD; tramitación completa con distribuidora (Iberdrola Murcia); con o sin excedentes RD 244/2019; retorno habitual vivienda 6-9 años, empresa 4-7 años; irradiación Murcia 1.800-2.000 h/año. Legalización/CIE: alta luz, aumento potencia, legalización instalaciones antiguas; tramitación CARM + distribuidora; plazo 2-4 semanas. Wallbox recarga VE: garaje privado, comunitario y flotas; marcas Wallbox/Zaptec/ABB; ITC-BT-52; plazo 1 día. Mantenimiento: preventivo anual y correctivo; urgencias <3h área metropolitana Murcia, <5h resto región; L-S hasta 21h. Domótica: KNX (proyectos alto rendimiento) y WiFi/Zigbee (vivienda económica); Alexa/Google Home. Iluminación LED: auditoría energética, ahorro 40-65%, garantía equipos 3 años."
   }
 ]

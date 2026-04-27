@@ -1,42 +1,7 @@
 [
   {
-    "id": "precio_cuadro_electrico",
-    "titulo": "Precio orientativo: cuadro eléctrico",
-    "contenido": "Renovación de cuadro eléctrico en vivienda: entre 350 y 600 € (cuadro básico, sin ampliar circuitos). Si hay que añadir circuitos o adaptar el cableado existente: entre 600 y 1.200 €. Si además se necesita CIE y gestiones con la distribuidora, suma entre 150 y 300 € adicionales. Todos los precios son orientativos y sin IVA."
-  },
-  {
-    "id": "precio_instalacion_vivienda",
-    "titulo": "Precio orientativo: instalación eléctrica en vivienda",
-    "contenido": "Instalación eléctrica completa en piso de 80-100 m²: entre 2.500 y 4.500 €. En viviendas de 100-150 m²: entre 4.000 y 6.500 €. Reforma parcial (solo cuadro + 2-3 circuitos nuevos): entre 800 y 1.500 €. Punto de luz o enchufe adicional suelto: entre 80 y 150 €. Sin IVA, orientativo, el precio final depende del estado del cableado existente y las rozas necesarias."
-  },
-  {
-    "id": "precio_solar_residencial",
-    "titulo": "Precio orientativo: instalación solar en vivienda",
-    "contenido": "Instalación solar fotovoltaica en vivienda unifamiliar: 3 kWp (6-8 paneles) entre 4.500 y 6.500 €; 5 kWp (10-12 paneles) entre 6.500 y 9.000 €; 10 kWp (22-24 paneles) entre 10.000 y 15.000 €. Con baterías de acumulación (10 kWh): añadir entre 3.500 y 6.000 € dependiendo de la tecnología. En Murcia el retorno de la inversión habitual sin baterías es de 6-9 años. Sin IVA, orientativo."
-  },
-  {
-    "id": "precio_solar_empresa",
-    "titulo": "Precio orientativo: instalación solar en empresa o nave",
-    "contenido": "Solar para empresa o nave industrial: 20 kWp (referencia nave pequeña) entre 18.000 y 26.000 €; 50 kWp entre 38.000 y 52.000 €; 100 kWp entre 65.000 y 90.000 €. A mayor potencia, el coste por kW instalado mejora. El retorno habitual en empresa con buen perfil de consumo diurno es de 4-7 años. Sin IVA, orientativo, requiere estudio previo de consumo."
-  },
-  {
-    "id": "precio_cie",
-    "titulo": "Precio orientativo: CIE y boletín eléctrico",
-    "contenido": "CIE de una instalación ya conforme (solo tramitación y certificado): entre 150 y 300 €. CIE con adecuaciones menores (sustituir diferencial, añadir protecciones): entre 300 y 600 €. CIE con reforma del cuadro y parte del cableado: entre 600 y 1.200 €. Sin IVA, orientativo."
-  },
-  {
-    "id": "precio_local_comercial",
-    "titulo": "Precio orientativo: local comercial",
-    "contenido": "Instalación eléctrica básica en local comercial (hasta 100 m², oficina o tienda): entre 2.000 y 4.000 €. Local con cocina o maquinaria específica (bar, restaurante, clínica): entre 4.000 y 9.000 €. Nave o local industrial hasta 500 m²: entre 6.000 y 15.000 €. Sin IVA, orientativo, varía según uso y potencia prevista."
-  },
-  {
-    "id": "precio_wallbox",
-    "titulo": "Precio orientativo: punto de recarga vehículo eléctrico",
-    "contenido": "Instalación de wallbox en garaje privado de vivienda unifamiliar: entre 800 y 1.200 €. En garaje comunitario (comunidad de propietarios, con gestión de accesos individuales): entre 1.000 y 1.800 € por plaza. En flotas de empresa con varios puntos: consultar, el precio por punto mejora a mayor cantidad. Sin IVA, orientativo."
-  },
-  {
-    "id": "precio_mantenimiento",
-    "titulo": "Precio orientativo: mantenimiento eléctrico",
-    "contenido": "Contrato de mantenimiento preventivo anual para vivienda: entre 80 y 150 €. Para local comercial: entre 150 y 350 €. Para nave industrial: desde 400 € según alcance. Intervención puntual por avería (hora de técnico en zona metropolitana de Murcia): entre 60 y 90 € la hora. Urgencias fuera de horario: recargo de entre el 50 % y el 80 %. Sin IVA, orientativo."
+    "id": "precios",
+    "titulo": "Precios orientativos BlueArc (sin IVA, IVA general 21%, vivienda privada puede aplicar 10%)",
+    "contenido": "Cuadro eléctrico vivienda: básico 350-600€ | con circuitos/cableado 600-1.200€ | +CIE/distribuidora 150-300€ extra. Instalación eléctrica vivienda: 80-100m² 2.500-4.500€ | 100-150m² 4.000-6.500€ | reforma parcial 800-1.500€ | punto luz/enchufe suelto 80-150€. Solar vivienda: 3kWp(6-8 pan.) 4.500-6.500€ | 5kWp(10-12 pan.) 6.500-9.000€ | 10kWp(22-24 pan.) 10.000-15.000€ | +baterías 10kWh suma 3.500-6.000€. Solar empresa/nave: 20kWp 18.000-26.000€ | 50kWp 38.000-52.000€ | 100kWp 65.000-90.000€. CIE/boletín: instalación conforme 150-300€ | con adecuaciones menores 300-600€ | con reforma cuadro/cableado 600-1.200€. Local comercial: hasta 100m² oficina/tienda 2.000-4.000€ | con cocina/maquinaria bar/restaurante 4.000-9.000€ | nave/local industrial hasta 500m² 6.000-15.000€. Wallbox VE: garaje privado unifamiliar 800-1.200€ | plaza comunitaria 1.000-1.800€. Mantenimiento anual: vivienda 80-150€ | local 150-350€ | nave industrial desde 400€. Avería/hora técnico: 60-90€/h; urgencia fuera horario +50-80%."
   }
 ]

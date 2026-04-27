@@ -1,42 +1,7 @@
 [
   {
-    "id": "faq_plazos",
-    "titulo": "Plazos de ejecución habituales",
-    "contenido": "Cambio o renovación de cuadro eléctrico: 1-2 días. Instalación eléctrica completa en vivienda: 3-7 días. Reforma parcial de local: 2-4 días. Instalación solar fotovoltaica en vivienda: 2-3 días de obra, más 2-4 semanas de tramitación administrativa con la distribuidora. Proyecto industrial complejo: 2-8 semanas según alcance. La visita técnica previa la realizamos en 48-72 h desde el primer contacto."
-  },
-  {
-    "id": "faq_presupuesto_gratis",
-    "titulo": "Visita técnica y presupuesto",
-    "contenido": "La visita técnica y el presupuesto son completamente gratuitos y sin compromiso. Tras la visita entregamos un presupuesto detallado por escrito en menos de 48 h. El presupuesto incluye materiales, mano de obra y tramitación. No hay letra pequeña: lo que está en el presupuesto es lo que pagas, salvo que durante la ejecución aparezca alguna incidencia no visible previamente, que siempre te comunicamos antes de proceder."
-  },
-  {
-    "id": "faq_urgencias",
-    "titulo": "Averías y urgencias eléctricas",
-    "contenido": "Atendemos urgencias eléctricas de lunes a sábado hasta las 21:00 h. El tiempo de respuesta habitual es de menos de 3 horas en el área metropolitana de Murcia y menos de 4-5 horas en el resto de la región. Si hay olor a quemado, chisporroteos, humo o riesgo para personas, corta el suministro desde el interruptor general si puedes hacerlo con seguridad y llama de inmediato. No manipules el cuadro ni conductores sin un técnico."
-  },
-  {
-    "id": "faq_subvenciones",
-    "titulo": "Ayudas y subvenciones disponibles",
-    "contenido": "En la Región de Murcia han existido ayudas para instalaciones de autoconsumo solar y puntos de recarga de vehículo eléctrico, a través de convocatorias de la CARM y de programas estatales del IDAE. La disponibilidad y cuantía cambia con cada convocatoria. En BlueArc te orientamos sobre las líneas abiertas en el momento de preparar tu proyecto y gestionamos la documentación necesaria para solicitarlas."
-  },
-  {
-    "id": "faq_empresa_habilitada",
-    "titulo": "Habilitación y certificaciones de BlueArc",
-    "contenido": "BlueArc Ingeniería está inscrita como empresa instaladora habilitada en baja tensión (categoría especialista) en el Registro de Instaladores de la Consejería de Industria de la Región de Murcia. Podemos emitir certificados de instalación eléctrica (CIE), tramitar legalizaciones y firmar proyectos de baja tensión. Disponemos de seguro de responsabilidad civil y todos nuestros técnicos tienen la habilitación individual correspondiente."
-  },
-  {
-    "id": "faq_solar_murcia",
-    "titulo": "Por qué Murcia es ideal para el autoconsumo solar",
-    "contenido": "Murcia es una de las provincias con mayor irradiación solar de España, con más de 300 días de sol al año y una media de 1.800-2.000 horas de sol anuales. Esto hace que una instalación solar aquí genere entre un 20 y un 30 % más de energía que en el norte de España con la misma potencia instalada. El retorno de la inversión en una vivienda unifamiliar suele estar entre 6 y 9 años, y en empresa con buen consumo diurno entre 4 y 7 años."
-  },
-  {
-    "id": "faq_portal_cliente",
-    "titulo": "Portal de clientes de BlueArc",
-    "contenido": "Disponemos de un portal privado para clientes donde puedes consultar el estado de tu proyecto, ver y descargar presupuestos y documentos, y comunicarte directamente con el equipo. El acceso se facilita cuando el proyecto lo requiere. Si aún no tienes acceso y lo necesitas, contáctanos por email o teléfono y te lo activamos en el mismo día."
-  },
-  {
-    "id": "faq_factura",
-    "titulo": "Facturación e IVA",
-    "contenido": "Todos los precios que te damos en el asistente o en los presupuestos orientativos son sin IVA. El IVA aplicable es el general del 21 %, salvo en obras de renovación en viviendas particulares donde puede aplicarse el tipo reducido del 10 % si se cumplen los requisitos legales (vivienda de uso privado, sin materiales que superen el 40 % del total). En el presupuesto formal siempre indicamos el IVA aplicable."
+    "id": "faq",
+    "titulo": "FAQ BlueArc Ingeniería",
+    "contenido": "Plazos: cuadro 1-2 días | instalación vivienda 3-7 días | reforma local 2-4 días | solar obra 2-3 días + tramitación 2-4 semanas | industrial 2-8 semanas. Presupuesto: visita técnica gratuita y sin compromiso; presupuesto escrito en 48h; precio cerrado (sin sorpresas salvo incidencia no visible comunicada previamente). Urgencias: respuesta <3h área metropolitana Murcia, <5h resto región; L-S hasta 21h; ante olor quemado/chisporroteo/humo: cortar suministro si es seguro y llamar al técnico. Subvenciones: CARM y IDAE han tenido convocatorias para autoconsumo y wallbox; disponibilidad y cuantía cambia por convocatoria; BlueArc orienta y gestiona documentación. Habilitación: empresa instaladora BT especialista inscrita en CARM; puede emitir CIE y firmar proyectos; RC asegurada. Murcia y solar: >300 días sol/año, 1.800-2.000 h/año, 20-30% más generación que norte España; retorno vivienda 6-9 años, empresa 4-7 años. Portal cliente: acceso privado para ver proyecto, presupuestos, documentos y chat; se activa si el proyecto lo requiere; solicitar por email o teléfono. IVA: general 21%; obras renovación vivienda privada pueden aplicar 10% si cumplen requisitos (sin materiales >40% del total)."
   }
 ]
