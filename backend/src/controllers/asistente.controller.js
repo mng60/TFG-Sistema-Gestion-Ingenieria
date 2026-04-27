@@ -1,6 +1,6 @@
 const path = require('path');
 const fs   = require('fs');
-const { ask, isAvailable } = require('../services/ai.service');
+const { ask, traducirSiNecesario, isAvailable } = require('../services/ai.service');
 const { esConsultaEnergiaActual, construirRespuestaEnergia } = require('./helpers/asistenteEnergia.helper');
 
 // ── Conocimiento embebido en el system prompt ─────────────────────────────────
@@ -127,7 +127,9 @@ const preguntar = async (req, res) => {
     if (esTiempo(t))           return res.json({ success: true, respuesta: conEgg(await respuestaTiempo()) });
     if (esCalculadoraSolar(t)) return res.json({ success: true, respuesta: conEgg(respuestaCalculadoraSolar(t)) });
     if (esConsultaEnergiaActual(pregunta)) {
-      return res.json({ success: true, respuesta: conEgg(await construirRespuestaEnergia(pregunta)) });
+      const respEnergia = await construirRespuestaEnergia(pregunta);
+      const respTraducida = await traducirSiNecesario(respEnergia, pregunta);
+      return res.json({ success: true, respuesta: conEgg(respTraducida) });
     }
 
     // Historial de conversación para contexto multi-turno en Gemini
