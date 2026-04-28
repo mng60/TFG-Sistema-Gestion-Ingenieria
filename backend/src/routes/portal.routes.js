@@ -16,7 +16,7 @@ const {
   getEmpleadosProyecto,
   getActualizacionesProyecto
 } = require('../controllers/cliente.auth.controller');
-const { crearTicketPortal } = require('../controllers/ticket.controller');
+const { crearTicketPortal, getMisTickets } = require('../controllers/ticket.controller');
 const { uploadAvatares } = require('../config/multer');
 
 const router = express.Router();
@@ -97,6 +97,9 @@ router.get('/proyectos/:id/empleados', authClienteMiddleware, getEmpleadosProyec
 
 // GET /api/portal/proyectos/:proyectoId/actualizaciones - Actualizaciones del proyecto (read-only)
 router.get('/proyectos/:proyectoId/actualizaciones', authClienteMiddleware, getActualizacionesProyecto);
+
+// GET /api/portal/tickets - Ver solicitudes propias del cliente
+router.get('/tickets', authClienteMiddleware, getMisTickets);
 
 // POST /api/portal/tickets - Solicitar nuevo proyecto (cliente autenticado)
 router.post('/tickets', authClienteMiddleware, crearTicketPortal);

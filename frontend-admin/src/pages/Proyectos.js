@@ -356,14 +356,12 @@ function Proyectos() {
               </thead>
               <tbody>
                 {proyectosFiltrados.map((proyecto) => (
-                  <tr key={proyecto.id}>
-                    <td 
-                      className="proyecto-nombre-clickable"
-                      onClick={() => navigate(`/proyectos/${proyecto.id}`)}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      <strong>{proyecto.nombre}</strong>
-                    </td>
+                  <tr
+                    key={proyecto.id}
+                    onClick={() => navigate(`/proyectos/${proyecto.id}`)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <td><strong>{proyecto.nombre}</strong></td>
                     <td>{proyecto.cliente_nombre || '-'}</td>
                     <td>{proyecto.responsable_nombre || 'Sin asignar'}</td>
                     <td>
@@ -378,7 +376,7 @@ function Proyectos() {
                     </td>
                     <td>{formatearFecha(proyecto.fecha_fin_estimada)}</td>
                     <td>
-                      {proyecto.total_presupuestado > 0 
+                      {proyecto.total_presupuestado > 0
                         ? formatearMoneda(proyecto.total_presupuestado)
                         : <span style={{ color: '#95a5a6', fontSize: '0.85rem' }}>Sin presupuesto</span>
                       }
@@ -389,21 +387,21 @@ function Proyectos() {
                           <>
                             <button
                               className="btn-sm btn-edit"
-                              onClick={() => abrirModalEditar(proyecto)}
+                              onClick={(e) => { e.stopPropagation(); abrirModalEditar(proyecto); }}
                               title="Editar"
                             >
                               <Pencil size={14} />
                             </button>
                             <button
                               className="btn-sm btn-success"
-                              onClick={() => abrirModalAsignar(proyecto)}
+                              onClick={(e) => { e.stopPropagation(); abrirModalAsignar(proyecto); }}
                               title="Asignar empleado"
                             >
                               <UserPlus size={14} />
                             </button>
                             <button
                               className="btn-sm btn-danger"
-                              onClick={() => handleEliminar(proyecto)}
+                              onClick={(e) => { e.stopPropagation(); handleEliminar(proyecto); }}
                               title="Eliminar"
                             >
                               <Trash2 size={14} />

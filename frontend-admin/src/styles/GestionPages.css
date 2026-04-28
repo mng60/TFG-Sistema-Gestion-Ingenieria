@@ -109,6 +109,11 @@
   border-color: rgba(77, 182, 168, 0.5);
 }
 
+.filter-select option {
+  background: #fff;
+  color: #1a1a1a;
+}
+
 /* Tarjeta de contenido */
 .content-card {
   background: #0d1b2a;
