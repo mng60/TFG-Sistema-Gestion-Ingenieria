@@ -167,6 +167,11 @@
   background: rgba(77, 182, 168, 0.04);
 }
 
+.data-table tbody tr.tr-clickable:hover td,
+.data-table tbody tr.tr-clickable:hover td strong {
+  color: #4DB6A8;
+}
+
 .data-table tbody tr:last-child td {
   border-bottom: none;
 }

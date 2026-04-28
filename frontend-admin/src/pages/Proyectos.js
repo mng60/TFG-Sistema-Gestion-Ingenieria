@@ -358,6 +358,7 @@ function Proyectos() {
                 {proyectosFiltrados.map((proyecto) => (
                   <tr
                     key={proyecto.id}
+                    className="tr-clickable"
                     onClick={() => navigate(`/proyectos/${proyecto.id}`)}
                     style={{ cursor: 'pointer' }}
                   >

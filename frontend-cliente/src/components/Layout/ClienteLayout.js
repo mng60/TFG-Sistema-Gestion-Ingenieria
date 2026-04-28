@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { ClipboardList, FolderOpen, MessagesSquare, LogOut } from 'lucide-react';
+import { ClipboardList, FolderOpen, MessagesSquare, LogOut, Inbox } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { getAvatarInitial, getAvatarSrc } from '../../utils/format';
 import '../../styles/ClienteLayout.css';
@@ -27,6 +27,7 @@ function ClienteLayout({ children }) {
   const isChat = location.pathname === '/chat';
   const isProjectsSection = location.pathname === '/dashboard' || location.pathname.startsWith('/proyectos/');
   const isSolicitudSection = location.pathname === '/solicitar-proyecto';
+  const isMisSolicitudesSection = location.pathname === '/mis-solicitudes';
 
   useEffect(() => {
     if (isChat) {
@@ -118,6 +119,15 @@ function ClienteLayout({ children }) {
           >
             <ClipboardList size={20} className="nav-icon-svg" />
             <span className="nav-label sidebar-txt">Solicitar Proyecto</span>
+          </NavLink>
+
+          <NavLink
+            to="/mis-solicitudes"
+            className={() => `nav-item ${isMisSolicitudesSection ? 'active' : ''}`}
+            onClick={() => setSidebarOpen(false)}
+          >
+            <Inbox size={20} className="nav-icon-svg" />
+            <span className="nav-label sidebar-txt">Mis Solicitudes</span>
           </NavLink>
 
           <NavLink

@@ -5,6 +5,7 @@ import Landing from './pages/Landing';
 import SobreNosotros from './pages/SobreNosotros';
 import Contacto from './pages/Contacto';
 import SolicitarProyecto from './pages/SolicitarProyecto';
+import MisSolicitudes from './pages/MisSolicitudes';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ProyectoCompleto from './pages/ProyectoCompleto';
@@ -70,6 +71,12 @@ function App() {
           <Route path="/solicitar-proyecto" element={
             <ClienteProtectedRoute>
               <SolicitarProyecto />
+            </ClienteProtectedRoute>
+          } />
+
+          <Route path="/mis-solicitudes" element={
+            <ClienteProtectedRoute>
+              <MisSolicitudes />
             </ClienteProtectedRoute>
           } />
 

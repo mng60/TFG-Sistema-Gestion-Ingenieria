@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { BriefcaseBusiness, CircleHelp, UserRound, CheckCircle2, Clock } from 'lucide-react';
+import React, { useState } from 'react';
+import { BriefcaseBusiness, CircleHelp, UserRound } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import '../styles/SolicitarProyecto.css';
 import api from '../services/api';
-import { formatearFecha } from '../utils/format';
 
 const TIPO_PROYECTO_OPTIONS = [
   { value: 'fotovoltaica', label: 'Instalacion fotovoltaica' },
@@ -25,14 +24,6 @@ function SolicitarProyecto() {
     ubicacion: '',
     mensaje: ''
   });
-  const [solicitudes, setSolicitudes] = useState([]);
-
-  useEffect(() => {
-    api.get('/portal/tickets')
-      .then((res) => setSolicitudes((res.data.tickets || []).filter(t => t.tipo === 'solicitud_nuevo_proyecto')))
-      .catch(() => {});
-  }, [formSent]);
-
   const nombreContacto = cliente?.persona_contacto || cliente?.nombre_empresa || 'Cliente portal';
   const empresa = cliente?.nombre_empresa || '';
 
@@ -79,64 +70,6 @@ function SolicitarProyecto() {
           </p>
         </div>
       </div>
-
-      {solicitudes.length > 0 && (
-        <div className="solicitud-grid" style={{ marginBottom: 24 }}>
-          <section className="solicitud-card solicitud-card--form solicitud-card--full">
-            <h3 style={{ margin: '0 0 16px', fontSize: '1rem', color: '#1B3A4B', fontWeight: 700 }}>
-              Mis solicitudes anteriores
-            </h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {solicitudes.map((sol) => (
-                <div
-                  key={sol.id}
-                  style={{
-                    padding: '14px 16px',
-                    borderRadius: 10,
-                    border: '1px solid #dbe4ea',
-                    background: '#f8fbfc',
-                    display: 'flex',
-                    gap: 14,
-                    alignItems: 'flex-start'
-                  }}
-                >
-                  <div style={{ marginTop: 2, flexShrink: 0 }}>
-                    {sol.estado === 'resuelto'
-                      ? <CheckCircle2 size={18} color="#27ae60" />
-                      : <Clock size={18} color="#e67e22" />
-                    }
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
-                      <span style={{
-                        fontSize: '0.75rem',
-                        fontWeight: 700,
-                        padding: '2px 8px',
-                        borderRadius: 20,
-                        background: sol.estado === 'resuelto' ? '#eafaf1' : '#fef6ec',
-                        color: sol.estado === 'resuelto' ? '#1e8449' : '#b7590a'
-                      }}>
-                        {sol.estado === 'resuelto' ? 'Atendida' : 'Pendiente'}
-                      </span>
-                      <span style={{ fontSize: '0.82rem', color: '#8fa0aa' }}>
-                        {formatearFecha(sol.created_at)}
-                      </span>
-                    </div>
-                    <p style={{ margin: 0, color: '#52626a', fontSize: '0.92rem', lineHeight: 1.5 }}>
-                      {sol.mensaje.length > 180 ? sol.mensaje.slice(0, 180) + '…' : sol.mensaje}
-                    </p>
-                    {sol.estado === 'resuelto' && sol.resuelto_at && (
-                      <p style={{ margin: '4px 0 0', fontSize: '0.8rem', color: '#27ae60' }}>
-                        Atendida el {formatearFecha(sol.resuelto_at)}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        </div>
-      )}
 
       <div className="solicitud-grid">
         <section className="solicitud-card solicitud-card--form solicitud-card--full">
