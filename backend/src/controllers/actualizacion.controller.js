@@ -1,5 +1,6 @@
 const ProyectoActualizacion = require('../models/ProyectoActualizacion');
 const Ticket = require('../models/Ticket');
+const { pool } = require('../config/database');
 
 const getActualizaciones = async (req, res) => {
   try {
@@ -43,14 +44,19 @@ const createActualizacion = async (req, res) => {
       if (realizado) lineas.push(``, `Realizado: ${realizado}`);
       if (pendiente) lineas.push(`Pendiente: ${pendiente}`);
 
-      Ticket.create({
-        tipo: 'solicitud_cambio_fecha',
-        tipo_usuario: 'empleado',
-        email: req.user.email,
-        nombre: req.user.nombre,
-        mensaje: lineas.join('\n'),
-        proyecto_id: id
-      }).catch((err) => console.error('Error creando ticket cambio fecha:', err.message));
+      pool.query('SELECT telefono FROM users WHERE id = $1', [req.user.id])
+        .then(r => {
+          Ticket.create({
+            tipo: 'solicitud_cambio_fecha',
+            tipo_usuario: 'empleado',
+            email: req.user.email,
+            nombre: req.user.nombre,
+            telefono: r.rows[0]?.telefono || null,
+            mensaje: lineas.join('\n'),
+            proyecto_id: id
+          }).catch((err) => console.error('Error creando ticket cambio fecha:', err.message));
+        })
+        .catch((err) => console.error('Error obteniendo telefono empleado:', err.message));
     }
 
     res.json({ success: true, actualizacion });

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import presupuestoService from '../services/presupuestoService';
 import PresupuestoModal from './modals/PresupuestoModal';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, X } from 'lucide-react';
 import { formatearFecha, formatearMoneda } from '../utils/format';
+import '../styles/Modal.css';
 
 function ProyectoPresupuestos({ 
   proyectoId, 
@@ -15,6 +16,7 @@ function ProyectoPresupuestos({
 }) {
   const [showPresupuestoModal, setShowPresupuestoModal] = useState(false);
   const [presupuestoSeleccionado, setPresupuestoSeleccionado] = useState(null);
+  const [presupuestoDetalle, setPresupuestoDetalle] = useState(null);
 
   const abrirModalPresupuesto = (presupuesto = null) => {
     if (presupuesto && presupuesto.aceptado) {
@@ -77,7 +79,7 @@ function ProyectoPresupuestos({
             </thead>
             <tbody>
               {presupuestos.map((presupuesto) => (
-                <tr key={presupuesto.id}>
+                <tr key={presupuesto.id} className="tr-clickable" onClick={() => setPresupuestoDetalle(presupuesto)} style={{ cursor: 'pointer' }}>
                   <td>
                     <strong>{presupuesto.numero_presupuesto}</strong>
                     <div className="presupuesto-version">
@@ -93,7 +95,7 @@ function ProyectoPresupuestos({
                       {presupuesto.aceptado ? 'Aceptado' : presupuesto.estado}
                     </span>
                   </td>
-                  <td>
+                  <td onClick={e => e.stopPropagation()}>
                     <div className="action-buttons">
                       {!presupuesto.aceptado && proyecto.estado !== 'completado' && (
                         <button
@@ -119,6 +121,90 @@ function ProyectoPresupuestos({
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {presupuestoDetalle && (
+        <div className="modal-overlay" onClick={() => setPresupuestoDetalle(null)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: 680 }}>
+            <div className="modal-header">
+              <h2>Detalle del presupuesto</h2>
+              <button className="modal-close" onClick={() => setPresupuestoDetalle(null)}><X size={18} /></button>
+            </div>
+            <div className="modal-form">
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Número</label>
+                  <div className="modal-description" style={{ marginBottom: 0 }}>
+                    {presupuestoDetalle.numero_presupuesto}
+                    <span style={{ marginLeft: 8, fontSize: '0.8rem', opacity: 0.6 }}>v{presupuestoDetalle.version}</span>
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>Estado</label>
+                  <div className="modal-description" style={{ marginBottom: 0 }}>
+                    <span className={`badge badge-${presupuestoDetalle.aceptado ? 'aceptado' : presupuestoDetalle.estado}`}>
+                      {presupuestoDetalle.aceptado ? 'Aceptado' : presupuestoDetalle.estado}
+                    </span>
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>Fecha emisión</label>
+                  <div className="modal-description" style={{ marginBottom: 0 }}>{formatearFecha(presupuestoDetalle.fecha_emision)}</div>
+                </div>
+                {presupuestoDetalle.fecha_validez && (
+                  <div className="form-group">
+                    <label>Fecha validez</label>
+                    <div className="modal-description" style={{ marginBottom: 0 }}>{formatearFecha(presupuestoDetalle.fecha_validez)}</div>
+                  </div>
+                )}
+                <div className="form-group">
+                  <label>Subtotal</label>
+                  <div className="modal-description" style={{ marginBottom: 0 }}>{formatearMoneda(presupuestoDetalle.subtotal)}</div>
+                </div>
+                <div className="form-group">
+                  <label>IVA</label>
+                  <div className="modal-description" style={{ marginBottom: 0 }}>{presupuestoDetalle.iva}%</div>
+                </div>
+                <div className="form-group form-group-full">
+                  <label>Total</label>
+                  <div className="modal-description" style={{ marginBottom: 0, fontSize: '1.15rem', fontWeight: 700 }}>
+                    {formatearMoneda(presupuestoDetalle.total)}
+                  </div>
+                </div>
+                {presupuestoDetalle.descripcion && (
+                  <div className="form-group form-group-full">
+                    <label>Descripción</label>
+                    <div className="modal-description" style={{ marginBottom: 0, whiteSpace: 'pre-wrap' }}>{presupuestoDetalle.descripcion}</div>
+                  </div>
+                )}
+                {presupuestoDetalle.condiciones && (
+                  <div className="form-group form-group-full">
+                    <label>Condiciones</label>
+                    <div className="modal-description" style={{ marginBottom: 0, whiteSpace: 'pre-wrap' }}>{presupuestoDetalle.condiciones}</div>
+                  </div>
+                )}
+                {presupuestoDetalle.notas && (
+                  <div className="form-group form-group-full">
+                    <label>Notas internas</label>
+                    <div className="modal-description" style={{ marginBottom: 0, whiteSpace: 'pre-wrap' }}>{presupuestoDetalle.notas}</div>
+                  </div>
+                )}
+              </div>
+              <div className="modal-actions">
+                <button type="button" className="btn-secondary" onClick={() => setPresupuestoDetalle(null)}>Cerrar</button>
+                {!presupuestoDetalle.aceptado && proyecto.estado !== 'completado' && proyecto.estado !== 'cancelado' && (
+                  <button
+                    type="button"
+                    className="btn-primary"
+                    onClick={() => { setPresupuestoDetalle(null); abrirModalPresupuesto(presupuestoDetalle); }}
+                  >
+                    <Pencil size={15} /> Editar
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

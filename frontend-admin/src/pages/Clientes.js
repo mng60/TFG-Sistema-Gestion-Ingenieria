@@ -35,6 +35,7 @@ function Clientes() {
     notas: '',
     activo: true
   });
+  const [formErrors, setFormErrors] = useState({});
 
   useEffect(() => {
     document.title = 'Panel Interno - Clientes';
@@ -88,6 +89,7 @@ function Clientes() {
       notas: '',
       activo: true
     });
+    setFormErrors({});
     setShowModal(true);
   };
 
@@ -107,6 +109,7 @@ function Clientes() {
       notas: cliente.notas || '',
       activo: cliente.activo
     });
+    setFormErrors({});
     setShowModal(true);
   };
 
@@ -144,11 +147,40 @@ function Clientes() {
       ...formData,
       [name]: type === 'checkbox' ? checked : filtered
     });
+    if (formErrors[name]) {
+      setFormErrors(prev => ({ ...prev, [name]: undefined }));
+    }
+  };
+
+  const validateForm = () => {
+    const errors = {};
+    if (!formData.nombre_empresa.trim()) errors.nombre_empresa = 'Campo obligatorio';
+    const cifRegex = /^[A-Z][0-9]{7}[A-Z0-9]$/;
+    if (!formData.cif) errors.cif = 'Campo obligatorio';
+    else if (!cifRegex.test(formData.cif)) errors.cif = 'CIF inválido — debe ser 1 letra, 7 dígitos y 1 carácter (ej: A1234567B)';
+    if (!formData.persona_contacto.trim()) errors.persona_contacto = 'Campo obligatorio';
+    if (!formData.email.trim()) errors.email = 'Campo obligatorio';
+    if (!formData.email_personal.trim()) errors.email_personal = 'Campo obligatorio';
+    const telefonoDigits = formData.telefono.replace(/[^0-9]/g, '');
+    if (!formData.telefono.trim()) errors.telefono = 'Campo obligatorio';
+    else if (telefonoDigits.length < 9) errors.telefono = 'Introduce un teléfono válido (mín. 9 dígitos)';
+    if (!formData.direccion.trim()) errors.direccion = 'Campo obligatorio';
+    if (!formData.ciudad.trim()) errors.ciudad = 'Campo obligatorio';
+    if (!formData.codigo_postal) errors.codigo_postal = 'Campo obligatorio';
+    else if (formData.codigo_postal.length !== 5) errors.codigo_postal = 'El código postal debe tener 5 dígitos';
+    return errors;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+    setFormErrors({});
+
     try {
       if (modalMode === 'crear') {
         await clienteService.create(formData);
@@ -157,7 +189,7 @@ function Clientes() {
         await clienteService.update(clienteSeleccionado.id, formData);
         showToast('Cliente actualizado exitosamente', 'success');
       }
-      
+
       setShowModal(false);
       cargarClientes();
     } catch (error) {
@@ -309,14 +341,14 @@ function Clientes() {
       </div>
 
       {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
+        <div className="modal-overlay" onClick={() => { setShowModal(false); setFormErrors({}); }}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>{modalMode === 'crear' ? 'Nuevo Cliente' : 'Editar Cliente'}</h2>
-              <button className="modal-close" onClick={() => setShowModal(false)}>✕</button>
+              <button className="modal-close" onClick={() => { setShowModal(false); setFormErrors({}); }}>✕</button>
             </div>
 
-            <form onSubmit={handleSubmit} className="modal-form">
+            <form onSubmit={handleSubmit} className="modal-form" noValidate>
               <div className="form-grid">
                 <div className="form-group form-group-full">
                   <label>Nombre de la Empresa *</label>
@@ -325,8 +357,9 @@ function Clientes() {
                     name="nombre_empresa"
                     value={formData.nombre_empresa}
                     onChange={handleInputChange}
-                    required
+                    className={formErrors.nombre_empresa ? 'input-error' : ''}
                   />
+                  {formErrors.nombre_empresa && <span className="field-error">{formErrors.nombre_empresa}</span>}
                 </div>
 
                 <div className="form-group">
@@ -336,8 +369,10 @@ function Clientes() {
                     name="cif"
                     value={formData.cif}
                     onChange={handleInputChange}
-                    required
+                    placeholder="A1234567B"
+                    className={formErrors.cif ? 'input-error' : ''}
                   />
+                  {formErrors.cif && <span className="field-error">{formErrors.cif}</span>}
                 </div>
 
                 <div className="form-group">
@@ -347,8 +382,9 @@ function Clientes() {
                     name="persona_contacto"
                     value={formData.persona_contacto}
                     onChange={handleInputChange}
-                    required
+                    className={formErrors.persona_contacto ? 'input-error' : ''}
                   />
+                  {formErrors.persona_contacto && <span className="field-error">{formErrors.persona_contacto}</span>}
                 </div>
 
                 <div className="form-group">
@@ -358,8 +394,9 @@ function Clientes() {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    required
+                    className={formErrors.email ? 'input-error' : ''}
                   />
+                  {formErrors.email && <span className="field-error">{formErrors.email}</span>}
                 </div>
 
                 <div className="form-group">
@@ -369,13 +406,14 @@ function Clientes() {
                     name="email_personal"
                     value={formData.email_personal}
                     onChange={handleInputChange}
-                    required
                     placeholder="contacto@gmail.com"
+                    className={formErrors.email_personal ? 'input-error' : ''}
                   />
+                  {formErrors.email_personal && <span className="field-error">{formErrors.email_personal}</span>}
                 </div>
 
                 <div className="form-group">
-                  <label>Teléfono</label>
+                  <label>Teléfono *</label>
                   <input
                     type="tel"
                     name="telefono"
@@ -383,31 +421,37 @@ function Clientes() {
                     onChange={handleInputChange}
                     inputMode="tel"
                     placeholder="600 000 000"
+                    className={formErrors.telefono ? 'input-error' : ''}
                   />
+                  {formErrors.telefono && <span className="field-error">{formErrors.telefono}</span>}
                 </div>
 
                 <div className="form-group form-group-full">
-                  <label>Dirección</label>
+                  <label>Dirección *</label>
                   <input
                     type="text"
                     name="direccion"
                     value={formData.direccion}
                     onChange={handleInputChange}
+                    className={formErrors.direccion ? 'input-error' : ''}
                   />
+                  {formErrors.direccion && <span className="field-error">{formErrors.direccion}</span>}
                 </div>
 
                 <div className="form-group">
-                  <label>Ciudad</label>
+                  <label>Ciudad *</label>
                   <input
                     type="text"
                     name="ciudad"
                     value={formData.ciudad}
                     onChange={handleInputChange}
+                    className={formErrors.ciudad ? 'input-error' : ''}
                   />
+                  {formErrors.ciudad && <span className="field-error">{formErrors.ciudad}</span>}
                 </div>
 
                 <div className="form-group">
-                  <label>Código Postal</label>
+                  <label>Código Postal *</label>
                   <input
                     type="text"
                     name="codigo_postal"
@@ -416,7 +460,9 @@ function Clientes() {
                     inputMode="numeric"
                     maxLength="5"
                     placeholder="03001"
+                    className={formErrors.codigo_postal ? 'input-error' : ''}
                   />
+                  {formErrors.codigo_postal && <span className="field-error">{formErrors.codigo_postal}</span>}
                 </div>
 
                 <div className="form-group form-group-full">
@@ -444,7 +490,7 @@ function Clientes() {
               </div>
 
               <div className="modal-actions">
-                <button type="button" className="btn-secondary" onClick={() => setShowModal(false)}>
+                <button type="button" className="btn-secondary" onClick={() => { setShowModal(false); setFormErrors({}); }}>
                   Cancelar
                 </button>
                 <button type="submit" className="btn-primary">

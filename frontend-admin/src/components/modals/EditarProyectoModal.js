@@ -3,6 +3,8 @@ import proyectoService from '../../services/proyectoService';
 import '../../styles/Modal.css';
 
 function EditarProyectoModal({ proyecto, clientes, usuarios, onClose, onSuccess, onError }) {
+  const esCompletado = proyecto.estado === 'completado';
+
   const [formData, setFormData] = useState({
     nombre: proyecto.nombre || '',
     descripcion: proyecto.descripcion || '',
@@ -25,13 +27,15 @@ function EditarProyectoModal({ proyecto, clientes, usuarios, onClose, onSuccess,
     e.preventDefault();
 
     try {
-      const dataToSend = {
-        ...formData,
-        fecha_inicio: formData.fecha_inicio || null,
-        fecha_fin_estimada: formData.fecha_fin_estimada || null,
-        fecha_fin_real: formData.fecha_fin_real || null,
-        responsable_id: formData.responsable_id || null
-      };
+      const dataToSend = esCompletado
+        ? { notas: formData.notas }
+        : {
+            ...formData,
+            fecha_inicio: formData.fecha_inicio || null,
+            fecha_fin_estimada: formData.fecha_fin_estimada || null,
+            fecha_fin_real: formData.fecha_fin_real || null,
+            responsable_id: formData.responsable_id || null
+          };
 
       await proyectoService.update(proyecto.id, dataToSend);
       onSuccess();
@@ -49,20 +53,25 @@ function EditarProyectoModal({ proyecto, clientes, usuarios, onClose, onSuccess,
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
+          {esCompletado && (
+            <div className="completed-notice">
+              Proyecto completado — solo se pueden editar las notas.
+            </div>
+          )}
           <div className="form-grid">
             <div className="form-group form-group-full">
               <label>Nombre del Proyecto *</label>
-              <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} required />
+              <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} required disabled={esCompletado} />
             </div>
 
             <div className="form-group form-group-full">
               <label>Descripción</label>
-              <textarea name="descripcion" value={formData.descripcion} onChange={handleChange} rows="3" />
+              <textarea name="descripcion" value={formData.descripcion} onChange={handleChange} rows="3" disabled={esCompletado} />
             </div>
 
             <div className="form-group">
               <label>Cliente *</label>
-              <select name="cliente_id" value={formData.cliente_id} onChange={handleChange} required>
+              <select name="cliente_id" value={formData.cliente_id} onChange={handleChange} required disabled={esCompletado}>
                 <option value="">Seleccionar...</option>
                 {clientes.map(c => <option key={c.id} value={c.id}>{c.nombre_empresa}</option>)}
               </select>
@@ -70,7 +79,7 @@ function EditarProyectoModal({ proyecto, clientes, usuarios, onClose, onSuccess,
 
             <div className="form-group">
               <label>Responsable</label>
-              <select name="responsable_id" value={formData.responsable_id} onChange={handleChange}>
+              <select name="responsable_id" value={formData.responsable_id} onChange={handleChange} disabled={esCompletado}>
                 <option value="">Sin asignar...</option>
                 {usuarios.map(u => <option key={u.id} value={u.id}>{u.nombre} ({u.rol})</option>)}
               </select>
@@ -78,7 +87,7 @@ function EditarProyectoModal({ proyecto, clientes, usuarios, onClose, onSuccess,
 
             <div className="form-group">
               <label>Estado *</label>
-              <select name="estado" value={formData.estado} onChange={handleChange} required>
+              <select name="estado" value={formData.estado} onChange={handleChange} required disabled={esCompletado}>
                 <option value="pendiente">Pendiente</option>
                 <option value="en_progreso">En Progreso</option>
                 <option value="pausado">Pausado</option>
@@ -89,7 +98,7 @@ function EditarProyectoModal({ proyecto, clientes, usuarios, onClose, onSuccess,
 
             <div className="form-group">
               <label>Prioridad *</label>
-              <select name="prioridad" value={formData.prioridad} onChange={handleChange} required>
+              <select name="prioridad" value={formData.prioridad} onChange={handleChange} required disabled={esCompletado}>
                 <option value="baja">Baja</option>
                 <option value="media">Media</option>
                 <option value="alta">Alta</option>
@@ -99,17 +108,17 @@ function EditarProyectoModal({ proyecto, clientes, usuarios, onClose, onSuccess,
 
             <div className="form-group">
               <label>Fecha Inicio</label>
-              <input type="date" name="fecha_inicio" value={formData.fecha_inicio} onChange={handleChange} />
+              <input type="date" name="fecha_inicio" value={formData.fecha_inicio} onChange={handleChange} disabled={esCompletado} />
             </div>
 
             <div className="form-group">
               <label>Fecha Fin Estimada</label>
-              <input type="date" name="fecha_fin_estimada" value={formData.fecha_fin_estimada} onChange={handleChange} />
+              <input type="date" name="fecha_fin_estimada" value={formData.fecha_fin_estimada} onChange={handleChange} disabled={esCompletado} />
             </div>
 
             <div className="form-group form-group-full">
               <label>Ubicación</label>
-              <input type="text" name="ubicacion" value={formData.ubicacion} onChange={handleChange} />
+              <input type="text" name="ubicacion" value={formData.ubicacion} onChange={handleChange} disabled={esCompletado} />
             </div>
 
             <div className="form-group form-group-full">

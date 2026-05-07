@@ -1,0 +1,272 @@
+.mis-solicitudes-page { width: 100%; }
+
+/* ── Header ── */
+.ms-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border: 1px solid #f0f0f0;
+  margin-bottom: 24px;
+}
+
+.ms-page-header h1 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 4px;
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.ms-page-header p {
+  margin: 0;
+  color: #9ca3af;
+  font-size: 0.9rem;
+}
+
+.ms-nueva-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  background: #1B3A4B;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.ms-nueva-btn:hover {
+  background: #254f63;
+  transform: translateY(-1px);
+}
+
+/* ── Lista ── */
+.ms-list { display: flex; flex-direction: column; gap: 14px; }
+
+.ms-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: white;
+  border-radius: 16px;
+  border: 1.5px solid #e8ecf0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  padding: 20px 24px;
+  cursor: pointer;
+  transition: box-shadow 0.25s, transform 0.25s, border-color 0.25s;
+}
+
+.ms-card:hover {
+  box-shadow: 0 8px 28px rgba(13,148,136,0.13);
+  transform: translateY(-2px);
+  border-color: #2DD4BF;
+}
+
+.ms-card-left { flex: 1; min-width: 0; }
+
+.ms-card-tipo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 8px;
+  transition: color 0.25s;
+}
+
+.ms-card:hover .ms-card-tipo { color: #0D9488; }
+
+.ms-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.ms-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.ms-badge--pendiente { background: #fff7ed; color: #b45309; }
+.ms-badge--atendida  { background: #f0fdf4; color: #166534; }
+
+.ms-card-fecha { font-size: 0.82rem; color: #9ca3af; }
+.ms-card-atendida { font-size: 0.82rem; color: #16a34a; font-weight: 600; }
+
+.ms-card-arrow {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #0D9488;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: color 0.2s;
+}
+
+.ms-card:hover .ms-card-arrow { color: #0F766E; }
+
+/* ── Empty state ── */
+.ms-empty {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e8edf1;
+  padding: 60px 24px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+/* ── Modal ── */
+.ms-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.ms-modal {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 640px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+}
+
+.ms-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 22px 28px;
+  border-bottom: 2px solid #e0e0e0;
+  background: linear-gradient(135deg, #1B3A4B 0%, #254f63 100%);
+  color: white;
+  border-radius: 16px 16px 0 0;
+  flex-shrink: 0;
+}
+
+.ms-modal-header h2 {
+  margin: 0;
+  font-size: 1.32rem;
+  font-weight: 700;
+  color: white;
+}
+
+.ms-modal-close {
+  background: rgba(255, 255, 255, 0.16);
+  border: none;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  color: white;
+  padding: 0;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.ms-modal-close:hover {
+  background: rgba(255, 255, 255, 0.28);
+  transform: rotate(90deg);
+}
+
+.ms-modal-body { padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+
+.ms-modal-section { display: flex; flex-direction: column; gap: 14px; }
+
+.ms-modal-section-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #9ca3af;
+  margin: 0;
+}
+
+.ms-modal-field { display: flex; flex-direction: column; gap: 3px; }
+
+.ms-modal-field label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #52626a;
+  letter-spacing: 0.03em;
+}
+
+.ms-modal-field p {
+  margin: 0;
+  color: #22333a;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.ms-modal-pending {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+}
+
+.ms-modal-pending p {
+  margin: 0;
+  color: #9a3412;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.ms-modal-resolved {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+
+.ms-modal-resolved-body { flex: 1; }
+
+.ms-modal-resolved p {
+  margin: 0;
+  color: #166534;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+
+.ms-divider { height: 1px; background: #f0f4f6; }
+
+@media (max-width: 768px) {
+  .ms-page-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .ms-page-header h1 { font-size: 1.35rem; }
+  .ms-nueva-btn { width: 100%; justify-content: center; }
+  .ms-card { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .ms-card-arrow { align-self: flex-end; }
+}

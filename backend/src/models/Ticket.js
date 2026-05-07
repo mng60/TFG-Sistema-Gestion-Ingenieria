@@ -24,6 +24,7 @@ pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS empresa VARCHAR(255)`).
 pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS telefono VARCHAR(50)`).catch(() => {});
 pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS proyecto_id INTEGER REFERENCES proyectos(id) ON DELETE SET NULL`).catch(() => {});
 pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS resuelto_at TIMESTAMP`).catch(() => {});
+pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS nota_resolucion TEXT`).catch(() => {});
 
 // Añadir columnas de intentos de login a users y clientes
 pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS login_attempts INTEGER DEFAULT 0`)
@@ -47,9 +48,10 @@ class Ticket {
 
   static async findAll({ estado } = {}) {
     let query = `
-      SELECT t.*, u.nombre as resuelto_por_nombre
+      SELECT t.*, u.nombre as resuelto_por_nombre, p.nombre as proyecto_nombre
       FROM tickets t
       LEFT JOIN users u ON t.resuelto_por = u.id
+      LEFT JOIN proyectos p ON t.proyecto_id = p.id
     `;
     const values = [];
     if (estado) {
@@ -72,11 +74,11 @@ class Ticket {
     return result.rows;
   }
 
-  static async resolver(id, resueltoPor) {
+  static async resolver(id, resueltoPor, nota = null) {
     const result = await pool.query(
-      `UPDATE tickets SET estado = 'resuelto', resuelto_por = $1, resuelto_at = CURRENT_TIMESTAMP
+      `UPDATE tickets SET estado = 'resuelto', resuelto_por = $1, resuelto_at = CURRENT_TIMESTAMP, nota_resolucion = $3
        WHERE id = $2 RETURNING *`,
-      [resueltoPor, id]
+      [resueltoPor, id, nota || null]
     );
     return result.rows[0];
   }

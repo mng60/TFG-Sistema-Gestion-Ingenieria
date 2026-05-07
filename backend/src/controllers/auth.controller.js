@@ -108,7 +108,7 @@ const login = async (req, res) => {
     // Login correcto — resetear intentos
     await pool.query('UPDATE users SET login_attempts = 0, locked_until = NULL WHERE id = $1', [user.id]);
 
-    const token = generateToken({ id: user.id, email: user.email, rol: user.rol });
+    const token = generateToken({ id: user.id, email: user.email, rol: user.rol, nombre: user.nombre });
 
     res.json({
       success: true,

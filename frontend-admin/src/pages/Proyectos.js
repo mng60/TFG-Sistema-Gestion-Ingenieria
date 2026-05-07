@@ -138,11 +138,6 @@ function Proyectos() {
   };
 
   const abrirModalEditar = (proyecto) => {
-    if (proyecto.estado === 'completado') {
-      showToast('No se pueden editar proyectos completados', 'warning');
-      return;
-    }
-
     setModalMode('editar');
     setProyectoSeleccionado(proyecto);
     setFormData({
@@ -393,13 +388,15 @@ function Proyectos() {
                             >
                               <Pencil size={14} />
                             </button>
-                            <button
-                              className="btn-sm btn-success"
-                              onClick={(e) => { e.stopPropagation(); abrirModalAsignar(proyecto); }}
-                              title="Asignar empleado"
-                            >
-                              <UserPlus size={14} />
-                            </button>
+                            {proyecto.estado !== 'completado' && (
+                              <button
+                                className="btn-sm btn-success"
+                                onClick={(e) => { e.stopPropagation(); abrirModalAsignar(proyecto); }}
+                                title="Asignar empleado"
+                              >
+                                <UserPlus size={14} />
+                              </button>
+                            )}
                             <button
                               className="btn-sm btn-danger"
                               onClick={(e) => { e.stopPropagation(); handleEliminar(proyecto); }}

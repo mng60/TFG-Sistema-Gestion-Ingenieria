@@ -14,11 +14,13 @@ const crearTicket = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Email y tipo de usuario son obligatorios' });
     }
 
-    // Verificar que el email existe para ese tipo de usuario
+    // Verificar que el email existe para ese tipo de usuario y obtener datos
     let existe = false;
+    let datosUsuario = { nombre, telefono: null };
     if (tipo_usuario === 'empleado') {
-      const r = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+      const r = await pool.query('SELECT id, nombre, telefono FROM users WHERE email = $1', [email]);
       existe = r.rows.length > 0;
+      if (existe) datosUsuario = { nombre: r.rows[0].nombre, telefono: r.rows[0].telefono };
     } else if (tipo_usuario === 'cliente') {
       const r = await pool.query('SELECT id FROM clientes WHERE email = $1', [email]);
       existe = r.rows.length > 0;
@@ -26,7 +28,7 @@ const crearTicket = async (req, res) => {
 
     // Respondemos igual aunque no exista (seguridad)
     if (existe) {
-      await Ticket.create({ tipo_usuario, email, nombre, mensaje });
+      await Ticket.create({ tipo_usuario, email, nombre: datosUsuario.nombre, telefono: datosUsuario.telefono, mensaje });
     }
 
     res.json({ success: true, message: 'Solicitud enviada. El administrador se pondrá en contacto contigo.' });
@@ -52,7 +54,8 @@ const getTickets = async (req, res) => {
 const resolverTicket = async (req, res) => {
   try {
     const { id } = req.params;
-    const ticket = await Ticket.resolver(id, req.user.id);
+    const { nota_resolucion } = req.body;
+    const ticket = await Ticket.resolver(id, req.user.id, nota_resolucion);
     if (!ticket) return res.status(404).json({ success: false, message: 'Ticket no encontrado' });
     res.json({ success: true, ticket });
   } catch (error) {

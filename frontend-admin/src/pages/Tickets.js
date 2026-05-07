@@ -1,12 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import {
+  Banknote,
   BriefcaseBusiness,
   CalendarClock,
   CheckCheck,
   Clock,
   Eye,
   EyeOff,
+  FolderOpen,
   Globe,
   KeyRound,
   Mail,
@@ -14,6 +16,7 @@ import {
   TicketCheck,
   UserRound
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useEmpleadoAuth } from '../context/EmpleadoAuthContext';
 import ConfirmModal from '../components/ConfirmModal';
 import '../styles/GestionPages.css';
@@ -68,6 +71,15 @@ function getTipoBadge(ticket) {
       color: '#b45309',
       label: 'Cambio de fecha',
       icon: <CalendarClock size={12} />
+    };
+  }
+
+  if (tipo === 'solicitud_modificacion_presupuesto') {
+    return {
+      bg: '#eff6ff',
+      color: '#1d4ed8',
+      label: 'Modif. presupuesto',
+      icon: <Banknote size={12} />
     };
   }
 
@@ -141,9 +153,7 @@ function ResetPasswordModal({ ticket, onClose, onSuccess, showToast }) {
               </button>
             </div>
           </div>
-          <p style={{ fontSize: '0.82rem', color: '#e67e22', marginTop: -8 }}>
-            Comparte la nueva contrasena por el canal acordado con el cliente.
-          </p>
+
           <div className="modal-actions">
             <button type="button" className="btn-secondary" onClick={onClose}>Cancelar</button>
             <button type="submit" className="btn-primary" disabled={saving}>
@@ -159,10 +169,12 @@ function ResetPasswordModal({ ticket, onClose, onSuccess, showToast }) {
 function TicketDetailModal({ ticket, onClose, onResolve, onResetPassword }) {
   const tipoBadge = getTipoBadge(ticket);
   const tipoNormalizado = getTicketTipoNormalizado(ticket);
+  const [notaResolucion, setNotaResolucion] = useState('');
+  const navigate = useNavigate();
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content modal-small" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 720 }}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 760 }}>
         <div className="modal-header">
           <h2>Detalle del ticket</h2>
           <button className="modal-close" onClick={onClose}>x</button>
@@ -232,12 +244,14 @@ function TicketDetailModal({ ticket, onClose, onResolve, onResetPassword }) {
               </div>
             </div>
 
-            <div className="form-group">
-              <label>Empresa / proyecto</label>
-              <div className="modal-description" style={{ marginBottom: 0 }}>
-                {ticket.empresa || ticket.proyecto_nombre || '-'}
+            {(ticket.empresa || ticket.proyecto_nombre) && (
+              <div className="form-group">
+                <label>{ticket.empresa ? 'Empresa' : 'Proyecto'}</label>
+                <div className="modal-description" style={{ marginBottom: 0 }}>
+                  {ticket.empresa || ticket.proyecto_nombre}
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="form-group form-group-full">
               <label>Fecha</label>
@@ -265,17 +279,48 @@ function TicketDetailModal({ ticket, onClose, onResolve, onResetPassword }) {
             </div>
           </div>
 
+          {ticket.estado === 'pendiente' && tipoNormalizado === 'solicitud_nuevo_proyecto' && onResolve && (
+            <div className="form-group" style={{ marginTop: 4 }}>
+              <label>Nota de respuesta para el cliente</label>
+              <textarea
+                value={notaResolucion}
+                onChange={e => setNotaResolucion(e.target.value)}
+                rows={3}
+                placeholder="Ej: Estudiaremos tu propuesta y te contactaremos en los próximos días..."
+              />
+            </div>
+          )}
+
+          {ticket.estado === 'resuelto' && ticket.nota_resolucion && (
+            <div className="form-group form-group-full" style={{ marginTop: 4 }}>
+              <label>Nota enviada al cliente</label>
+              <div className="modal-description" style={{ marginBottom: 0, whiteSpace: 'pre-wrap' }}>
+                {ticket.nota_resolucion}
+              </div>
+            </div>
+          )}
+
           <div className="modal-actions">
             <button type="button" className="btn-secondary" onClick={onClose}>
               Cerrar
             </button>
+            {tipoNormalizado === 'solicitud_modificacion_presupuesto' && ticket.proyecto_id && (
+              <button
+                type="button"
+                className="btn-sm btn-edit"
+                style={{ padding: '10px 16px', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                onClick={() => { navigate(`/proyectos/${ticket.proyecto_id}`); onClose(); }}
+              >
+                <FolderOpen size={15} /> Ir al proyecto
+              </button>
+            )}
             {ticket.estado === 'pendiente' && onResolve && (
               tipoNormalizado === 'olvido_password' ? (
                 <button type="button" className="btn-primary" onClick={onResetPassword}>
                   <KeyRound size={15} /> Reactivar y resolver
                 </button>
               ) : (
-                <button type="button" className="btn-primary" onClick={onResolve}>
+                <button type="button" className="btn-primary" onClick={() => onResolve(notaResolucion)}>
                   <CheckCheck size={15} /> Marcar resuelto
                 </button>
               )
@@ -345,7 +390,7 @@ function Tickets() {
     [tickets]
   );
 
-  const handleResolver = (ticket) => {
+  const handleResolver = (ticket, nota = '') => {
     setConfirmModal({
       title: 'Resolver ticket',
       message: `Marcar como resuelto el ticket de "${ticket.email}"?`,
@@ -356,7 +401,7 @@ function Tickets() {
           const token = localStorage.getItem('empleado_token');
           await axios.put(
             `${API_URL}/tickets/${ticket.id}/resolver`,
-            {},
+            { nota_resolucion: nota || null },
             { headers: { Authorization: `Bearer ${token}` } }
           );
           setDetalleTicket(null);
@@ -390,7 +435,6 @@ function Tickets() {
                 <th>Mensaje</th>
                 <th>Fecha</th>
                 <th>Estado</th>
-                {showActions && filtro !== 'resuelto' && <th>Acciones</th>}
               </tr>
             </thead>
             <tbody>
@@ -453,32 +497,6 @@ function Tickets() {
                         </span>
                       )}
                     </td>
-                    {showActions && filtro !== 'resuelto' && (
-                      <td onClick={(e) => e.stopPropagation()}>
-                        {ticket.estado === 'pendiente' && (
-                          <div className="action-buttons">
-                            {getTicketTipoNormalizado(ticket) === 'olvido_password' ? (
-                              <button
-                                className="btn-sm btn-edit"
-                                onClick={() => setResetModal(ticket)}
-                                style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
-                                title="Reactivar acceso y resolver"
-                              >
-                                <KeyRound size={13} /> Resolver
-                              </button>
-                            ) : (
-                              <button
-                                className="btn-sm btn-edit"
-                                onClick={() => handleResolver(ticket)}
-                                title="Marcar como resuelto"
-                              >
-                                ✓ Resolver
-                              </button>
-                            )}
-                          </div>
-                        )}
-                      </td>
-                    )}
                   </tr>
                 );
               })}
@@ -567,7 +585,7 @@ function Tickets() {
         <TicketDetailModal
           ticket={detalleTicket}
           onClose={() => setDetalleTicket(null)}
-          onResolve={isAdmin() ? () => handleResolver(detalleTicket) : undefined}
+          onResolve={isAdmin() ? (nota) => handleResolver(detalleTicket, nota) : undefined}
           onResetPassword={isAdmin() ? () => {
             setDetalleTicket(null);
             setResetModal(detalleTicket);

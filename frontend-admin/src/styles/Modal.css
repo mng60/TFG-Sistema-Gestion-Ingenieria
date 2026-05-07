@@ -93,6 +93,22 @@
   padding: 30px;
   overflow-y: auto;
   flex: 1;
+  scrollbar-width: none;
+}
+
+.modal-form::-webkit-scrollbar {
+  display: none;
+}
+
+.completed-notice {
+  background: rgba(77, 182, 168, 0.12);
+  border: 1px solid rgba(77, 182, 168, 0.35);
+  border-radius: 8px;
+  color: #4DB6A8;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 10px 14px;
+  margin-bottom: 20px;
 }
 
 .modal-description {
@@ -120,7 +136,7 @@
 }
 
 .form-group label {
-  color: rgba(255, 255, 255, 0.65);
+  color: white;
   font-weight: 600;
   font-size: 0.95rem;
 }

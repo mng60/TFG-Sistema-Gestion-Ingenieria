@@ -288,6 +288,16 @@
 
 .data-table tr:hover td { background: #f8f9fa; }
 
+.data-table .tr-pres:hover td {
+  background: #f0fdfa;
+  border-bottom-color: #b2f0e8;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.data-table .tr-pres:hover td:first-child {
+  box-shadow: inset 3px 0 0 #2DD4BF;
+}
+
 /* ==================== BOTONES ==================== */
 .btn-accept {
   background: #28a745;
@@ -477,6 +487,164 @@
 
 .act-bloque-realizado .act-bloque-label-cliente { color: #27ae60; }
 .act-bloque-pendiente .act-bloque-label-cliente { color: #e74c3c; }
+
+/* ==================== MODALES PRESUPUESTO ==================== */
+.pc-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.pc-modal {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 620px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+  display: flex;
+  flex-direction: column;
+}
+
+.pc-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 22px 28px;
+  border-bottom: 2px solid #e0e0e0;
+  background: linear-gradient(135deg, #1B3A4B 0%, #254f63 100%);
+  border-radius: 16px 16px 0 0;
+  flex-shrink: 0;
+}
+
+.pc-modal-header h3 {
+  margin: 0;
+  font-size: 1.32rem;
+  font-weight: 700;
+  color: white;
+}
+
+.pc-modal-close {
+  background: rgba(255,255,255,0.16);
+  border: none;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  color: white;
+  padding: 0;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.pc-modal-close:hover { background: rgba(255,255,255,0.28); transform: rotate(90deg); }
+
+.pc-modal-body { padding: 24px 28px; }
+
+.pc-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.pc-modal-field { display: flex; flex-direction: column; gap: 3px; }
+.pc-modal-field.full { grid-column: 1 / -1; }
+
+.pc-modal-field label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #52626a;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.pc-modal-field p {
+  margin: 0;
+  color: #22333a;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.pc-modal-total {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.pc-modal-total-label { font-size: 0.9rem; color: #374151; font-weight: 600; }
+.pc-modal-total-amount { font-size: 1.3rem; font-weight: 800; color: #166534; }
+
+.pc-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f4f6;
+  margin-top: 8px;
+}
+
+.pc-modal-divider { height: 1px; background: #f0f4f6; margin: 16px 0; }
+
+.pc-modal-form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+
+.pc-modal-form-group label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #374151;
+}
+
+.pc-modal-form-group textarea,
+.pc-modal-form-group input[type="number"] {
+  padding: 10px 14px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  color: #22333a;
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+
+.pc-modal-form-group textarea:focus,
+.pc-modal-form-group input[type="number"]:focus {
+  outline: none;
+  border-color: #1B3A4B;
+}
+
+.pc-modal-btn-cancel {
+  padding: 10px 20px;
+  background: #f3f4f6;
+  color: #374151;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.pc-modal-btn-cancel:hover { background: #e5e7eb; }
+
+@media (max-width: 600px) {
+  .pc-modal-grid { grid-template-columns: 1fr; }
+  .pc-modal-header h3 { font-size: 1.1rem; }
+}
 
 .act-bloque-cliente p {
   font-size: 0.88rem;

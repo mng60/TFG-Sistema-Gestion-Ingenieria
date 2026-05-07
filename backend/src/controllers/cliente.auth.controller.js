@@ -419,10 +419,13 @@ const rechazarMiPresupuesto = async (req, res) => {
   try {
     const clienteId = req.user.id;
     const { id } = req.params;
+    const { motivo, precio_sugerido } = req.body;
     const { pool } = require('../config/database');
+    const Ticket = require('../models/Ticket');
 
     const checkResult = await pool.query(`
-      SELECT p.id, p.aceptado, p.estado
+      SELECT p.id, p.aceptado, p.estado, p.numero_presupuesto, p.total, p.proyecto_id,
+             pr.nombre as proyecto_nombre
       FROM presupuestos p
       JOIN proyectos pr ON p.proyecto_id = pr.id
       WHERE p.id = $1 AND pr.cliente_id = $2
@@ -431,7 +434,8 @@ const rechazarMiPresupuesto = async (req, res) => {
     if (checkResult.rows.length === 0) {
       return res.status(404).json({ success: false, message: 'Presupuesto no encontrado o no autorizado' });
     }
-    if (checkResult.rows[0].aceptado || checkResult.rows[0].estado === 'rechazado') {
+    const pres = checkResult.rows[0];
+    if (pres.aceptado || pres.estado === 'rechazado') {
       return res.status(400).json({ success: false, message: 'El presupuesto ya ha sido procesado' });
     }
 
@@ -439,6 +443,38 @@ const rechazarMiPresupuesto = async (req, res) => {
       UPDATE presupuestos SET estado = 'rechazado', updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *
     `, [id]);
     const presupuesto = result.rows[0];
+
+    // Crear ticket de solicitud de modificación con el motivo del rechazo
+    if (motivo) {
+      try {
+        const clienteInfo = await pool.query(
+          `SELECT nombre_empresa, persona_contacto, email, telefono_contacto FROM clientes WHERE id = $1`,
+          [clienteId]
+        );
+        const cliente = clienteInfo.rows[0];
+        const lineas = [
+          `Presupuesto: ${pres.numero_presupuesto}`,
+          `Total original: ${formatMoneda(pres.total)}`,
+          `Proyecto: ${pres.proyecto_nombre}`,
+          '',
+          'Motivo del rechazo:',
+          motivo
+        ];
+        if (precio_sugerido) lineas.push('', `Precio sugerido: ${formatMoneda(precio_sugerido)}`);
+        await Ticket.create({
+          tipo: 'solicitud_modificacion_presupuesto',
+          tipo_usuario: 'cliente',
+          email: cliente.email,
+          nombre: cliente.persona_contacto || cliente.nombre_empresa,
+          empresa: cliente.nombre_empresa,
+          telefono: cliente.telefono_contacto || null,
+          mensaje: lineas.join('\n'),
+          proyecto_id: pres.proyecto_id
+        });
+      } catch (ticketErr) {
+        console.error('Error creando ticket de modificación:', ticketErr);
+      }
+    }
 
     // Notificar a los admins por email
     try {
