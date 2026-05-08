@@ -152,6 +152,7 @@ const getProfile = async (req, res) => {
         rol: user.rol,
         telefono: user.telefono,
         foto_url: user.foto_url || null,
+        email_personal: user.email_personal || null,
         created_at: user.created_at
       }
     });
@@ -165,11 +166,11 @@ const getProfile = async (req, res) => {
 // Actualizar perfil propio (nombre, telefono)
 const updateProfile = async (req, res) => {
   try {
-    const { nombre, telefono } = req.body;
+    const { nombre, telefono, email_personal } = req.body;
     if (!nombre || !nombre.trim()) {
       return res.status(400).json({ success: false, message: 'El nombre es obligatorio' });
     }
-    const updated = await User.updatePerfil(req.user.id, { nombre: nombre.trim(), telefono });
+    const updated = await User.updatePerfil(req.user.id, { nombre: nombre.trim(), telefono, email_personal });
     res.json({ success: true, user: updated });
   } catch (error) {
     console.error('Error en updateProfile:', error);
