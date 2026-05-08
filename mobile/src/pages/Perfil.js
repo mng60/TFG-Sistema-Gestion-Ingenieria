@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import MobileLayout from '../components/layout/MobileLayout';
@@ -35,6 +35,12 @@ function Perfil() {
   const [savingInfo, setSavingInfo] = useState(false);
   const [savingPass, setSavingPass] = useState(false);
   const [uploadingFoto, setUploadingFoto] = useState(false);
+
+  useEffect(() => {
+    if (empleado?.email_personal && !form.email_personal) {
+      setForm(prev => ({ ...prev, email_personal: empleado.email_personal }));
+    }
+  }, [empleado?.email_personal]);
 
   const showToast = (msg, type = 'success') => {
     setToast({ msg, type });

@@ -183,14 +183,14 @@ const preguntar = async (req, res) => {
     const conv = respuestaConversacional(t);
     if (conv) return res.json({ success: true, respuesta: conEgg(conv) });
 
-    if (esFechaHora(t))        return res.json({ success: true, respuesta: conEgg(respuestaFechaHora(t)) });
-    if (esTiempo(t))           return res.json({ success: true, respuesta: conEgg(await respuestaTiempo()) });
-    if (esCalculadoraSolar(t)) return res.json({ success: true, respuesta: conEgg(respuestaCalculadoraSolar(t)) });
     if (esConsultaEnergiaActual(pregunta)) {
       const respEnergia = await construirRespuestaEnergia(pregunta);
       const respTraducida = await traducirSiNecesario(respEnergia, pregunta);
       return res.json({ success: true, respuesta: conEgg(respTraducida) });
     }
+    if (esFechaHora(t))        return res.json({ success: true, respuesta: conEgg(respuestaFechaHora(t)) });
+    if (esTiempo(t))           return res.json({ success: true, respuesta: conEgg(await respuestaTiempo()) });
+    if (esCalculadoraSolar(t)) return res.json({ success: true, respuesta: conEgg(respuestaCalculadoraSolar(t)) });
 
     // Caché para preguntas sin conversación activa
     const key = cacheKey(t);

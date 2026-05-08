@@ -128,14 +128,14 @@ function InfoPanel({ participant, conversacion, currentUser, onClose }) {
               participant.tipo_usuario === 'cliente' ? (
                 <button
                   className="info-action-btn"
-                  onClick={() => { navigate(`/proyectos?cliente_id=${participant.user_id}&nombre=${encodeURIComponent(participant.nombre)}`); onClose(); }}
+                  onClick={() => navigate(`/proyectos?cliente_id=${participant.user_id}&nombre=${encodeURIComponent(participant.nombre)}`)}
                 >
                   <FolderOpen size={14} /> Ver proyectos del cliente
                 </button>
               ) : (
                 <button
                   className="info-action-btn"
-                  onClick={() => { navigate(`/proyectos?solo_empleado_id=${participant.user_id}&nombre=${encodeURIComponent(participant.nombre)}`); onClose(); }}
+                  onClick={() => navigate(`/proyectos?solo_empleado_id=${participant.user_id}&nombre=${encodeURIComponent(participant.nombre)}`)}
                 >
                   <FolderOpen size={14} /> Ver todos sus proyectos
                 </button>
