@@ -124,15 +124,14 @@ function InfoPanel({ participant, conversacion, currentUser, onClose }) {
               <Paperclip size={14} /> Ver archivos compartidos
             </button>
 
-            <button 
+            <button
               className="info-action-btn"
               onClick={() => {
                 if (participant.tipo_usuario === 'cliente') {
                   navigate(`/proyectos?cliente_id=${participant.user_id}&nombre=${encodeURIComponent(participant.nombre)}`);
                 } else {
-                  navigate(`/proyectos?solo_empleado_id=${participant.user_id}&nombre=${encodeURIComponent(participant.nombre)}`);
+                  navigate(`/proyectos?empleado_id=${participant.user_id}&nombre=${encodeURIComponent(participant.nombre)}`);
                 }
-                onClose();
               }}
             >
               <FolderOpen size={14} /> Ver proyectos
