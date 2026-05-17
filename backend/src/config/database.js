@@ -4,13 +4,15 @@ require('dotenv').config();
 
 // Configuración del pool de conexiones
 // Soporta DATABASE_URL (Neon/Railway) o variables individuales (desarrollo local)
-const poolConfig = process.env.DATABASE_URL
+const isProduction = !!process.env.DATABASE_URL;
+
+const poolConfig = isProduction
   ? {
       connectionString: process.env.DATABASE_URL,
       ssl: { rejectUnauthorized: false },
-      max: 20,
+      max: 10,
       idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 2000,
+      connectionTimeoutMillis: 10000,
     }
   : {
       host: process.env.DB_HOST,
@@ -20,7 +22,7 @@ const poolConfig = process.env.DATABASE_URL
       database: process.env.DB_NAME,
       max: 20,
       idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 2000,
+      connectionTimeoutMillis: 5000,
     };
 
 const pool = new Pool(poolConfig);

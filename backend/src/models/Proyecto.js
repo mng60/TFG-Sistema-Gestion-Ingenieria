@@ -311,53 +311,6 @@ class Proyecto {
     }
   }
 
-  // Obtener estadísticas generales (sin filtro de rol)
-  static async getEstadisticas() {
-    try {
-      const queryProyectos = `
-        SELECT
-          COUNT(*) as total_proyectos,
-          COUNT(CASE WHEN estado = 'pendiente' THEN 1 END) as pendiente,
-          COUNT(CASE WHEN estado = 'en_progreso' THEN 1 END) as en_progreso,
-          COUNT(CASE WHEN estado = 'pausado' THEN 1 END) as pausado,
-          COUNT(CASE WHEN estado = 'completado' THEN 1 END) as completado,
-          COUNT(CASE WHEN estado = 'cancelado' THEN 1 END) as cancelado
-        FROM proyectos
-      `;
-
-      const queryPresupuestos = `
-        SELECT
-          COALESCE(SUM(subtotal), 0) as total_sin_iva,
-          COALESCE(SUM(total), 0) as total_con_iva
-        FROM presupuestos
-        WHERE aceptado = true
-      `;
-
-      const [resProyectos, resPresupuestos] = await Promise.all([
-        pool.query(queryProyectos),
-        pool.query(queryPresupuestos)
-      ]);
-
-      const p = resProyectos.rows[0];
-      const s = resPresupuestos.rows[0];
-
-      return {
-        total_proyectos: parseInt(p.total_proyectos) || 0,
-        por_estado: {
-          pendiente: parseInt(p.pendiente) || 0,
-          en_progreso: parseInt(p.en_progreso) || 0,
-          pausado: parseInt(p.pausado) || 0,
-          completado: parseInt(p.completado) || 0,
-          cancelado: parseInt(p.cancelado) || 0
-        },
-        presupuesto_total_estimado: parseFloat(s.total_sin_iva) || 0,
-        presupuesto_real_total: parseFloat(s.total_con_iva) || 0
-      };
-    } catch (error) {
-      throw error;
-    }
-  }
-
   // Obtener datos del dashboard filtrados por rol
   static async getDashboardData(userId, rol) {
     try {

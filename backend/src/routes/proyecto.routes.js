@@ -8,8 +8,7 @@ const {
   deleteProyecto,
   asignarEmpleado,
   desasignarEmpleado,
-  getProyectoEmpleados,
-  getEstadisticas
+  getProyectoEmpleados
 } = require('../controllers/proyecto.controller');
 const authMiddleware = require('../middlewares/auth.middleware');
 const checkRole = require('../middlewares/role.middleware');
@@ -51,9 +50,6 @@ const asignarEmpleadoValidation = [
 
 // Todas las rutas requieren autenticación
 router.use(authMiddleware);
-
-// GET /api/proyectos/estadisticas - Obtener estadísticas
-router.get('/estadisticas', getEstadisticas);
 
 // GET /api/proyectos - Obtener todos los proyectos
 router.get('/', getAllProyectos);

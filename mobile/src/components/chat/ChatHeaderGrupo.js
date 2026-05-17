@@ -15,8 +15,6 @@ function ChatHeaderGrupo({ conversacion, currentUser, onConversacionEliminada, s
       case 'info':
         onOpenInfoPanel?.();
         break;
-      case 'silenciar':
-        break;
       case 'eliminar':
         setConfirmModal({
           title: '⚠️ Eliminar Grupo',
@@ -117,9 +115,6 @@ function ChatHeaderGrupo({ conversacion, currentUser, onConversacionEliminada, s
 
                 <div className="menu-divider"></div>
 
-                <button onClick={() => handleMenuAction('silenciar')}>
-                  Silenciar notificaciones
-                </button>
                 <button onClick={() => handleMenuAction('eliminar')} className="menu-danger">
                   Eliminar grupo
                 </button>

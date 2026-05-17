@@ -90,16 +90,6 @@ export const AuthProvider = ({ children }) => {
     setCliente(null);
   };
 
-  const actualizarPerfil = async () => {
-    try {
-      const perfilActualizado = await authService.getPerfil();
-      setCliente(perfilActualizado);
-      return perfilActualizado;
-    } catch (error) {
-      throw error;
-    }
-  };
-
   const actualizarCliente = (data) => {
     const updated = { ...(authService.getCurrentCliente() || {}), ...data };
     localStorage.setItem('cliente', JSON.stringify(updated));
@@ -110,7 +100,6 @@ export const AuthProvider = ({ children }) => {
     cliente,
     login,
     logout,
-    actualizarPerfil,
     actualizarCliente,
     loading,
     socket,

@@ -22,11 +22,6 @@ const clienteService = {
     return response.data;
   },
 
-  deactivate: async (id) => {
-    const response = await api.patch(`/clientes/${id}/deactivate`);
-    return response.data;
-  },
-
   delete: async (id) => {
     const response = await api.delete(`/clientes/${id}`);
     return response.data;

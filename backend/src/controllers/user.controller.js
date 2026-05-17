@@ -241,41 +241,11 @@ const updatePassword = async (req, res) => {
   }
 };
 
-const testEmail = async (req, res) => {
-  const { to } = req.body;
-  if (!to) return res.status(400).json({ success: false, message: 'Falta el campo "to"' });
-
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    return res.json({ success: false, message: 'RESEND_API_KEY no configurado en Railway' });
-  }
-
-  try {
-    const { Resend } = require('resend');
-    const r = new Resend(apiKey);
-    const from = process.env.EMAIL_FROM || 'BlueArc Ingeniería <onboarding@resend.dev>';
-    const { data, error } = await r.emails.send({
-      from,
-      to: [to],
-      subject: 'Test email — BlueArc Ingeniería',
-      html: '<p>Test desde Railway con Resend. ¡Funciona!</p>'
-    });
-
-    if (error) {
-      return res.status(500).json({ success: false, message: error.message, from });
-    }
-    res.json({ success: true, message: `Enviado con id: ${data.id}`, from });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-};
-
 module.exports = {
   getAllUsers,
   getUserById,
   createUser,
   updateUser,
   deleteUser,
-  updatePassword,
-  testEmail
+  updatePassword
 };

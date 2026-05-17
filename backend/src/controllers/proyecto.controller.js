@@ -420,25 +420,6 @@ const getProyectoEmpleados = async (req, res) => {
   }
 };
 
-// Obtener estadísticas generales
-const getEstadisticas = async (req, res) => {
-  try {
-    const estadisticas = await Proyecto.getEstadisticas();
-
-    res.json({
-      success: true,
-      ...estadisticas
-    });
-  } catch (error) {
-    console.error('Error en getEstadisticas:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al obtener estadísticas',
-      error: error.message
-    });
-  }
-};
-
 module.exports = {
   getAllProyectos,
   getProyectoById,
@@ -447,6 +428,5 @@ module.exports = {
   deleteProyecto,
   asignarEmpleado,
   desasignarEmpleado,
-  getProyectoEmpleados,
-  getEstadisticas
+  getProyectoEmpleados
 };

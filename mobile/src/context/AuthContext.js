@@ -104,7 +104,7 @@ export const AuthProvider = ({ children }) => {
         justifyContent: 'center',
         alignItems: 'center',
         height: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: 'linear-gradient(135deg, #1B3A4B 0%, #4DB6A8 100%)',
         color: 'white',
         fontSize: '1.2rem'
       }}>

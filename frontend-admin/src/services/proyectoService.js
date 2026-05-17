@@ -42,11 +42,6 @@ const proyectoService = {
     return response.data;
   },
 
-  getEstadisticas: async () => {
-    const response = await api.get('/proyectos/estadisticas');
-    return response.data;
-  },
-
   getDashboard: async () => {
     const response = await api.get('/dashboard');
     return response.data;

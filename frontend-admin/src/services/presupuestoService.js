@@ -27,16 +27,6 @@ const presupuestoService = {
     return response.data;
   },
 
-  aceptar: async (id) => {
-    const response = await api.patch(`/presupuestos/${id}/aceptar`);
-    return response.data;
-  },
-
-  rechazar: async (id) => {
-    const response = await api.patch(`/presupuestos/${id}/rechazar`);
-    return response.data;
-  },
-
   delete: async (id) => {
     const response = await api.delete(`/presupuestos/${id}`);
     return response.data;

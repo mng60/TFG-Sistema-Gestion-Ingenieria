@@ -315,4 +315,27 @@ CREATE INDEX IF NOT EXISTS idx_mensajes_is_deleted ON mensajes(is_deleted);
 
 COMMENT ON TABLE mensajes IS 'Mensajes de las conversaciones de chat';
 
+-- ── Datos de mercado (precio PVPC diario desde REE) ─────────────────────────
+CREATE TABLE IF NOT EXISTS datos_mercado (
+    clave VARCHAR(50) PRIMARY KEY,
+    valor JSONB NOT NULL,
+    actualizado_at TIMESTAMP DEFAULT NOW()
+);
+
+COMMENT ON TABLE datos_mercado IS 'Almacén clave-valor para datos de mercado energético (PVPC diario REE)';
+
+-- ── Tokens FCM para notificaciones push (Firebase Cloud Messaging) ───────────
+CREATE TABLE IF NOT EXISTS fcm_tokens (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    tipo_usuario VARCHAR(20) NOT NULL,
+    token TEXT NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_fcm_tokens_user ON fcm_tokens(user_id, tipo_usuario);
+
+COMMENT ON TABLE fcm_tokens IS 'Tokens de dispositivo para notificaciones push via Firebase FCM (mobile)';
+
 COMMIT;

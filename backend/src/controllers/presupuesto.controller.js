@@ -215,73 +215,6 @@ const updatePresupuesto = async (req, res) => {
   }
 };
 
-// Aceptar presupuesto
-const aceptarPresupuesto = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const presupuestoExistente = await Presupuesto.findById(id);
-    if (!presupuestoExistente) {
-      return res.status(404).json({
-        success: false,
-        message: 'Presupuesto no encontrado'
-      });
-    }
-
-    if (presupuestoExistente.aceptado) {
-      return res.status(400).json({
-        success: false,
-        message: 'El presupuesto ya está aceptado'
-      });
-    }
-
-    const presupuestoAceptado = await Presupuesto.aceptar(id);
-
-    res.json({
-      success: true,
-      message: 'Presupuesto aceptado exitosamente',
-      presupuesto: presupuestoAceptado
-    });
-  } catch (error) {
-    console.error('Error en aceptarPresupuesto:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al aceptar presupuesto',
-      error: error.message
-    });
-  }
-};
-
-// Rechazar presupuesto
-const rechazarPresupuesto = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const presupuestoExistente = await Presupuesto.findById(id);
-    if (!presupuestoExistente) {
-      return res.status(404).json({
-        success: false,
-        message: 'Presupuesto no encontrado'
-      });
-    }
-
-    const presupuestoRechazado = await Presupuesto.rechazar(id);
-
-    res.json({
-      success: true,
-      message: 'Presupuesto rechazado',
-      presupuesto: presupuestoRechazado
-    });
-  } catch (error) {
-    console.error('Error en rechazarPresupuesto:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al rechazar presupuesto',
-      error: error.message
-    });
-  }
-};
-
 // Eliminar presupuesto
 const deletePresupuesto = async (req, res) => {
   try {
@@ -326,7 +259,5 @@ module.exports = {
   getPresupuestosByProyecto,
   createPresupuesto,
   updatePresupuesto,
-  aceptarPresupuesto,
-  rechazarPresupuesto,
   deletePresupuesto
 };

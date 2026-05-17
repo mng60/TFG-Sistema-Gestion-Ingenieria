@@ -37,8 +37,6 @@ function ChatHeader({ conversacion, currentUser, onConversacionEliminada, onBack
           navigate(`/proyectos?empleado_id=${otherParticipant.user_id}&nombre=${encodeURIComponent(otherParticipant.nombre)}`);
         }
         break;
-      case 'silenciar':
-        break;
       case 'eliminar':
         setConfirmModal({
           title: '⚠️ Eliminar Conversación',
@@ -143,9 +141,6 @@ function ChatHeader({ conversacion, currentUser, onConversacionEliminada, onBack
 
               <div className="menu-divider"></div>
 
-              <button onClick={() => handleMenuAction('silenciar')}>
-                Silenciar notificaciones
-              </button>
               <button onClick={() => handleMenuAction('eliminar')} className="menu-danger">
                 Eliminar conversación
               </button>

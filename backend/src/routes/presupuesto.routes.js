@@ -6,8 +6,6 @@ const {
   getPresupuestosByProyecto,
   createPresupuesto,
   updatePresupuesto,
-  aceptarPresupuesto,
-  rechazarPresupuesto,
   deletePresupuesto
 } = require('../controllers/presupuesto.controller');
 const authMiddleware = require('../middlewares/auth.middleware');
@@ -57,12 +55,6 @@ router.post('/', checkRole('admin'), presupuestoValidation, createPresupuesto);
 
 // PUT /api/presupuestos/:id - Actualizar presupuesto (solo admin)
 router.put('/:id', checkRole('admin'), presupuestoValidation, updatePresupuesto);
-
-// PATCH /api/presupuestos/:id/aceptar - Aceptar presupuesto (solo admin)
-router.patch('/:id/aceptar', checkRole('admin'), aceptarPresupuesto);
-
-// PATCH /api/presupuestos/:id/rechazar - Rechazar presupuesto (solo admin)
-router.patch('/:id/rechazar', checkRole('admin'), rechazarPresupuesto);
 
 // DELETE /api/presupuestos/:id - Eliminar presupuesto (solo admin)
 router.delete('/:id', checkRole('admin'), deletePresupuesto);
