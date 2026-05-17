@@ -48,8 +48,7 @@ function EmpleadoLogin() {
 
   React.useEffect(() => { document.title = 'Portal Empleados - Login'; }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const doLogin = async () => {
     setError('');
     setLoading(true);
     try {
@@ -62,8 +61,9 @@ function EmpleadoLogin() {
     }
   };
 
-  const handleOlvide = async (e) => {
-    e.preventDefault();
+  const handleSubmit = (e) => { e.preventDefault(); doLogin(); };
+
+  const doOlvide = async () => {
     setOlvideLoading(true);
     try {
       await fetch(`${API_URL}/tickets`, {
@@ -82,6 +82,8 @@ function EmpleadoLogin() {
       setOlvideLoading(false);
     }
   };
+
+  const handleOlvide = (e) => { e.preventDefault(); doOlvide(); };
 
   return (
     <div className="dark-login">

@@ -40,11 +40,9 @@ function Login() {
     document.title = 'Portal de Clientes - Login';
   }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const doLogin = async () => {
     setError('');
     setLoading(true);
-
     try {
       await login(email, password);
       navigate('/dashboard');
@@ -55,10 +53,10 @@ function Login() {
     }
   };
 
-  const handleOlvide = async (e) => {
-    e.preventDefault();
-    setOlvideLoading(true);
+  const handleSubmit = (e) => { e.preventDefault(); doLogin(); };
 
+  const doOlvide = async () => {
+    setOlvideLoading(true);
     try {
       await fetch(`${API_URL}/tickets`, {
         method: 'POST',
@@ -69,7 +67,6 @@ function Login() {
           mensaje: 'Solicitud de recuperacion de contrasena desde el portal de clientes.'
         })
       });
-
       setOlvideMsg('Solicitud enviada. Tu gestor de proyecto restablecera tu contrasena en breve.');
     } catch {
       setOlvideMsg('Error al enviar la solicitud. Intentalo de nuevo.');
@@ -77,6 +74,8 @@ function Login() {
       setOlvideLoading(false);
     }
   };
+
+  const handleOlvide = (e) => { e.preventDefault(); doOlvide(); };
 
   return (
     <div className="login-split">
