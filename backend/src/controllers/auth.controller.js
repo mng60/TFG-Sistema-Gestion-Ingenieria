@@ -64,7 +64,8 @@ const login = async (req, res) => {
         email: user.email,
         rol: user.rol,
         telefono: user.telefono,
-        foto_url: user.foto_url || null
+        foto_url: user.foto_url || null,
+        email_personal: user.email_personal || null
       }
     });
 

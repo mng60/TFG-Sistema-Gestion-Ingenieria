@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useEmpleadoAuth } from '../context/EmpleadoAuthContext';
 import axios from 'axios';
 import { Camera, Eye, EyeOff, Save, Lock, User } from 'lucide-react';
@@ -16,6 +16,16 @@ function Perfil() {
     telefono: empleado?.telefono || '',
     email_personal: empleado?.email_personal || ''
   });
+  useEffect(() => {
+    if (empleado) {
+      setForm({
+        nombre: empleado.nombre || '',
+        telefono: empleado.telefono || '',
+        email_personal: empleado.email_personal || ''
+      });
+    }
+  }, [empleado?.nombre, empleado?.telefono, empleado?.email_personal]);
+
   const [passForm, setPassForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
   const [toast, setToast] = useState(null);
   const [savingInfo, setSavingInfo] = useState(false);
@@ -179,12 +189,11 @@ function Perfil() {
                     <input value={empleado?.rol === 'admin' ? 'Administrador' : 'Empleado'} disabled style={{ background: '#f8f9fa', color: '#7f8c8d' }} />
                   </div>
                   <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                    <label>Email personal (notificaciones) *</label>
+                    <label>Email personal (notificaciones)</label>
                     <input
                       type="email"
                       value={form.email_personal}
                       onChange={e => setForm({ ...form, email_personal: e.target.value })}
-                      required
                       placeholder="personal@gmail.com"
                     />
                   </div>
