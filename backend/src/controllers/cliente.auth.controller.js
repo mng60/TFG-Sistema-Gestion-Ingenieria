@@ -693,38 +693,6 @@ const uploadAvatarCliente = async (req, res) => {
   }
 };
 
-// Obtener actualizaciones de un proyecto (solo si el cliente es propietario)
-const getActualizacionesProyecto = async (req, res) => {
-  try {
-    const clienteId = req.user.id;
-    const { proyectoId } = req.params;
-    const { pool } = require('../config/database');
-
-    // Verificar que el proyecto pertenece al cliente
-    const checkRes = await pool.query(
-      'SELECT id FROM proyectos WHERE id = $1 AND cliente_id = $2',
-      [proyectoId, clienteId]
-    );
-    if (checkRes.rows.length === 0) {
-      return res.status(403).json({ success: false, message: 'Acceso no autorizado' });
-    }
-
-    const result = await pool.query(
-      `SELECT a.*, u.nombre as autor_nombre, u.foto_url as autor_foto
-       FROM proyecto_actualizaciones a
-       LEFT JOIN users u ON u.id = a.empleado_id
-       WHERE a.proyecto_id = $1
-       ORDER BY a.created_at DESC`,
-      [proyectoId]
-    );
-
-    res.json({ success: true, actualizaciones: result.rows });
-  } catch (error) {
-    console.error('Error en getActualizacionesProyecto:', error);
-    res.status(500).json({ success: false, message: 'Error al obtener actualizaciones', error: error.message });
-  }
-};
-
 module.exports = {
   activarAccesoCliente,
   loginCliente,
@@ -739,6 +707,5 @@ module.exports = {
   rechazarMiPresupuesto,
   getMisDocumentos,
   descargarMiDocumento,
-  getEmpleadosProyecto,
-  getActualizacionesProyecto
+  getEmpleadosProyecto
 };

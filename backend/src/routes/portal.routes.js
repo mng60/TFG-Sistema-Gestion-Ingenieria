@@ -13,8 +13,7 @@ const {
   rechazarMiPresupuesto,
   getMisDocumentos,
   descargarMiDocumento,
-  getEmpleadosProyecto,
-  getActualizacionesProyecto
+  getEmpleadosProyecto
 } = require('../controllers/cliente.auth.controller');
 const { crearTicketPortal, getMisTickets } = require('../controllers/ticket.controller');
 const { uploadAvatares } = require('../config/multer');
@@ -94,9 +93,6 @@ router.get('/documentos', authClienteMiddleware, getMisDocumentos);
 
 // GET /api/portal/proyectos/:id/empleados - Empleados asignados al proyecto (para iniciar chat)
 router.get('/proyectos/:id/empleados', authClienteMiddleware, getEmpleadosProyecto);
-
-// GET /api/portal/proyectos/:proyectoId/actualizaciones - Actualizaciones del proyecto (read-only)
-router.get('/proyectos/:proyectoId/actualizaciones', authClienteMiddleware, getActualizacionesProyecto);
 
 // GET /api/portal/tickets - Ver solicitudes propias del cliente
 router.get('/tickets', authClienteMiddleware, getMisTickets);
