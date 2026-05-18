@@ -4,7 +4,7 @@ import { Paperclip, Mail, Phone, FolderOpen } from 'lucide-react';
 import ArchivosPanel from './ArchivosPanel';
 import { getAvatarInitial, getAvatarSrc } from '../../utils/format';
 
-function InfoPanel({ participant, conversacion, currentUser, onClose }) {
+function InfoPanel({ participant, conversacion, currentUser, onClose, onArchivosPanelOpen }) {
   const [infoAdicional, setInfoAdicional] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -117,9 +117,12 @@ function InfoPanel({ participant, conversacion, currentUser, onClose }) {
           <div className="info-section">
             <h3>Acciones rápidas</h3>
 
-            <button 
+            <button
               className="info-action-btn"
-              onClick={() => setShowArchivos(true)}
+              onClick={() => {
+                if (onArchivosPanelOpen) onArchivosPanelOpen(() => setShowArchivos(false));
+                setShowArchivos(true);
+              }}
             >
               <Paperclip size={14} /> Ver archivos compartidos
             </button>
@@ -127,6 +130,7 @@ function InfoPanel({ participant, conversacion, currentUser, onClose }) {
             <button
               className="info-action-btn"
               onClick={() => {
+                if (conversacion?.id) sessionStorage.setItem('chat_restore_conversacion_id', conversacion.id);
                 if (participant.tipo_usuario === 'cliente') {
                   navigate(`/proyectos?cliente_id=${participant.user_id}&nombre=${encodeURIComponent(participant.nombre)}`);
                 } else {
@@ -142,7 +146,7 @@ function InfoPanel({ participant, conversacion, currentUser, onClose }) {
         {showArchivos && (
           <ArchivosPanel
             conversacionId={conversacion.id}
-            onClose={() => setShowArchivos(false)}
+            onClose={() => window.history.back()}
           />
         )}
 

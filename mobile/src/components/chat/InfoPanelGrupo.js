@@ -6,7 +6,7 @@ import ConfirmModal from '../common/ConfirmModal';
 import { getAvatarInitial, getAvatarSrc } from '../../utils/format';
 import ArchivosPanel from './ArchivosPanel';
 
-function InfoPanelGrupo({ conversacion, currentUser, onClose, onConversacionEliminada, showToast, onOpenDirectChat }) {
+function InfoPanelGrupo({ conversacion, currentUser, onClose, onConversacionEliminada, showToast, onOpenDirectChat, onArchivosPanelOpen }) {
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
   const [proyecto, setProyecto] = useState(null);
@@ -171,16 +171,20 @@ function InfoPanelGrupo({ conversacion, currentUser, onClose, onConversacionElim
             <div className="info-section">
               <h3>Acciones rápidas</h3>
               
-              <button 
+              <button
                 className="info-action-btn"
-                onClick={() => setShowArchivos(true)}
+                onClick={() => {
+                  if (onArchivosPanelOpen) onArchivosPanelOpen(() => setShowArchivos(false));
+                  setShowArchivos(true);
+                }}
               >
                 <Paperclip size={14} /> Ver archivos compartidos
               </button>
-              
-              <button 
+
+              <button
                 className="info-action-btn"
                 onClick={() => {
+                  if (conversacion?.id) sessionStorage.setItem('chat_restore_conversacion_id', conversacion.id);
                   navigate(`/proyectos/${proyecto.id}`);
                   onClose();
                 }}
@@ -205,7 +209,7 @@ function InfoPanelGrupo({ conversacion, currentUser, onClose, onConversacionElim
         {showArchivos && (
           <ArchivosPanel
             conversacionId={conversacion.id}
-            onClose={() => setShowArchivos(false)}
+            onClose={() => window.history.back()}
           />
         )}
 

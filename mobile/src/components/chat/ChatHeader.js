@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import ConfirmModal from '../common/ConfirmModal';
 import { ArrowLeft } from 'lucide-react';
 
-function ChatHeader({ conversacion, currentUser, onConversacionEliminada, onBack, onlineUsers = new Set(), showInfoPanel, onOpenInfoPanel, onCloseInfoPanel }) {
+function ChatHeader({ conversacion, currentUser, onConversacionEliminada, onBack, onlineUsers = new Set(), showInfoPanel, onOpenInfoPanel, onCloseInfoPanel, onArchivosPanelOpen }) {
   const [showMenu, setShowMenu] = useState(false);
   const [confirmModal, setConfirmModal] = useState(null);
   const navigate = useNavigate();
@@ -28,12 +28,12 @@ function ChatHeader({ conversacion, currentUser, onConversacionEliminada, onBack
         onOpenInfoPanel?.();
         break;
       case 'proyectos':
-        // Si es cliente, filtrar por sus proyectos
+        if (conversacion?.id) {
+          sessionStorage.setItem('chat_restore_conversacion_id', conversacion.id);
+        }
         if (otherParticipant?.tipo_usuario === 'cliente') {
           navigate(`/proyectos?cliente_id=${otherParticipant.user_id}&nombre=${encodeURIComponent(otherParticipant.nombre)}`);
-        } 
-        // Si es empleado, filtrar por proyectos compartidos
-        else if (otherParticipant?.tipo_usuario === 'empleado') {
+        } else if (otherParticipant?.tipo_usuario === 'empleado') {
           navigate(`/proyectos?empleado_id=${otherParticipant.user_id}&nombre=${encodeURIComponent(otherParticipant.nombre)}`);
         }
         break;
@@ -156,6 +156,7 @@ function ChatHeader({ conversacion, currentUser, onConversacionEliminada, onBack
           conversacion={conversacion}
           currentUser={currentUser}
           onClose={onCloseInfoPanel}
+          onArchivosPanelOpen={onArchivosPanelOpen}
         />
       )}
 

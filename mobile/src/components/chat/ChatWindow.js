@@ -4,7 +4,7 @@ import ChatHeaderGrupo from './ChatHeaderGrupo';
 import ChatFooter from './ChatFooter';
 import MessageBubble from './MessageBubble';
 
-function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones, onConversationRead, onConversacionEliminada, showToast, onBack, onlineUsers = new Set(), onOpenDirectChat, onConversacionCreada, showInfoPanel, onOpenInfoPanel, onCloseInfoPanel }) {
+function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones, onConversationRead, onConversacionEliminada, showToast, onBack, onlineUsers = new Set(), onOpenDirectChat, onConversacionCreada, showInfoPanel, onOpenInfoPanel, onCloseInfoPanel, onArchivosPanelOpen }) {
   const [mensajes, setMensajes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
@@ -381,6 +381,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
           showInfoPanel={showInfoPanel}
           onOpenInfoPanel={onOpenInfoPanel}
           onCloseInfoPanel={onCloseInfoPanel}
+          onArchivosPanelOpen={onArchivosPanelOpen}
         />
       ) : (
         <ChatHeader
@@ -392,6 +393,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
           showInfoPanel={showInfoPanel}
           onOpenInfoPanel={onOpenInfoPanel}
           onCloseInfoPanel={onCloseInfoPanel}
+          onArchivosPanelOpen={onArchivosPanelOpen}
         />
       )}
 

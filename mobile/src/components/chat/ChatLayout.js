@@ -19,6 +19,7 @@ function ChatLayout() {
   const [activeView, setActiveView] = useState('list');
   const [showInfoPanel, setShowInfoPanel] = useState(false);
   const showInfoPanelRef = useRef(false);
+  const closeArchivosPanelRef = useRef(null);
 
   useEffect(() => {
     activeViewRef.current = activeView;
@@ -92,6 +93,11 @@ function ChatLayout() {
     );
 
     const handlePopState = () => {
+      if (closeArchivosPanelRef.current) {
+        closeArchivosPanelRef.current();
+        closeArchivosPanelRef.current = null;
+        return;
+      }
       if (showInfoPanelRef.current) {
         setShowInfoPanel(false);
         return;
@@ -180,6 +186,11 @@ function ChatLayout() {
         : c
     ));
     setActiveView('window');
+  }, []);
+
+  const handleArchivosPanelOpen = useCallback((closeFn) => {
+    closeArchivosPanelRef.current = closeFn;
+    window.history.pushState({ ...(window.history.state || {}), chatView: 'archivos' }, '');
   }, []);
 
   const handleOpenInfoPanel = useCallback(() => {
@@ -288,6 +299,16 @@ function ChatLayout() {
     if (conv) handleSelectConversacion(conv);
   }, [conversaciones, handleSelectConversacion]);
 
+  // Restaurar conversación activa al volver desde "Ver proyectos"
+  useEffect(() => {
+    if (!conversaciones.length) return;
+    const restoreId = sessionStorage.getItem('chat_restore_conversacion_id');
+    if (!restoreId) return;
+    sessionStorage.removeItem('chat_restore_conversacion_id');
+    const conv = conversaciones.find(c => String(c.id) === String(restoreId));
+    if (conv) handleSelectConversacion(conv);
+  }, [conversaciones, handleSelectConversacion]);
+
   // Registrar navegador de push mientras el chat está abierto
   useEffect(() => {
     window.__pushNavigateToChat = (conversacionId) => {
@@ -330,6 +351,7 @@ function ChatLayout() {
           showInfoPanel={showInfoPanel}
           onOpenInfoPanel={handleOpenInfoPanel}
           onCloseInfoPanel={handleCloseInfoPanel}
+          onArchivosPanelOpen={handleArchivosPanelOpen}
         />
       </div>
 
