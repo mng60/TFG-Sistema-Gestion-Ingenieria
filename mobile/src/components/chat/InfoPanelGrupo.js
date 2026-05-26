@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import ConfirmModal from '../common/ConfirmModal';
 import { getAvatarInitial, getAvatarSrc } from '../../utils/format';
 import ArchivosPanel from './ArchivosPanel';
+import { offlineDB } from '../../utils/offlineDB';
 
 function InfoPanelGrupo({ conversacion, currentUser, onClose, onConversacionEliminada, showToast, onOpenDirectChat, onArchivosPanelOpen }) {
   const navigate = useNavigate();
@@ -36,11 +37,14 @@ function InfoPanelGrupo({ conversacion, currentUser, onClose, onConversacionElim
       const data = await response.json();
       if (data.success) {
         setProyecto(data.proyecto);
+        offlineDB.saveProyectoInfo(conversacion.proyecto_id, data.proyecto);
       }
 
       setParticipantes(conversacion.participantes || []);
     } catch (error) {
-      console.error('Error al cargar proyecto:', error);
+      const cached = await offlineDB.getProyectoInfo(conversacion.proyecto_id);
+      if (cached) setProyecto(cached);
+      setParticipantes(conversacion.participantes || []);
     } finally {
       setLoading(false);
     }

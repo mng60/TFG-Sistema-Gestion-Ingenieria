@@ -37,9 +37,14 @@ function Proyectos() {
       setLoading(true);
       try {
         const data = await proyectoService.getAll();
-        setProyectos(data.proyectos || []);
+        const list = data.proyectos || [];
+        setProyectos(list);
+        localStorage.setItem('sgi_proyectos_cache', JSON.stringify(list));
       } catch (e) {
-        console.error(e);
+        const cached = localStorage.getItem('sgi_proyectos_cache');
+        if (cached) {
+          try { setProyectos(JSON.parse(cached)); } catch {}
+        }
       } finally {
         setLoading(false);
       }

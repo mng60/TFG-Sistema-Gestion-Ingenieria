@@ -3,6 +3,7 @@ import ImageViewer from './ImageViewer';
 import { FileText, Archive, Music, Image, FolderOpen } from 'lucide-react';
 import { formatearFechaCorta } from '../../utils/format';
 import { downloadUrlToDevice } from '../../utils/nativeDownloads';
+import { offlineDB } from '../../utils/offlineDB';
 
 function ArchivosPanel({ conversacionId, onClose }) {
   const [archivos, setArchivos] = useState({ imagenes: [], documentos: [], audios: [] });
@@ -36,9 +37,11 @@ function ArchivosPanel({ conversacionId, onClose }) {
       const data = await response.json();
       if (data.success) {
         setArchivos(data.archivos);
+        offlineDB.saveArchivos(conversacionId, data.archivos);
       }
     } catch (error) {
-      console.error('Error al cargar archivos:', error);
+      const cached = await offlineDB.getArchivos(conversacionId);
+      if (cached) setArchivos(cached);
     } finally {
       setLoading(false);
     }

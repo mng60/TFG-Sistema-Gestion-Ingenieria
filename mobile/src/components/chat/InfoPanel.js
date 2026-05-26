@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Paperclip, Mail, Phone, FolderOpen } from 'lucide-react';
 import ArchivosPanel from './ArchivosPanel';
 import { getAvatarInitial, getAvatarSrc } from '../../utils/format';
+import { offlineDB } from '../../utils/offlineDB';
 
 function InfoPanel({ participant, conversacion, currentUser, onClose, onArchivosPanelOpen }) {
   const [infoAdicional, setInfoAdicional] = useState(null);
@@ -29,9 +30,11 @@ function InfoPanel({ participant, conversacion, currentUser, onClose, onArchivos
       const data = await response.json();
       if (data.success) {
         setInfoAdicional(data.data);
+        offlineDB.saveInfoParticipante(participant.user_id, participant.tipo_usuario, data.data);
       }
     } catch (error) {
-      console.error('Error al cargar info adicional:', error);
+      const cached = await offlineDB.getInfoParticipante(participant.user_id, participant.tipo_usuario);
+      if (cached) setInfoAdicional(cached);
     } finally {
       setLoading(false);
     }

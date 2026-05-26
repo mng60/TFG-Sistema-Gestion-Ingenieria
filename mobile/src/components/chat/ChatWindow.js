@@ -3,8 +3,11 @@ import ChatHeader from './ChatHeader';
 import ChatHeaderGrupo from './ChatHeaderGrupo';
 import ChatFooter from './ChatFooter';
 import MessageBubble from './MessageBubble';
+import { useAuth } from '../../context/AuthContext';
+import { offlineDB } from '../../utils/offlineDB';
 
 function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones, onConversationRead, onConversacionEliminada, showToast, onBack, onlineUsers = new Set(), onOpenDirectChat, onConversacionCreada, showInfoPanel, onOpenInfoPanel, onCloseInfoPanel, onArchivosPanelOpen }) {
+  const { isOnline } = useAuth();
   const [mensajes, setMensajes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
@@ -228,7 +231,9 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
       const data = await response.json();
 
       if (data.success) {
-        setMensajes(data.mensajes || []);
+        const msgs = data.mensajes || [];
+        setMensajes(msgs);
+        offlineDB.saveMensajes(conversacion.id, msgs);
         setIsInitialLoad(true);
 
         const readAt = data.read_at || new Date().toISOString();
@@ -251,7 +256,27 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
         onConversationRead?.(conversacion.id, readAt);
       }
     } catch (error) {
-      console.error('❌ Error al cargar mensajes:', error);
+      // Sin conexión: cargar desde caché + mensajes pendientes de envío
+      const cached = await offlineDB.getMensajes(conversacion.id);
+      const pending = await offlineDB.getAllPendingMessages();
+      const pendingForConv = pending
+        .filter(({ value }) => String(value.conversacion_id) === String(conversacion.id))
+        .map(({ key: tempId, value }) => ({
+          id: null,
+          client_temp_id: tempId,
+          conversacion_id: conversacion.id,
+          user_id: value.user_id,
+          tipo_usuario: 'empleado',
+          mensaje: value.mensaje,
+          tipo_mensaje: value.tipo_mensaje,
+          remitente_nombre: value.remitente_nombre,
+          created_at: value.created_at,
+          pending: true,
+        }));
+      if (cached) {
+        setMensajes([...cached, ...pendingForConv]);
+        setIsInitialLoad(true);
+      }
     } finally {
       setLoading(false);
     }
@@ -281,9 +306,13 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
   };
 
   const handleSendMessage = async (mensaje, tipoMensaje = 'texto') => {
-    if (!socket || !conversacion) return;
+    if (!conversacion) return;
 
     if (conversacion.ephemeral) {
+      if (!isOnline) {
+        showToast?.('Sin conexión — no puedes iniciar un chat nuevo offline', 'error');
+        return;
+      }
       try {
         const API_URL = process.env.REACT_APP_API_URL || `http://${window.location.hostname}:5000/api`;
         const token = localStorage.getItem('empleado_token');
@@ -326,6 +355,20 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
 
     upsertMensaje(optimisticMessage);
     scrollToBottom();
+
+    // Sin conexión: encolar para enviar cuando vuelva la red
+    if (!isOnline || !socket) {
+      await offlineDB.addPendingMessage({
+        conversacion_id: conversacion.id,
+        mensaje,
+        tipo_mensaje: tipoMensaje,
+        client_temp_id: clientTempId,
+        remitente_nombre: currentUser.nombre || 'Tu',
+        user_id: currentUser.id,
+        created_at: new Date().toISOString(),
+      });
+      return;
+    }
 
     socket.emit(
       'send_message',

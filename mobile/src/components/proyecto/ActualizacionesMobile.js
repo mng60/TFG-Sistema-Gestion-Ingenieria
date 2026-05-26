@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Trash2, Calendar } from 'lucide-react';
 import proyectoService from '../../services/proyectoService';
 import { formatearFecha, formatearFechaHora } from '../../utils/format';
+import { offlineDB } from '../../utils/offlineDB';
+import { useAuth } from '../../context/AuthContext';
 
 function ActualizacionesMobile({ proyectoId, actualizaciones, isAdmin, empleadoId, onReload, showToast }) {
+  const { isOnline } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -13,6 +16,24 @@ function ActualizacionesMobile({ proyectoId, actualizaciones, isAdmin, empleadoI
     fecha_sugerida: ''
   });
 
+  // Al montar y haber conexión, enviar actualizaciones que quedaron pendientes offline
+  useEffect(() => {
+    if (!isOnline) return;
+    const flush = async () => {
+      const pending = (await offlineDB.getAllPendingActualizaciones())
+        .filter(({ value }) => String(value.proyecto_id) === String(proyectoId));
+      if (!pending.length) return;
+      for (const { key: tempId, value } of pending) {
+        try {
+          await proyectoService.createActualizacion(value.proyecto_id, value.formData);
+          await offlineDB.removePendingActualizacion(tempId);
+        } catch {}
+      }
+      onReload();
+    };
+    flush();
+  }, [isOnline, proyectoId]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.realizado && !formData.pendiente) {
@@ -20,6 +41,20 @@ function ActualizacionesMobile({ proyectoId, actualizaciones, isAdmin, empleadoI
       return;
     }
     setSubmitting(true);
+
+    if (!isOnline) {
+      const tempId = `act-${Date.now()}`;
+      await offlineDB.addPendingActualizacion(tempId, {
+        proyecto_id: proyectoId,
+        formData: { ...formData },
+      });
+      setFormData({ realizado: '', pendiente: '', sugiere_cambio_fecha: false, fecha_sugerida: '' });
+      setShowForm(false);
+      showToast('Guardado localmente — se enviará al recuperar conexión', 'warning');
+      setSubmitting(false);
+      return;
+    }
+
     try {
       await proyectoService.createActualizacion(proyectoId, formData);
       setFormData({ realizado: '', pendiente: '', sugiere_cambio_fecha: false, fecha_sugerida: '' });

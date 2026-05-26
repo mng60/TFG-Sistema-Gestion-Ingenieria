@@ -7,6 +7,22 @@
   background: var(--color-bg);
 }
 
+.offline-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #e67e22;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+  letter-spacing: 0.01em;
+}
+
 .mobile-main {
   flex: 1;
   min-height: 0;

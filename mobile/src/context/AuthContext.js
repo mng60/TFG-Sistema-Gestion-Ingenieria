@@ -17,6 +17,18 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [socket, setSocket] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState(new Set());
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   useEffect(() => {
     const empleadoGuardado = authService.getCurrentEmpleado();
@@ -94,6 +106,7 @@ export const AuthProvider = ({ children }) => {
     actualizarEmpleado,
     socket,
     onlineUsers,
+    isOnline,
     isAuthenticated: !!empleado
   };
 

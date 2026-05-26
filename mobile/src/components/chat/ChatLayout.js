@@ -4,10 +4,11 @@ import NuevoConversacionModal from './NuevoConversacionModal';
 import ChatWindow from './ChatWindow';
 import Toast from '../common/Toast';
 import { useAuth } from '../../context/AuthContext';
+import { offlineDB } from '../../utils/offlineDB';
 import '../../styles/Chat.css';
 
 function ChatLayout() {
-  const { empleado, socket, onlineUsers } = useAuth();
+  const { empleado, socket, onlineUsers, isOnline } = useAuth();
   const [conversaciones, setConversaciones] = useState([]);
   const [conversacionActiva, setConversacionActiva] = useState(null);
   const conversacionActivaIdRef = useRef(null);
@@ -40,10 +41,14 @@ function ChatLayout() {
       });
       const data = await res.json();
       if (data.success) {
-        setConversaciones(data.conversaciones || []);
+        const convs = data.conversaciones || [];
+        setConversaciones(convs);
+        offlineDB.saveConversaciones(convs);
       }
     } catch (e) {
-      console.error('Error al cargar conversaciones:', e);
+      // Sin conexión: cargar desde caché local
+      const cached = await offlineDB.getConversaciones();
+      if (cached) setConversaciones(cached);
     }
   }, []);
 
@@ -130,6 +135,34 @@ function ChatLayout() {
     socket.on('connect', joinRooms);
     return () => socket.off('connect', joinRooms);
   }, [socket, conversaciones]);
+
+  // Flush de mensajes pendientes (escritos offline) al reconectar
+  useEffect(() => {
+    if (!socket || !isOnline) return;
+
+    const flush = async () => {
+      const pending = await offlineDB.getAllPendingMessages();
+      if (!pending.length) return;
+      for (const { key: tempId, value: msg } of pending) {
+        socket.emit(
+          'send_message',
+          {
+            conversacion_id: msg.conversacion_id,
+            mensaje: msg.mensaje,
+            tipo_mensaje: msg.tipo_mensaje,
+            client_temp_id: tempId,
+          },
+          (response) => {
+            if (response?.success) offlineDB.removePendingMessage(tempId);
+          }
+        );
+      }
+    };
+
+    socket.on('connect', flush);
+    if (socket.connected) flush();
+    return () => socket.off('connect', flush);
+  }, [socket, isOnline]);
 
   // Badge: listener registrado una sola vez por socket, usa ref para evitar stale closure
   useEffect(() => {
