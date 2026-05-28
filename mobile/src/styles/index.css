@@ -16,8 +16,8 @@
   --safe-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
   --safe-bottom-effective: max(var(--safe-bottom), 18px);
   --safe-top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
-  --statusbar-space: max(var(--safe-top), 28px);
-  --statusbar-overlay-height: calc(var(--statusbar-space) + 2px);
+  --statusbar-space: var(--safe-top);
+  --statusbar-overlay-height: var(--statusbar-space);
   --offline-banner-height: 34px;
   --offline-banner-offset: 0px;
   --app-top-offset: calc(var(--statusbar-overlay-height) + var(--offline-banner-offset));
