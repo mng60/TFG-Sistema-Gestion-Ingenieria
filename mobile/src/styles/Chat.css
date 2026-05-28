@@ -769,7 +769,7 @@
 /* ==================== INFO PANEL ==================== */
 .info-panel-overlay {
   position: fixed;
-  top: 0;
+  top: var(--app-top-offset);
   right: 0;
   bottom: 0;
   left: 0;
@@ -779,8 +779,8 @@
 }
 
 .info-panel {
-  position: fixed;
-  top: var(--app-top-offset);
+  position: absolute;
+  top: 0;
   right: 0;
   bottom: 0;
   width: 400px;
@@ -788,7 +788,9 @@
   box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
   animation: slideInRight 0.3s ease;
   overflow-y: auto;
-  height: calc(var(--app-height) - var(--app-top-offset));
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
 }
 
 @keyframes fadeIn {
@@ -1506,30 +1508,22 @@
 
 /* ==================== MOBILE TWO-SCREEN LAYOUT ==================== */
 .chat-layout-mobile {
-  position: relative;
-  box-sizing: border-box;
-  padding-top: var(--statusbar-space);
-  height: calc(var(--app-height) - var(--bottom-nav-height) - var(--safe-bottom-effective) - var(--statusbar-space));
-  min-height: 0;
+  position: fixed;
+  top: calc(var(--statusbar-space) + var(--offline-banner-offset));
+  left: 0;
+  right: 0;
+  bottom: calc(var(--bottom-nav-height) + var(--safe-bottom-effective));
   overflow: hidden;
   background: #f0f2f5;
   /* Evita que el WebView de Android aplique dark mode a esta sección */
   color-scheme: light;
-  transition: padding-top 0.3s ease, height 0.3s ease;
+  z-index: 1;
+  transition: top 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.mobile-layout--offline .chat-layout-mobile {
-  padding-top: calc(var(--statusbar-space) + var(--offline-banner-height));
-  height: calc(var(--app-height) - var(--bottom-nav-height) - var(--safe-bottom-effective) - var(--statusbar-space) - var(--offline-banner-height));
-}
-
-/* Con teclado abierto: nav oculto, chat ocupa el espacio completo */
+/* Con teclado abierto: nav oculto, chat ocupa hasta el borde inferior */
 body.keyboard-open .chat-layout-mobile {
-  height: calc(var(--app-height) - var(--statusbar-space));
-}
-
-body.keyboard-open .mobile-layout--offline .chat-layout-mobile {
-  height: calc(var(--app-height) - var(--statusbar-space) - var(--offline-banner-height));
+  bottom: 0;
 }
 
 .chat-list-screen {
@@ -1570,6 +1564,7 @@ body.keyboard-open .mobile-layout--offline .chat-layout-mobile {
   flex: 1;
   min-height: 0;
 }
+
 
 /* En mobile, la ventana de chat ocupa toda la pantalla */
 .chat-window-screen .chat-window {

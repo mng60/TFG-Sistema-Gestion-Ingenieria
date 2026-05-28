@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { Paperclip, Mail, Phone, FolderOpen } from 'lucide-react';
 import ArchivosPanel from './ArchivosPanel';
@@ -42,7 +43,7 @@ function InfoPanel({ participant, conversacion, currentUser, onClose, onArchivos
 
   if (!participant) return null;
 
-  return (
+  return ReactDOM.createPortal(
     <div className="info-panel-overlay" onClick={onClose}>
       <div className="info-panel" onClick={(e) => e.stopPropagation()}>
         <div className="info-panel-header">
@@ -154,7 +155,8 @@ function InfoPanel({ participant, conversacion, currentUser, onClose, onArchivos
         )}
 
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

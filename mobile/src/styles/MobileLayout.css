@@ -28,19 +28,22 @@
   right: 0;
   height: var(--offline-banner-height);
   padding: 0 12px;
-  z-index: 1095;
+  z-index: 1110;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
   animation: bannerSlideDown 0.3s ease;
+  transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Franja de 3px: oculta el texto pero mantiene el indicador de color */
+.offline-banner.collapsed > * {
+  opacity: 0;
+  transition: opacity 0.25s ease;
 }
 
 @keyframes bannerSlideDown {
   from { transform: translateY(-100%); opacity: 0; }
   to   { transform: translateY(0);    opacity: 1; }
-}
-
-body.screen-chat .offline-banner {
-  z-index: 1110;
-  letter-spacing: 0.01em;
 }
 
 .mobile-main {
