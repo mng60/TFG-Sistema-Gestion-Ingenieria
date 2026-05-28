@@ -4,7 +4,12 @@
   min-height: 100vh;
   min-height: var(--app-height);
   height: var(--app-height);
+  position: relative;
   background: var(--color-bg);
+}
+
+.mobile-layout--offline {
+  --offline-banner-offset: var(--offline-banner-height);
 }
 
 .offline-banner {
@@ -16,10 +21,19 @@
   color: #fff;
   font-size: 0.78rem;
   font-weight: 600;
-  padding: 6px 12px;
-  position: sticky;
-  top: 0;
-  z-index: 9999;
+  letter-spacing: 0.01em;
+  position: fixed;
+  top: var(--statusbar-overlay-height);
+  left: 0;
+  right: 0;
+  height: var(--offline-banner-height);
+  padding: 0 12px;
+  z-index: 1095;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
+}
+
+body.screen-chat .offline-banner {
+  z-index: 1110;
   letter-spacing: 0.01em;
 }
 
@@ -27,7 +41,7 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: calc(16px + var(--statusbar-space)) 16px calc(var(--bottom-nav-height) + var(--safe-bottom-effective) + 16px);
+  padding: calc(16px + var(--app-top-offset)) 16px calc(var(--bottom-nav-height) + var(--safe-bottom-effective) + 16px);
 }
 
 .mobile-main.no-padding {

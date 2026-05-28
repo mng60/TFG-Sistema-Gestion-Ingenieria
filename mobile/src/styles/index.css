@@ -17,6 +17,10 @@
   --safe-bottom-effective: max(env(safe-area-inset-bottom, 0px), 18px);
   --safe-top: env(safe-area-inset-top, 0px);
   --statusbar-space: 28px;
+  --statusbar-overlay-height: calc(var(--statusbar-space) + 2px);
+  --offline-banner-height: 34px;
+  --offline-banner-offset: 0px;
+  --app-top-offset: calc(var(--statusbar-overlay-height) + var(--offline-banner-offset));
   --app-height: 100dvh;
   --visual-viewport-offset-top: 0px;
 }
@@ -88,7 +92,7 @@ body.screen-app::before {
   top: 0;
   left: 0;
   right: 0;
-  height: calc(var(--statusbar-space) + 2px);
+  height: var(--statusbar-overlay-height);
   background: var(--color-bg);
   z-index: 1100;
   pointer-events: none;

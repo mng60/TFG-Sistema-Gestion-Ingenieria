@@ -8,11 +8,11 @@ function MobileLayout({ children, noPadding = false }) {
   const { isOnline } = useAuth();
 
   return (
-    <div className="mobile-layout">
+    <div className={`mobile-layout${!isOnline ? ' mobile-layout--offline' : ''}`}>
       {!isOnline && (
-        <div className="offline-banner">
+        <div className="offline-banner" role="status" aria-live="polite">
           <WifiOff size={13} />
-          <span>Sin conexión — modo sin red</span>
+          <span>Sin conexion - modo sin red</span>
         </div>
       )}
       <main className={`mobile-main${noPadding ? ' no-padding' : ''}`}>

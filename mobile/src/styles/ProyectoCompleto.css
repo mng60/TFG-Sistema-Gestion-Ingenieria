@@ -1,5 +1,5 @@
 .proyecto-detail {
-  padding-top: var(--statusbar-space);
+  padding-top: var(--app-top-offset);
 }
 
 .project-hero {
@@ -72,7 +72,7 @@
   padding: 0;
   margin-bottom: 16px;
   position: sticky;
-  top: var(--statusbar-space);
+  top: var(--app-top-offset);
   z-index: 10;
   overflow-x: auto;
   scrollbar-width: none;

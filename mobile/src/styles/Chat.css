@@ -1505,8 +1505,8 @@
 /* ==================== MOBILE TWO-SCREEN LAYOUT ==================== */
 .chat-layout-mobile {
   position: relative;
-  margin-top: var(--statusbar-space);
-  height: calc(var(--app-height) - var(--bottom-nav-height) - var(--safe-bottom-effective) - var(--statusbar-space));
+  margin-top: var(--app-top-offset);
+  height: calc(var(--app-height) - var(--bottom-nav-height) - var(--safe-bottom-effective) - var(--app-top-offset));
   min-height: 0;
   overflow: hidden;
   background: #f0f2f5;
@@ -1516,7 +1516,7 @@
 
 /* Con teclado abierto: nav oculto, chat ocupa el espacio completo */
 body.keyboard-open .chat-layout-mobile {
-  height: calc(var(--app-height) - var(--statusbar-space));
+  height: calc(var(--app-height) - var(--app-top-offset));
 }
 
 .chat-list-screen {
