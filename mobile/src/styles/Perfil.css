@@ -1,6 +1,6 @@
 .perfil-page {
   padding: 16px;
-  padding-top: calc(16px + var(--statusbar-space));
+  padding-top: calc(16px + var(--app-top-offset));
   max-width: 480px;
   margin: 0 auto;
 }

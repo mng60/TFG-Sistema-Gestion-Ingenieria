@@ -1,10 +1,10 @@
 .in-app-banner {
   position: fixed;
-  top: calc(env(safe-area-inset-top, 0px) + 8px);
+  top: calc(var(--safe-top) + 8px);
   left: 12px;
   right: 12px;
   z-index: 9999;
-  transform: translateY(calc(-100% - env(safe-area-inset-top, 0px) - 20px));
+  transform: translateY(calc(-100% - var(--safe-top) - 20px));
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   pointer-events: none;
 }

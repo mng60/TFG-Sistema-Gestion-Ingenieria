@@ -13,10 +13,10 @@
   --color-danger: #e74c3c;
   --color-info: #3498db;
   --bottom-nav-height: 64px;
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-bottom-effective: max(env(safe-area-inset-bottom, 0px), 18px);
-  --safe-top: env(safe-area-inset-top, 0px);
-  --statusbar-space: 28px;
+  --safe-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
+  --safe-bottom-effective: max(var(--safe-bottom), 18px);
+  --safe-top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
+  --statusbar-space: max(var(--safe-top), 28px);
   --statusbar-overlay-height: calc(var(--statusbar-space) + 2px);
   --offline-banner-height: 34px;
   --offline-banner-offset: 0px;
