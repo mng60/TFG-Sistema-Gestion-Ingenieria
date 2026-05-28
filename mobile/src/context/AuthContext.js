@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import authService from '../services/authService';
 
@@ -17,14 +17,22 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [socket, setSocket] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState(new Set());
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [isOnline, setIsOnline] = useState(true);
+  const offlineTimerRef = useRef(null);
 
   useEffect(() => {
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
+    const handleOnline = () => {
+      clearTimeout(offlineTimerRef.current);
+      setIsOnline(true);
+    };
+    const handleOffline = () => {
+      // Esperar 2s antes de mostrar el banner para evitar parpadeos por red inestable
+      offlineTimerRef.current = setTimeout(() => setIsOnline(false), 2000);
+    };
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
     return () => {
+      clearTimeout(offlineTimerRef.current);
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
