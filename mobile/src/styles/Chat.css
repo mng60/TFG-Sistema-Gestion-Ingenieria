@@ -780,7 +780,7 @@
 
 .info-panel {
   position: fixed;
-  top: 0;
+  top: var(--app-top-offset);
   right: 0;
   bottom: 0;
   width: 400px;
@@ -788,6 +788,7 @@
   box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
   animation: slideInRight 0.3s ease;
   overflow-y: auto;
+  height: calc(var(--app-height) - var(--app-top-offset));
 }
 
 @keyframes fadeIn {
@@ -1173,7 +1174,8 @@
   width: 100%;
   max-width: 500px;
   background: white;
-  height: 100vh;
+  height: calc(var(--app-height) - var(--app-top-offset));
+  margin-top: var(--app-top-offset);
   display: flex;
   flex-direction: column;
   box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
@@ -1505,19 +1507,29 @@
 /* ==================== MOBILE TWO-SCREEN LAYOUT ==================== */
 .chat-layout-mobile {
   position: relative;
-  margin-top: var(--app-top-offset);
-  height: calc(var(--app-height) - var(--bottom-nav-height) - var(--safe-bottom-effective) - var(--app-top-offset));
+  box-sizing: border-box;
+  padding-top: var(--statusbar-space);
+  height: calc(var(--app-height) - var(--bottom-nav-height) - var(--safe-bottom-effective) - var(--statusbar-space));
   min-height: 0;
   overflow: hidden;
   background: #f0f2f5;
   /* Evita que el WebView de Android aplique dark mode a esta sección */
   color-scheme: light;
-  transition: margin-top 0.3s ease, height 0.3s ease;
+  transition: padding-top 0.3s ease, height 0.3s ease;
+}
+
+.mobile-layout--offline .chat-layout-mobile {
+  padding-top: calc(var(--statusbar-space) + var(--offline-banner-height));
+  height: calc(var(--app-height) - var(--bottom-nav-height) - var(--safe-bottom-effective) - var(--statusbar-space) - var(--offline-banner-height));
 }
 
 /* Con teclado abierto: nav oculto, chat ocupa el espacio completo */
 body.keyboard-open .chat-layout-mobile {
-  height: calc(var(--app-height) - var(--app-top-offset));
+  height: calc(var(--app-height) - var(--statusbar-space));
+}
+
+body.keyboard-open .mobile-layout--offline .chat-layout-mobile {
+  height: calc(var(--app-height) - var(--statusbar-space) - var(--offline-banner-height));
 }
 
 .chat-list-screen {

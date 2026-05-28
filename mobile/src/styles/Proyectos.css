@@ -48,7 +48,7 @@
 
 .proyectos-search {
   position: sticky;
-  top: var(--app-top-offset);
+  top: 0;
   background: var(--color-bg);
   padding-bottom: 12px;
   z-index: 10;

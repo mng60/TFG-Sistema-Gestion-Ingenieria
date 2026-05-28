@@ -47,8 +47,12 @@ body.screen-chat .offline-banner {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: calc(16px + var(--app-top-offset)) 16px calc(var(--bottom-nav-height) + var(--safe-bottom-effective) + 16px);
+  padding: var(--statusbar-space) 16px calc(var(--bottom-nav-height) + var(--safe-bottom-effective) + 16px);
   transition: padding-top 0.3s ease;
+}
+
+.mobile-layout--offline .mobile-main {
+  padding-top: calc(var(--statusbar-space) + var(--offline-banner-height));
 }
 
 .mobile-main.no-padding {
