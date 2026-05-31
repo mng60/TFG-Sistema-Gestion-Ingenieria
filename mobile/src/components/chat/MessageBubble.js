@@ -11,12 +11,10 @@ function MessageBubble({ mensaje, isOwn, conversacion }) {
   const getFullUrl = (url) => {
     if (!url) return '';
     
-    // Si ya es URL completa, devolverla tal cual
     if (url.startsWith('http://') || url.startsWith('https://')) {
       return url;
     }
-    
-    // Si es ruta relativa, construir URL completa
+
     const hostname = window.location.hostname;
     const API_BASE = process.env.REACT_APP_API_URL?.replace('/api', '') || `http://${hostname}:5000`;
     return `${API_BASE}${url}`;
@@ -24,6 +22,7 @@ function MessageBubble({ mensaje, isOwn, conversacion }) {
 
   const getCheckmarks = () => {
     if (!isOwn) return null;
+    if (mensaje.pending) return <span className="message-status" style={{ opacity: 0.5 }}>⏳</span>;
 
     if (!conversacion?.participantes || conversacion.participantes.length === 0) {
       return <span className="message-status">✓✓</span>;

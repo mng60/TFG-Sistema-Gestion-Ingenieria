@@ -54,12 +54,10 @@ function ChatLayout() {
     };
   };
 
-  // Cargar conversaciones (solo una vez al montar)
   useEffect(() => {
     cargarConversaciones();
   }, []);
 
-  // Unirse a las salas de conversación cuando cambien, y re-unirse tras reconexión
   useEffect(() => {
     if (!socket || conversaciones.length === 0) return;
 
@@ -81,7 +79,6 @@ function ChatLayout() {
     };
   }, [socket, conversaciones]);
 
-  // Actualizar lista y conversación activa al recibir mensaje nuevo
   useEffect(() => {
     if (!socket || !empleado) return;
 
@@ -107,7 +104,6 @@ function ChatLayout() {
     return () => socket.off('new_message', handleNewMessage);
   }, [socket, empleado]);
 
-  // Propagar messages_read al estado global de conversaciones y conversacionActiva
   useEffect(() => {
     if (!socket) return;
     const handleMessagesRead = (data) => {

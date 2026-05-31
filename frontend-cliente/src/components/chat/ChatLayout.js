@@ -57,12 +57,10 @@ function ChatLayout() {
     };
   };
 
-  // Cargar conversaciones al montar
   useEffect(() => {
     cargarConversaciones();
   }, []);
 
-  // Unirse a las salas cuando cambie el socket o las conversaciones, y re-unirse tras reconexión
   useEffect(() => {
     if (!socket || conversaciones.length === 0) return;
 
@@ -84,7 +82,6 @@ function ChatLayout() {
     };
   }, [socket, conversaciones]);
 
-  // Actualizar lista y conversación activa al recibir mensaje nuevo
   useEffect(() => {
     if (!socket || !cliente) return;
 
@@ -110,7 +107,6 @@ function ChatLayout() {
     return () => socket.off('new_message', handleNewMessage);
   }, [socket, cliente]);
 
-  // Propagar messages_read al estado global de conversaciones y conversacionActiva
   useEffect(() => {
     if (!socket) return;
     const handleMessagesRead = (data) => {
@@ -221,7 +217,6 @@ function ChatLayout() {
     setActiveView('window');
   };
 
-  // El usuario actual para el chat es el cliente autenticado
   const currentUser = cliente ? { ...cliente, tipo_usuario: 'cliente' } : null;
 
   if (!currentUser) return null;

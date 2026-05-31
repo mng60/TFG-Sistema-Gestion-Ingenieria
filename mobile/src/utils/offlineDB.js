@@ -76,47 +76,39 @@ async function getAll(store) {
 }
 
 export const offlineDB = {
-  // Lista de conversaciones
   saveConversaciones: (list) => set(STORES.conversaciones, 'list', list),
   getConversaciones: () => get(STORES.conversaciones, 'list'),
 
-  // Mensajes por conversación
   saveMensajes: (conversacionId, mensajes) =>
     set(STORES.mensajes, String(conversacionId), mensajes),
   getMensajes: (conversacionId) =>
     get(STORES.mensajes, String(conversacionId)),
 
-  // Mensajes pendientes de envío (offline)
   addPendingMessage: (msg) => set(STORES.pendingMessages, msg.client_temp_id, msg),
   removePendingMessage: (clientTempId) => del(STORES.pendingMessages, clientTempId),
   getAllPendingMessages: () => getAll(STORES.pendingMessages),
 
-  // Actualizaciones de proyecto pendientes (offline)
   addPendingActualizacion: (tempId, data) =>
     set(STORES.pendingActualizaciones, tempId, data),
   removePendingActualizacion: (tempId) =>
     del(STORES.pendingActualizaciones, tempId),
   getAllPendingActualizaciones: () => getAll(STORES.pendingActualizaciones),
 
-  // Info de participante (email, teléfono, grupos en común)
   saveInfoParticipante: (userId, tipo, data) =>
     set(STORES.infoParticipante, `${userId}_${tipo}`, data),
   getInfoParticipante: (userId, tipo) =>
     get(STORES.infoParticipante, `${userId}_${tipo}`),
 
-  // Lista de archivos compartidos por conversación
   saveArchivos: (conversacionId, archivos) =>
     set(STORES.archivos, String(conversacionId), archivos),
   getArchivos: (conversacionId) =>
     get(STORES.archivos, String(conversacionId)),
 
-  // Datos de proyecto (InfoPanelGrupo)
   saveProyectoInfo: (proyectoId, data) =>
     set(STORES.proyectos, `proyecto_${proyectoId}`, data),
   getProyectoInfo: (proyectoId) =>
     get(STORES.proyectos, `proyecto_${proyectoId}`),
 
-  // Lista de proyectos
   saveProyectos: (list) => set(STORES.proyectos, 'list', list),
   getProyectos: () => get(STORES.proyectos, 'list'),
 };

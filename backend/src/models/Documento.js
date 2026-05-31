@@ -10,7 +10,6 @@ pool.query(`
 `).catch(err => console.error('Error creando tabla documento_visibilidad_empleados:', err.message));
 
 class Documento {
-  // Crear un nuevo documento
   static async create(documentoData) {
     const {
       proyecto_id,
@@ -56,7 +55,6 @@ class Documento {
     }
   }
 
-  // Buscar documento por ID
   static async findById(id) {
     try {
       const query = `
@@ -80,7 +78,6 @@ class Documento {
     }
   }
 
-  // Obtener todos los documentos con filtros
   // options: { userId, isAdmin } para filtrar visibilidad por empleado
   static async findAll(filters = {}, options = {}) {
     const { userId, isAdmin } = options;
@@ -142,7 +139,6 @@ class Documento {
     }
   }
 
-  // Obtener empleados con acceso a un documento
   static async getAccesoEmpleados(documentoId) {
     try {
       const result = await pool.query(
@@ -184,7 +180,6 @@ class Documento {
     }
   }
 
-  // Obtener documentos de un proyecto
   static async findByProyecto(proyectoId) {
     try {
       const query = `
@@ -204,7 +199,6 @@ class Documento {
     }
   }
 
-  // Actualizar documento
   static async update(id, documentoData) {
     const {
       nombre,
@@ -239,7 +233,6 @@ class Documento {
     }
   }
 
-  // Eliminar documento
   static async delete(id) {
     try {
       const query = 'DELETE FROM documentos WHERE id = $1 RETURNING *';
@@ -250,7 +243,6 @@ class Documento {
     }
   }
 
-  // Obtener documentos públicos de un proyecto (para clientes)
   static async findPublicosByProyecto(proyectoId) {
     try {
       const query = `

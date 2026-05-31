@@ -14,10 +14,11 @@ function ChatLayout() {
   const conversacionActivaIdRef = useRef(null);
   const activeViewRef = useRef('list');
   const syncTimeoutRef = useRef(null);
+  // Rastrea explícitamente los pushState para que handlePopState no dependa de refs de estado
+  const chatViewStackRef = useRef([]);
   const [showNuevoModal, setShowNuevoModal] = useState(false);
   const [toast, setToast] = useState(null);
-  // Mobile: 'list' | 'window'
-  const [activeView, setActiveView] = useState('list');
+  const [activeView, setActiveView] = useState('list'); // 'list' | 'window'
   const [showInfoPanel, setShowInfoPanel] = useState(false);
   const showInfoPanelRef = useRef(false);
   const closeArchivosPanelRef = useRef(null);
@@ -98,16 +99,22 @@ function ChatLayout() {
     );
 
     const handlePopState = () => {
-      if (closeArchivosPanelRef.current) {
-        closeArchivosPanelRef.current();
-        closeArchivosPanelRef.current = null;
+      const last = chatViewStackRef.current[chatViewStackRef.current.length - 1];
+      if (last === 'archivos') {
+        chatViewStackRef.current.pop();
+        if (closeArchivosPanelRef.current) {
+          closeArchivosPanelRef.current();
+          closeArchivosPanelRef.current = null;
+        }
         return;
       }
-      if (showInfoPanelRef.current) {
+      if (last === 'info') {
+        chatViewStackRef.current.pop();
         setShowInfoPanel(false);
         return;
       }
-      if (activeViewRef.current === 'window') {
+      if (last === 'window' || activeViewRef.current === 'window') {
+        if (last === 'window') chatViewStackRef.current.pop();
         conversacionActivaIdRef.current = null;
         setConversacionActiva(null);
         setActiveView('list');
@@ -191,6 +198,7 @@ function ChatLayout() {
 
   const handleSelectConversacion = useCallback((conv) => {
     if (activeViewRef.current !== 'window') {
+      chatViewStackRef.current.push('window');
       window.history.pushState(
         {
           ...(window.history.state || {}),
@@ -200,6 +208,12 @@ function ChatLayout() {
         ''
       );
     } else {
+      // replaceState: si info/archivos estaban en el stack, descartarlos
+      const last = chatViewStackRef.current[chatViewStackRef.current.length - 1];
+      if (last === 'info' || last === 'archivos') {
+        chatViewStackRef.current.pop();
+        closeArchivosPanelRef.current = null;
+      }
       window.history.replaceState(
         {
           ...(window.history.state || {}),
@@ -222,11 +236,13 @@ function ChatLayout() {
   }, []);
 
   const handleArchivosPanelOpen = useCallback((closeFn) => {
+    chatViewStackRef.current.push('archivos');
     closeArchivosPanelRef.current = closeFn;
     window.history.pushState({ ...(window.history.state || {}), chatView: 'archivos' }, '');
   }, []);
 
   const handleOpenInfoPanel = useCallback(() => {
+    chatViewStackRef.current.push('info');
     window.history.pushState({ ...(window.history.state || {}), chatView: 'info' }, '');
     setShowInfoPanel(true);
   }, []);
@@ -262,6 +278,10 @@ function ChatLayout() {
     setShowNuevoModal(false);
     cargarConversaciones();
     setConversacionActiva(nuevaConv);
+    if (activeViewRef.current !== 'window') {
+      chatViewStackRef.current.push('window');
+      window.history.pushState({ ...(window.history.state || {}), chatView: 'window' }, '');
+    }
     setActiveView('window');
   }, [cargarConversaciones]);
 

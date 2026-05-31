@@ -16,7 +16,6 @@ function ChatFooter({ onSendMessage, onTyping, onSendFile, showToast, onInputFoc
   const recordingTimerRef = useRef(null);
   const cancelRecordingRef = useRef(false);
 
-  // Limpiar al desmontar
   useEffect(() => {
     return () => {
       if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
@@ -158,7 +157,6 @@ function ChatFooter({ onSendMessage, onTyping, onSendFile, showToast, onInputFoc
         setIsRecording(true);
         setRecordingTime(0);
 
-        // Contador de segundos
         recordingTimerRef.current = setInterval(() => {
           setRecordingTime((t) => t + 1);
         }, 1000);

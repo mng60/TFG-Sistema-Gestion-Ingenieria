@@ -88,7 +88,6 @@ function Proyectos() {
     }
   };
 
-  // Filtrado local (search + filtros de URL)
   const proyectosFiltrados = (() => {
     const params = new URLSearchParams(location.search);
     const clienteIdURL = params.get('cliente_id') ? parseInt(params.get('cliente_id')) : null;

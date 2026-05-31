@@ -19,7 +19,6 @@ function ProyectoCompleto() {
   const { isAdmin } = useEmpleadoAuth();
   const navigate = useNavigate();
 
-  // Estados principales
   const [proyecto, setProyecto] = useState(null);
   const [empleadosProyecto, setEmpleadosProyecto] = useState([]);
   const [presupuestos, setPresupuestos] = useState([]);
@@ -29,8 +28,6 @@ function ProyectoCompleto() {
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('info');
-  
-  // Estados de UI
   const [toast, setToast] = useState(null);
   const [confirmModal, setConfirmModal] = useState(null);
 

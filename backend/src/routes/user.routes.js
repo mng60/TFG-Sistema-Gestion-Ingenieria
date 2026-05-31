@@ -33,7 +33,7 @@ const updatePasswordValidation = [
 // Todas las rutas requieren autenticación
 router.use(authMiddleware);
 
-// GET /api/users/empleados-chat - Listar empleados para chat (sin necesidad de admin)
+// Accesible a todos los empleados autenticados, no solo admin (necesario para el chat)
 router.get('/empleados-chat', async (req, res) => {
   try {
     const users = await User.findAll();
@@ -53,22 +53,11 @@ router.get('/empleados-chat', async (req, res) => {
   }
 });
 
-// GET /api/users - Obtener todos los usuarios (SOLO admin)
 router.get('/', checkRole('admin'), getAllUsers);
-
-// GET /api/users/:id - Obtener un usuario por ID
 router.get('/:id', getUserById);
-
-// POST /api/users - Crear usuario (solo admin)
 router.post('/', checkRole('admin'), createUserValidation, createUser);
-
-// PUT /api/users/:id - Actualizar usuario
 router.put('/:id', updateUser);
-
-// DELETE /api/users/:id - Eliminar usuario (solo admin)
 router.delete('/:id', checkRole('admin'), deleteUser);
-
-// PUT /api/users/:id/password - Actualizar contraseña
 router.put('/:id/password', updatePasswordValidation, updatePassword);
 
 module.exports = router;

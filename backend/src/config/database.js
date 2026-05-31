@@ -1,8 +1,6 @@
-// backend/src/config/database.js
 const { Pool } = require('pg');
 require('dotenv').config();
 
-// Configuración del pool de conexiones
 // Soporta DATABASE_URL (Neon/Railway) o variables individuales (desarrollo local)
 const isProduction = !!process.env.DATABASE_URL;
 
@@ -27,18 +25,15 @@ const poolConfig = isProduction
 
 const pool = new Pool(poolConfig);
 
-// Evento cuando se conecta
 pool.on('connect', () => {
   console.log('✅ Conexión establecida con PostgreSQL');
 });
 
-// Evento de error
 pool.on('error', (err) => {
   console.error('❌ Error inesperado en PostgreSQL:', err);
   process.exit(-1);
 });
 
-// Función para probar la conexión
 const testConnection = async () => {
   try {
     const client = await pool.connect();

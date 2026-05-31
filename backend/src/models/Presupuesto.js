@@ -1,7 +1,6 @@
 const { pool } = require('../config/database');
 
 class Presupuesto {
-  // Crear un nuevo presupuesto
   static async create(presupuestoData) {
     const {
       proyecto_id,
@@ -51,7 +50,6 @@ class Presupuesto {
     }
   }
 
-  // Buscar presupuesto por ID
   static async findById(id) {
     try {
       const query = `
@@ -75,7 +73,6 @@ class Presupuesto {
     }
   }
 
-  // Buscar presupuesto por número
   static async findByNumero(numero_presupuesto) {
     try {
       const query = 'SELECT * FROM presupuestos WHERE numero_presupuesto = $1';
@@ -86,11 +83,10 @@ class Presupuesto {
     }
   }
 
-  // Obtener todos los presupuestos con filtros
   static async findAll(filters = {}) {
     try {
       let query = `
-        SELECT 
+        SELECT
           p.*,
           pr.nombre as proyecto_nombre,
           c.nombre_empresa as cliente_nombre,
@@ -100,23 +96,20 @@ class Presupuesto {
         LEFT JOIN clientes c ON pr.cliente_id = c.id
         LEFT JOIN users u ON p.creado_por = u.id
       `;
-      
+
       const conditions = [];
       const values = [];
-      
-      // Filtro por estado
+
       if (filters.estado) {
         conditions.push(`p.estado = $${conditions.length + 1}`);
         values.push(filters.estado);
       }
-      
-      // Filtro por proyecto
+
       if (filters.proyecto_id) {
         conditions.push(`p.proyecto_id = $${conditions.length + 1}`);
         values.push(filters.proyecto_id);
       }
-      
-      // Filtro por aceptado
+
       if (filters.aceptado !== undefined) {
         conditions.push(`p.aceptado = $${conditions.length + 1}`);
         values.push(filters.aceptado);
@@ -135,7 +128,6 @@ class Presupuesto {
     }
   }
 
-  // Actualizar presupuesto
   static async update(id, presupuestoData) {
     const {
       numero_presupuesto,
@@ -181,7 +173,6 @@ class Presupuesto {
     }
   }
 
-  // Aceptar presupuesto
   static async aceptar(id) {
     try {
       const query = `
@@ -201,7 +192,6 @@ class Presupuesto {
     }
   }
 
-  // Rechazar presupuesto
   static async rechazar(id) {
     try {
       const query = `
@@ -219,7 +209,6 @@ class Presupuesto {
     }
   }
 
-  // Eliminar presupuesto
   static async delete(id) {
     try {
       const query = 'DELETE FROM presupuestos WHERE id = $1 RETURNING id';
@@ -230,7 +219,6 @@ class Presupuesto {
     }
   }
 
-  // Obtener presupuestos de un proyecto
   static async findByProyecto(proyectoId) {
     try {
       const query = `

@@ -73,7 +73,6 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
 
     const handleMessagesRead = (data) => {
       if (data.conversacion_id === conversacion.id) {
-        // Actualizar last_read del participante directamente, sin fetch
         setConversacionLocal(prev => {
           if (!prev?.participantes) return prev;
           return {
@@ -160,6 +159,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
   };
 
   const marcarComoLeido = () => {
+    // ephemeral: conversación aún no creada en BD — se crea al enviar el primer mensaje
     if (!conversacion || conversacion.ephemeral) return;
 
     const now = new Date().toISOString();
@@ -213,7 +213,6 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
     if (!data.success) throw new Error(data.message || 'Error al subir archivo');
   };
 
-  // Banner de aviso de borrado
   const deletionDate = conversacion?.deletion_scheduled_at
     ? new Date(conversacion.deletion_scheduled_at).toLocaleDateString('es-ES', {
         day: '2-digit', month: 'long', year: 'numeric'

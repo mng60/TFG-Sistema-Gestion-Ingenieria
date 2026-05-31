@@ -7,7 +7,6 @@ pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_personal VARCHAR(25
   .catch(err => console.error('Error añadiendo email_personal a users:', err.message));
 
 class User {
-  // Crear un nuevo usuario
   static async create(userData) {
     const { nombre, email, password, rol, telefono, email_personal } = userData;
 
@@ -27,7 +26,6 @@ class User {
     }
   }
 
-  // Buscar usuario por email
   static async findByEmail(email) {
     try {
       const query = 'SELECT * FROM users WHERE email = $1';
@@ -39,7 +37,6 @@ class User {
     }
   }
 
-  // Buscar usuario por ID
   static async findById(id) {
     try {
       const query = 'SELECT id, nombre, email, rol, telefono, foto_url, email_personal, created_at FROM users WHERE id = $1';
@@ -51,7 +48,6 @@ class User {
     }
   }
 
-  // Actualizar foto de perfil
   static async updateFoto(id, fotoUrl) {
     try {
       const result = await pool.query(
@@ -64,7 +60,6 @@ class User {
     }
   }
 
-  // Actualizar perfil propio (nombre, telefono)
   static async updatePerfil(id, data) {
     const { nombre, telefono, email_personal } = data;
     try {
@@ -78,7 +73,6 @@ class User {
     }
   }
 
-  // Obtener todos los usuarios
   static async findAll() {
     try {
       const query = 'SELECT id, nombre, email, rol, telefono, foto_url, email_personal, created_at FROM users ORDER BY created_at DESC';
@@ -90,7 +84,6 @@ class User {
     }
   }
 
-  // Actualizar usuario
   static async update(id, userData) {
     const { nombre, email, telefono, rol, email_personal } = userData;
 
@@ -111,7 +104,6 @@ class User {
     }
   }
 
-  // Eliminar usuario
   static async delete(id) {
     try {
       const query = 'DELETE FROM users WHERE id = $1 RETURNING id';
@@ -123,7 +115,6 @@ class User {
     }
   }
 
-  // Actualizar contraseña
   static async updatePassword(id, newPassword) {
     try {
       const query = `

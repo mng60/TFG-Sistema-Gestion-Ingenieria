@@ -10,6 +10,7 @@ import ActualizacionesMobile from '../components/proyecto/ActualizacionesMobile'
 import Toast from '../components/common/Toast';
 import proyectoService from '../services/proyectoService';
 import documentoService from '../services/documentoService';
+import { offlineDB } from '../utils/offlineDB';
 import '../styles/ProyectoCompleto.css';
 
 function ProyectoCompleto() {
@@ -50,12 +51,28 @@ function ProyectoCompleto() {
           return;
         }
 
-        setProyecto(pData.proyecto);
-        setEmpleados(eData.empleados || []);
-        setDocumentos(dData.documentos || []);
-        setActualizaciones(aData.actualizaciones || []);
+        const snapshot = {
+          proyecto: pData.proyecto,
+          empleados: eData.empleados || [],
+          documentos: dData.documentos || [],
+          actualizaciones: aData.actualizaciones || []
+        };
+        offlineDB.saveProyectoInfo(id, snapshot);
+
+        setProyecto(snapshot.proyecto);
+        setEmpleados(snapshot.empleados);
+        setDocumentos(snapshot.documentos);
+        setActualizaciones(snapshot.actualizaciones);
       } catch {
-        navigate('/proyectos');
+        const cached = await offlineDB.getProyectoInfo(id);
+        if (cached) {
+          setProyecto(cached.proyecto);
+          setEmpleados(cached.empleados || []);
+          setDocumentos(cached.documentos || []);
+          setActualizaciones(cached.actualizaciones || []);
+        } else {
+          navigate('/proyectos');
+        }
       } finally {
         setLoading(false);
       }

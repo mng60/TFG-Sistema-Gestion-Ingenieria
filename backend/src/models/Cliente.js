@@ -7,7 +7,6 @@ pool.query(`ALTER TABLE clientes ADD COLUMN IF NOT EXISTS email_personal VARCHAR
   .catch(err => console.error('Error añadiendo email_personal a clientes:', err.message));
 
 class Cliente {
-  // Crear un nuevo cliente
   static async create(clienteData) {
     const {
       nombre_empresa,
@@ -62,7 +61,6 @@ class Cliente {
     }
   }
 
-  // Buscar cliente por CIF
   static async findByCIF(cif) {
     try {
       const query = 'SELECT * FROM clientes WHERE cif = $1';
@@ -73,7 +71,6 @@ class Cliente {
     }
   }
 
-  // Buscar cliente por ID
   static async findById(id) {
     try {
       const query = 'SELECT * FROM clientes WHERE id = $1';
@@ -84,20 +81,17 @@ class Cliente {
     }
   }
 
-  // Obtener todos los clientes
   static async findAll(filters = {}) {
     try {
       let query = 'SELECT * FROM clientes';
       const conditions = [];
       const values = [];
-      
-      // Filtro por activo
+
       if (filters.activo !== undefined) {
         conditions.push(`activo = $${conditions.length + 1}`);
         values.push(filters.activo);
       }
-      
-      // Filtro por búsqueda (nombre o CIF)
+
       if (filters.search) {
         conditions.push(`(nombre_empresa ILIKE $${conditions.length + 1} OR cif ILIKE $${conditions.length + 1})`);
         values.push(`%${filters.search}%`);
@@ -116,7 +110,6 @@ class Cliente {
     }
   }
 
-  // Actualizar cliente
   static async update(id, clienteData) {
     const {
       nombre_empresa,
@@ -202,7 +195,6 @@ class Cliente {
     }
   }
 
-  // Obtener proyectos del cliente
   static async getProyectos(clienteId) {
     try {
       const query = `

@@ -3,6 +3,7 @@ const User = require('../models/User');
 const { generateToken } = require('../utils/jwt');
 
 
+// Política de seguridad: bloqueo temporal tras 5 intentos fallidos, sin depender de sesiones ni Redis
 const MAX_INTENTOS = 5;
 const LOCK_MINUTOS = 15;
 

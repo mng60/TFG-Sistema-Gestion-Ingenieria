@@ -2,7 +2,6 @@ import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-// Crear instancia de axios
 const api = axios.create({
   baseURL: API_URL,
   headers: {
@@ -10,7 +9,6 @@ const api = axios.create({
   }
 });
 
-// Interceptor para añadir el token automáticamente
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('empleado_token');
@@ -24,7 +22,6 @@ api.interceptors.request.use(
   }
 );
 
-// Interceptor para manejar errores de respuesta
 api.interceptors.response.use(
   (response) => response,
   (error) => {

@@ -53,13 +53,6 @@ function norm(texto) {
   return String(texto || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 }
 
-function detectarEasterEgg(texto) {
-  const j = texto.match(/\b(xd|uwu|ewe|owo)\b/i);
-  if (j) return j[1].toLowerCase();
-  const e = texto.match(/(?<![a-z])(?::\)|;\)|:D|:P|:\(|:o|:O|\^_\^|>_<|<3)(?![a-z])/i);
-  return e ? e[0] : null;
-}
-
 // ── Saludos y conversación simple (sin LLM) ───────────────────────────────────
 const RESPUESTAS_CONVERSACIONALES = [
   { re: /^(hola|hey|ey|hi|hello|buenas?|buen[oa]s? (dias?|tardes?|noches?))[\s!.]*$/,
@@ -175,22 +168,20 @@ const preguntar = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Pregunta demasiado corta' });
     }
 
-    const easterEgg = detectarEasterEgg(pregunta);
-    const conEgg    = (texto) => easterEgg ? `${texto} ${easterEgg}` : texto;
-    const t         = norm(pregunta);
+    const t = norm(pregunta);
 
     // Respuestas sin LLM (instantáneas, no cuentan contra el rate limit)
     const conv = respuestaConversacional(t);
-    if (conv) return res.json({ success: true, respuesta: conEgg(conv) });
+    if (conv) return res.json({ success: true, respuesta: (conv) });
 
     if (esConsultaEnergiaActual(pregunta)) {
       const respEnergia = await construirRespuestaEnergia(pregunta);
       const respTraducida = await traducirSiNecesario(respEnergia, pregunta);
-      return res.json({ success: true, respuesta: conEgg(respTraducida) });
+      return res.json({ success: true, respuesta: (respTraducida) });
     }
-    if (esFechaHora(t))        return res.json({ success: true, respuesta: conEgg(respuestaFechaHora(t)) });
-    if (esTiempo(t))           return res.json({ success: true, respuesta: conEgg(await respuestaTiempo()) });
-    if (esCalculadoraSolar(t)) return res.json({ success: true, respuesta: conEgg(respuestaCalculadoraSolar(t)) });
+    if (esFechaHora(t))        return res.json({ success: true, respuesta: (respuestaFechaHora(t)) });
+    if (esTiempo(t))           return res.json({ success: true, respuesta: (await respuestaTiempo()) });
+    if (esCalculadoraSolar(t)) return res.json({ success: true, respuesta: (respuestaCalculadoraSolar(t)) });
 
     // Caché para preguntas sin conversación activa
     const key = cacheKey(t);
@@ -199,7 +190,7 @@ const preguntar = async (req, res) => {
       const cached = cacheGet(key);
       if (cached) {
         console.log('[AsistenteIA] Cache hit');
-        return res.json({ success: true, respuesta: conEgg(cached) });
+        return res.json({ success: true, respuesta: (cached) });
       }
     }
 
@@ -214,7 +205,7 @@ const preguntar = async (req, res) => {
 
     const respuesta = await ask(systemPrompt, pregunta, history);
     if (!hayHistorial) cacheSet(key, respuesta);
-    res.json({ success: true, respuesta: conEgg(respuesta) });
+    res.json({ success: true, respuesta: (respuesta) });
   } catch (error) {
     console.error('[AsistenteIA] Error:', error.message);
     res.status(503).json({ success: false, message: 'Asistente no disponible' });

@@ -14,7 +14,6 @@ import Perfil from './pages/Perfil';
 import ClienteLayout from './components/Layout/ClienteLayout';
 import './styles/App.css';
 
-// Ruta protegida: requiere autenticación y envuelve con el layout del portal
 function ClienteProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
   if (loading) return null;
@@ -22,7 +21,6 @@ function ClienteProtectedRoute({ children }) {
   return <ClienteLayout>{children}</ClienteLayout>;
 }
 
-// Ruta pública: redirige al dashboard si ya está autenticado
 function ClientePublicRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
   if (loading) return null;

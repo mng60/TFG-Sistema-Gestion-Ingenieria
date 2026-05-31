@@ -51,28 +51,13 @@ const asignarEmpleadoValidation = [
 // Todas las rutas requieren autenticación
 router.use(authMiddleware);
 
-// GET /api/proyectos - Obtener todos los proyectos
 router.get('/', getAllProyectos);
-
-// GET /api/proyectos/:id - Obtener un proyecto por ID
 router.get('/:id', getProyectoById);
-
-// GET /api/proyectos/:id/empleados - Obtener empleados del proyecto
 router.get('/:id/empleados', getProyectoEmpleados);
-
-// POST /api/proyectos - Crear proyecto (solo admin)
 router.post('/', checkRole('admin'), proyectoValidation, createProyecto);
-
-// POST /api/proyectos/:id/empleados - Asignar empleado (solo admin)
 router.post('/:id/empleados', checkRole('admin'), asignarEmpleadoValidation, asignarEmpleado);
-
-// PUT /api/proyectos/:id - Actualizar proyecto (solo admin)
 router.put('/:id', checkRole('admin'), proyectoValidation, updateProyecto);
-
-// DELETE /api/proyectos/:id/empleados/:userId - Desasignar empleado (solo admin)
 router.delete('/:id/empleados/:userId', checkRole('admin'), desasignarEmpleado);
-
-// DELETE /api/proyectos/:id - Eliminar proyecto (solo admin)
 router.delete('/:id', checkRole('admin'), deleteProyecto);
 
 module.exports = router;

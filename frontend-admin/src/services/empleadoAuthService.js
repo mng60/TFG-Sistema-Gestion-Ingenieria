@@ -1,7 +1,6 @@
 import api from './api';
 
 const empleadoAuthService = {
-  // Login de empleado/admin
   login: async (email, password) => {
     try {
       const response = await api.post('/auth/login', { email, password });

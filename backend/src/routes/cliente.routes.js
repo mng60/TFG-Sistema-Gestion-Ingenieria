@@ -36,25 +36,12 @@ const clienteValidation = [
 // Todas las rutas requieren autenticación
 router.use(authMiddleware);
 
-// GET /api/clientes - Obtener todos los clientes
 router.get('/', getAllClientes);
-
-// GET /api/clientes/:id - Obtener un cliente por ID
 router.get('/:id', getClienteById);
-
-// GET /api/clientes/:id/proyectos - Obtener proyectos de un cliente
 router.get('/:id/proyectos', getClienteProyectos);
-
-// POST /api/clientes - Crear cliente (solo admin)
 router.post('/', checkRole('admin'), clienteValidation, createCliente);
-
-// PUT /api/clientes/:id - Actualizar cliente (solo admin)
 router.put('/:id', checkRole('admin'), clienteValidation, updateCliente);
-
-// PATCH /api/clientes/:id/deactivate - Desactivar cliente (solo admin)
 router.patch('/:id/deactivate', checkRole('admin'), deactivateCliente);
-
-// DELETE /api/clientes/:id - Eliminar cliente (solo admin)
 router.delete('/:id', checkRole('admin'), deleteCliente);
 
 const { activarAccesoCliente } = require('../controllers/cliente.auth.controller');
@@ -66,7 +53,6 @@ const activarAccesoValidation = [
     .withMessage('La contraseña debe tener al menos 6 caracteres')
 ];
 
-// POST /api/clientes/:id/activar-acceso - Activar acceso al portal (solo admin)
 router.post('/:id/activar-acceso', checkRole('admin'), activarAccesoValidation, activarAccesoCliente);
 
 

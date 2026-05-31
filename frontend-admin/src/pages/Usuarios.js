@@ -33,7 +33,6 @@ function Usuarios() {
   useEffect(() => {
     document.title = 'Panel Interno - Usuarios';
     
-    // Solo admin puede acceder
     if (!isAdmin()) {
       showToast('Solo administradores pueden gestionar usuarios', 'error');
       navigate('/dashboard');
@@ -56,7 +55,6 @@ function Usuarios() {
     }
   };
 
-  // Filtrado local
   const usuariosFiltrados = usuarios.filter(user => {
     const matchSearch = !search || 
       user.nombre?.toLowerCase().includes(search.toLowerCase()) ||

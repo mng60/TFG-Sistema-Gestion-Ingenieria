@@ -1,7 +1,6 @@
 const { pool } = require('../config/database');
 
 class Proyecto {
-  // Crear un nuevo proyecto
   static async create(proyectoData) {
     const {
       nombre,
@@ -49,7 +48,6 @@ class Proyecto {
     }
   }
 
-  // Buscar proyecto por ID con información relacionada
   static async findById(id) {
     try {
       const query = `
@@ -72,7 +70,6 @@ class Proyecto {
     }
   }
 
-  // Obtener todos los proyectos con filtros
   static async findAll(filters = {}) {
     try {
       let query = `
@@ -140,35 +137,30 @@ class Proyecto {
         paramCount++;
       }
 
-      // Filtro por estado
       if (filters.estado) {
         conditions.push(`p.estado = $${paramCount}`);
         values.push(filters.estado);
         paramCount++;
       }
-      
-      // Filtro por prioridad
+
       if (filters.prioridad) {
         conditions.push(`p.prioridad = $${paramCount}`);
         values.push(filters.prioridad);
         paramCount++;
       }
-      
-      // Filtro por cliente
+
       if (filters.cliente_id) {
         conditions.push(`p.cliente_id = $${paramCount}`);
         values.push(filters.cliente_id);
         paramCount++;
       }
-      
-      // Filtro por responsable
+
       if (filters.responsable_id) {
         conditions.push(`p.responsable_id = $${paramCount}`);
         values.push(filters.responsable_id);
         paramCount++;
       }
-      
-      // Búsqueda por nombre
+
       if (filters.search) {
         conditions.push(`p.nombre ILIKE $${paramCount}`);
         values.push(`%${filters.search}%`);
@@ -189,7 +181,6 @@ class Proyecto {
     }
   }
 
-  // Actualizar proyecto
   static async update(id, proyectoData) {
     const {
       nombre,
@@ -243,7 +234,6 @@ class Proyecto {
     }
   }
 
-  // Eliminar proyecto
   static async delete(id) {
     try {
       const query = 'DELETE FROM proyectos WHERE id = $1 RETURNING id';
@@ -270,7 +260,6 @@ class Proyecto {
     return result.rows[0];
   }
 
-  // Desasignar empleado de proyecto
   static async desasignarEmpleado(proyectoId, userId) {
     try {
       const query = `
@@ -287,7 +276,6 @@ class Proyecto {
     }
   }
 
-  // Obtener empleados asignados al proyecto
   static async getEmpleados(proyectoId) {
     try {
       const query = `
@@ -311,7 +299,6 @@ class Proyecto {
     }
   }
 
-  // Obtener datos del dashboard filtrados por rol
   static async getDashboardData(userId, rol) {
     try {
       const isAdmin = rol === 'admin';

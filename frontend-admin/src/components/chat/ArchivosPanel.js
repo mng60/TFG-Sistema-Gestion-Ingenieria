@@ -63,7 +63,6 @@ function ArchivosPanel({ conversacionId, onClose }) {
   const handleDescargar = (archivo) => {
     const url = getFullUrl(archivo.archivo_url);
     
-    // Crear link temporal y clickearlo
     const link = document.createElement('a');
     link.href = url;
     link.download = archivo.archivo_nombre;

@@ -19,16 +19,9 @@ const router = express.Router();
 // Todas las rutas requieren autenticación (empleados y clientes del portal)
 router.use(authAnyMiddleware);
 
-// GET /api/chat/conversaciones - Obtener conversaciones del usuario
 router.get('/conversaciones', getConversaciones);
-
-// POST /api/chat/conversaciones - Crear nueva conversación
 router.post('/conversaciones', createConversacion);
-
-// GET /api/chat/conversaciones/:conversacionId - Obtener detalles de conversación
 router.get('/conversaciones/:conversacionId', getConversacionById);
-
-// GET /api/chat/mensajes/:conversacionId - Obtener mensajes de una conversación
 router.get('/mensajes/:conversacionId', getMensajes);
 
 router.get('/mensajes/:mensajeId/file', async (req, res) => {
@@ -72,13 +65,9 @@ router.get('/mensajes/:mensajeId/file', async (req, res) => {
   }
 });
 
-// POST /api/chat/mensajes - Enviar mensaje
 router.post('/mensajes', sendMensaje);
-
-// PUT /api/chat/conversaciones/:conversacionId/read - Marcar como leído
 router.put('/conversaciones/:conversacionId/read', markAsRead);
 
-// GET /api/chat/info-participante/:userId/:tipoUsuario - Obtener info completa del participante
 router.get('/info-participante/:userId/:tipoUsuario', async (req, res) => {
   try {
     const { userId, tipoUsuario } = req.params;
@@ -141,7 +130,6 @@ router.get('/info-participante/:userId/:tipoUsuario', async (req, res) => {
   }
 });
 
-// DELETE /api/chat/conversaciones/:conversacionId - Eliminar conversación
 router.delete('/conversaciones/:conversacionId', async (req, res) => {
   try {
     const { conversacionId } = req.params;
@@ -193,7 +181,6 @@ router.delete('/conversaciones/:conversacionId', async (req, res) => {
   }
 });
 
-// GET /api/chat/conversaciones/:conversacionId/archivos - Obtener archivos compartidos
 router.get('/conversaciones/:conversacionId/archivos', async (req, res) => {
   try {
     const { conversacionId } = req.params;
@@ -262,7 +249,6 @@ router.get('/conversaciones/:conversacionId/archivos', async (req, res) => {
   }
 });
 
-// POST /api/chat/upload - Subir archivo al chat
 router.post('/upload', (req, res, next) => {
   uploadChat.single('file')(req, res, (err) => {
     if (err) {

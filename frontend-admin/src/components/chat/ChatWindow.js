@@ -20,7 +20,6 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
     setConversacionLocal(conversacion || null);
   }, [conversacion]);
 
-  // Cargar mensajes cuando cambia la conversación
   useEffect(() => {
     if (!conversacion) {
       setMensajes([]);
@@ -57,7 +56,6 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
     };
   }, [mensajes.length, isInitialLoad, loading]);
 
-  // Escuchar nuevos mensajes via Socket.io
   useEffect(() => {
     if (!socket || !conversacion) return;
 
@@ -115,13 +113,11 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
       const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
       const token = localStorage.getItem('empleado_token');
 
-      // Crear FormData
       const formData = new FormData();
       formData.append('file', file);
       formData.append('conversacion_id', conversacion.id);
       formData.append('tipo_mensaje', tipoMensaje);
 
-      // Subir archivo
       const response = await fetch(`${API_URL}/chat/upload`, {
         method: 'POST',
         headers: {
@@ -133,7 +129,6 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
       const data = await response.json();
 
       if (data.success) {
-        // El mensaje se enviará via Socket.io desde el backend
       } else {
         throw new Error(data.message || 'Error al subir archivo');
       }
@@ -159,6 +154,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
   };
 
   const cargarMensajes = async () => {
+    // ephemeral: conversación aún no creada en BD — se crea al enviar el primer mensaje
     if (!conversacion || conversacion.ephemeral) return;
 
     setLoading(true);
@@ -237,6 +233,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
     if (!socket || !conversacion) return;
 
     if (conversacion.ephemeral) {
+      // Primer mensaje en conversación efímera: crear la conversación real antes de enviar
       try {
         const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
         const token = localStorage.getItem('empleado_token');

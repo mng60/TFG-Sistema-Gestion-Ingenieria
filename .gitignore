@@ -145,6 +145,9 @@ uploads/
 .claude/
 .codex/
 
+# Notas de defensa (uso privado del autor)
+docs/defensa.md
+
 # Credenciales Firebase (NO subir al repo)
 backend/firebase-service-account.json
 **/google-services.json

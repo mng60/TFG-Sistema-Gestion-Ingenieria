@@ -41,22 +41,11 @@ const presupuestoValidation = [
 // Todas las rutas requieren autenticación
 router.use(authMiddleware);
 
-// GET /api/presupuestos - Obtener todos los presupuestos
 router.get('/', getAllPresupuestos);
-
-// GET /api/presupuestos/proyecto/:proyectoId - Obtener presupuestos de un proyecto
 router.get('/proyecto/:proyectoId', getPresupuestosByProyecto);
-
-// GET /api/presupuestos/:id - Obtener un presupuesto por ID
 router.get('/:id', getPresupuestoById);
-
-// POST /api/presupuestos - Crear presupuesto (solo admin)
 router.post('/', checkRole('admin'), presupuestoValidation, createPresupuesto);
-
-// PUT /api/presupuestos/:id - Actualizar presupuesto (solo admin)
 router.put('/:id', checkRole('admin'), presupuestoValidation, updatePresupuesto);
-
-// DELETE /api/presupuestos/:id - Eliminar presupuesto (solo admin)
 router.delete('/:id', checkRole('admin'), deletePresupuesto);
 
 module.exports = router;

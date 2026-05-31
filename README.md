@@ -11,6 +11,7 @@ Sistema de gestion para una empresa de ingenieria electrica con backend API, por
 | Backend API | https://tfg-sistema-gestion-ingenieria-production.up.railway.app | Railway |
 | Portal Administracion | https://tfg-admin.vercel.app | Vercel |
 | Portal Cliente | https://tfg-cliente.vercel.app | Vercel |
+| App Movil Android | APK generada con Capacitor (ver seccion 9) | Android |
 
 ### Credenciales de demostracion
 
@@ -26,7 +27,7 @@ Estas credenciales se usan para la base de datos local de prueba y para la revis
 - Frontend admin: React 18, React Router, Axios
 - Frontend cliente: React 18, React Router, Axios
 - Mobile/PWA: React 18, Capacitor, Service Worker
-- Integraciones opcionales: Ollama/Groq, Cloudinary, Nodemailer
+- Integraciones opcionales: Groq (IA), Cloudinary, Nodemailer, Firebase (push)
 - Despliegue: Railway para API y Vercel para frontends
 
 ## Instalacion local
@@ -48,7 +49,6 @@ Para una revision local normal:
 
 Opcional segun lo que se quiera probar:
 
-- Ollama para el asistente IA en local
 - Android Studio para generar la APK
 
 ### 3. Instalar dependencias
@@ -80,9 +80,9 @@ JWT_SECRET=cambiar_en_local_123
 PORT=5000
 FRONTEND_URL=http://localhost:3000,http://localhost:3001,http://localhost:3002
 
-# Solo si se quiere probar el asistente IA en local
-OLLAMA_URL=http://localhost:11434
-OLLAMA_MODEL=phi3:mini
+# Solo si se quiere probar el asistente IA (clave gratuita en console.groq.com)
+GROQ_API_KEY=
+GROQ_MODEL=llama-3.3-70b-versatile
 ```
 
 Configuracion base para los frontends en local:
@@ -120,10 +120,14 @@ psql -U postgres -d tfg_gestion_ingenieria -f backend/src/config/seed.sql
 
 ### 6. Probar la IA en local (opcional)
 
-```bash
-ollama pull phi3:mini
-ollama serve
+El asistente usa Groq (Llama 3.3 70B). Para probarlo en local, obtener una clave gratuita en [console.groq.com](https://console.groq.com) y añadirla a `backend/.env`:
+
+```env
+GROQ_API_KEY=tu_clave_aqui
+GROQ_MODEL=llama-3.3-70b-versatile
 ```
+
+Sin clave configurada, el asistente responde con un mensaje de no disponible y el resto del sistema funciona con normalidad.
 
 ### 7. Arrancar los modulos
 
@@ -148,9 +152,11 @@ Puertos por defecto:
 - No hace falta configurar Groq, Cloudinary ni un proveedor de correo para revisar el flujo principal.
 - Si no se configura Cloudinary, los archivos se guardan en `backend/uploads`.
 - Si no se configura correo, las notificaciones no se envian pero la aplicacion sigue siendo navegable.
-- Si no se levanta Ollama, la parte que puede no responder como en produccion es el asistente IA.
+- Si no se configura Groq, el asistente IA de la web publica muestra "no disponible" pero el resto del sistema funciona con normalidad.
 
 ### 9. Generar APK Android (opcional)
+
+Antes de compilar, configurar `mobile/.env` con las URLs de produccion (ver comentarios en `mobile/.env.example`).
 
 ```bash
 cd mobile
@@ -162,6 +168,8 @@ npx cap open android
 Despues, desde Android Studio:
 
 `Build -> Build Bundle(s) / APK(s) -> Build APK(s)`
+
+El APK resultante se genera en `mobile/android/app/build/outputs/apk/debug/app-debug.apk`.
 
 ## Extensiones utiles de VS Code
 

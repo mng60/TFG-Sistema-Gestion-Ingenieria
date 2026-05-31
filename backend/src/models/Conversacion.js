@@ -1,7 +1,6 @@
 const { pool } = require('../config/database');
 
 class Conversacion {
-  // Crear nueva conversación
   static async create(data) {
     const { tipo, nombre, proyecto_id, participantes } = data;
     
@@ -9,7 +8,6 @@ class Conversacion {
     try {
       await client.query('BEGIN');
 
-      // Crear conversación
       const queryConv = `
         INSERT INTO conversaciones (tipo, nombre, proyecto_id)
         VALUES ($1, $2, $3)
@@ -37,7 +35,6 @@ class Conversacion {
     }
   }
 
-  // Obtener conversaciones de un usuario
   static async getByUser(userId, tipoUsuario) {
     try {
       const query = `
@@ -114,7 +111,6 @@ class Conversacion {
     }
   }
 
-  // Verificar si existe conversación entre dos usuarios
   static async findBetweenUsers(user1Id, user1Tipo, user2Id, user2Tipo) {
     try {
       const query = `
@@ -141,7 +137,6 @@ class Conversacion {
     }
   }
 
-  // Obtener conversación por ID con participantes
   static async findById(id) {
     try {
       const query = `
@@ -183,7 +178,6 @@ class Conversacion {
     }
   }
 
-  // Marcar mensajes como leídos
   static async markAsRead(conversacionId, userId, tipoUsuario) {
     const query = `
       UPDATE conversacion_participantes

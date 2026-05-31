@@ -71,6 +71,7 @@ const quitarEmpleadoDeGrupo = async (proyectoId, empleadoId) => {
   }
 };
 
+// 3 días de margen tras completar el proyecto para que el equipo cierre conversaciones pendientes
 const programarBorradoChat = async (proyectoId) => {
   try {
     await pool.query(

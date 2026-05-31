@@ -12,19 +12,11 @@ const loginValidation = [
   body('password').notEmpty().withMessage('La contraseña es obligatoria')
 ];
 
-// POST /api/auth/login - Iniciar sesión
 router.post('/login', loginValidation, login);
-
-// GET /api/auth/profile - Obtener perfil (ruta protegida)
 router.get('/profile', authMiddleware, getProfile);
-
-// PUT /api/auth/profile - Actualizar perfil (nombre, telefono)
 router.put('/profile', authMiddleware, updateProfile);
-
-// PUT /api/auth/change-password - Cambiar contraseña
 router.put('/change-password', authMiddleware, changePassword);
 
-// POST /api/auth/profile/foto - Subir foto de perfil
 router.post('/profile/foto', authMiddleware, (req, res, next) => {
   uploadAvatares.single('foto')(req, res, (err) => {
     if (err) return res.status(400).json({ success: false, message: err.message });

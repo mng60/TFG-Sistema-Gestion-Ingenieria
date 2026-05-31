@@ -22,12 +22,10 @@ function ConversationList({
   };
 
   const getNombreConversacion = (conversacion) => {
-    // Si es grupo de proyecto, usar el nombre del grupo
     if (conversacion.tipo === 'proyecto_grupo' && conversacion.nombre) {
       return conversacion.nombre;
     }
 
-    // Si es conversación 1-1, usar el nombre del otro participante
     const otherParticipant = getOtherParticipant(conversacion);
     return otherParticipant?.nombre || 'Usuario';
   };

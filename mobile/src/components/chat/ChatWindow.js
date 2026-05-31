@@ -62,7 +62,6 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
     setConversacionLocal(conversacion || null);
   }, [conversacion]);
 
-  // Cargar mensajes cuando cambia la conversación
   useEffect(() => {
     if (!conversacion) {
       setMensajes([]);
@@ -77,7 +76,6 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
     }
   }, [conversacion?.id]);
 
-  // Escuchar nuevos mensajes via Socket.io
   useEffect(() => {
     if (!socket || !conversacion) return;
 
@@ -146,13 +144,11 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
       const API_URL = process.env.REACT_APP_API_URL || `http://${window.location.hostname}:5000/api`;
       const token = localStorage.getItem('empleado_token');
 
-      // Crear FormData
       const formData = new FormData();
       formData.append('file', file);
       formData.append('conversacion_id', conversacion.id);
       formData.append('tipo_mensaje', tipoMensaje);
 
-      // Subir archivo
       const response = await fetch(`${API_URL}/chat/upload`, {
         method: 'POST',
         headers: {
@@ -168,7 +164,6 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
           upsertMensaje(data.mensaje);
           scrollToBottom();
         }
-        // El mensaje se enviará via Socket.io desde el backend
       } else {
         throw new Error(data.message || 'Error al subir archivo');
       }
@@ -216,6 +211,7 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
   };
 
   const cargarMensajes = async () => {
+    // ephemeral: conversación aún no creada en BD — se crea al enviar el primer mensaje
     if (!conversacion || conversacion.ephemeral) return;
 
     setLoading(true);
@@ -232,8 +228,20 @@ function ChatWindow({ conversacion, socket, currentUser, onReloadConversaciones,
 
       if (data.success) {
         const msgs = data.mensajes || [];
-        setMensajes(msgs);
         offlineDB.saveMensajes(conversacion.id, msgs);
+
+        // Fusionar mensajes pendientes de offlineDB que aún no llegaron al servidor
+        const pendingAll = await offlineDB.getAllPendingMessages();
+        const pendingForConv = pendingAll
+          .filter(({ value }) => String(value.conversacion_id) === String(conversacion.id))
+          .map(({ key: tempId, value }) => ({
+            id: null, client_temp_id: tempId, conversacion_id: conversacion.id,
+            user_id: value.user_id, tipo_usuario: 'empleado',
+            mensaje: value.mensaje, tipo_mensaje: value.tipo_mensaje,
+            remitente_nombre: value.remitente_nombre, created_at: value.created_at,
+            pending: true
+          }));
+        setMensajes([...msgs, ...pendingForConv]);
         setIsInitialLoad(true);
 
         const readAt = data.read_at || new Date().toISOString();

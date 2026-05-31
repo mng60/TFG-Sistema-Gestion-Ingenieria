@@ -70,6 +70,7 @@ const activarAccesoCliente = async (req, res) => {
   }
 };
 
+// Política de seguridad: bloqueo temporal tras 5 intentos fallidos, sin depender de sesiones ni Redis
 const MAX_INTENTOS = 5;
 const LOCK_MINUTOS = 15;
 
@@ -133,6 +134,7 @@ const loginCliente = async (req, res) => {
     );
 
     const token = generateToken({ id: cliente.id, email: cliente.email, tipo: 'cliente', nombre_empresa: cliente.nombre_empresa });
+    // Excluir campos sensibles de la respuesta antes de enviar al cliente
     const { password: _, login_attempts: __, locked_until: ___, ...clienteData } = cliente;
 
     res.json({ success: true, message: 'Login exitoso', token, cliente: clienteData });

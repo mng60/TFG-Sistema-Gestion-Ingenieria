@@ -19,14 +19,14 @@ pool.query(`
   )
 `).catch(err => console.error('Error creando tabla tickets:', err.message));
 
-// Añadir columnas nuevas si la tabla ya existía
+// Migraciones incrementales para tablas ya existentes
 pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS empresa VARCHAR(255)`).catch(() => {});
 pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS telefono VARCHAR(50)`).catch(() => {});
 pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS proyecto_id INTEGER REFERENCES proyectos(id) ON DELETE SET NULL`).catch(() => {});
 pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS resuelto_at TIMESTAMP`).catch(() => {});
 pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS nota_resolucion TEXT`).catch(() => {});
 
-// Añadir columnas de intentos de login a users y clientes
+// Login lockout: columnas compartidas con users y clientes
 pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS login_attempts INTEGER DEFAULT 0`)
   .catch(err => console.error(err.message));
 pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS locked_until TIMESTAMP`)

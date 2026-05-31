@@ -13,7 +13,6 @@ import Perfil from './pages/Perfil';
 import Tickets from './pages/Tickets';
 import './styles/App.css';
 
-// Rutas públicas de empleados
 function EmpleadoPublicRoute({ children }) {
   const { isAuthenticated } = useEmpleadoAuth();
   return !isAuthenticated ? children : <Navigate to="/dashboard" />;

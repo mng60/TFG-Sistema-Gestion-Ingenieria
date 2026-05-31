@@ -22,12 +22,10 @@ function ConversationList({
   };
 
   const getNombreConversacion = (conversacion) => {
-    // Si es grupo de proyecto, usar el nombre del grupo
     if (conversacion.tipo === 'proyecto_grupo' && conversacion.nombre) {
       return conversacion.nombre;
     }
 
-    // Si es conversación 1-1, usar el nombre del otro participante
     const otherParticipant = getOtherParticipant(conversacion);
     return otherParticipant?.nombre || 'Usuario';
   };
@@ -62,12 +60,10 @@ function ConversationList({
     
     const searchLower = searchTerm.toLowerCase();
     
-    // Si es grupo, buscar por nombre del grupo
     if (conv.tipo === 'proyecto_grupo' && conv.nombre) {
       return conv.nombre.toLowerCase().includes(searchLower);
     }
-    
-    // Si es 1-1, buscar por nombre del participante
+
     const other = getOtherParticipant(conv);
     return other?.nombre?.toLowerCase().includes(searchLower);
   })

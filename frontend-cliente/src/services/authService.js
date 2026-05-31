@@ -1,12 +1,10 @@
 import api from './api';
 
 const authService = {
-  // Login de cliente
   login: async (email, password) => {
     try {
       const response = await api.post('/portal/login', { email, password });
       if (response.data.success && response.data.token) {
-        // Guardar token y datos del cliente
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('cliente', JSON.stringify(response.data.cliente));
         return response.data;
@@ -17,24 +15,20 @@ const authService = {
     }
   },
 
-  // Logout
   logout: () => {
     localStorage.removeItem('token');
     localStorage.removeItem('cliente');
   },
 
-  // Obtener datos del cliente guardado
   getCurrentCliente: () => {
     const clienteStr = localStorage.getItem('cliente');
     return clienteStr ? JSON.parse(clienteStr) : null;
   },
 
-  // Verificar si está autenticado
   isAuthenticated: () => {
     return !!localStorage.getItem('token');
   },
 
-  // Obtener perfil actualizado
   getPerfil: async () => {
     try {
       const response = await api.get('/portal/perfil');
@@ -47,7 +41,6 @@ const authService = {
     }
   },
 
-  // Cambiar contraseña
   cambiarPassword: async (currentPassword, newPassword) => {
     try {
       const response = await api.put('/portal/cambiar-password', {

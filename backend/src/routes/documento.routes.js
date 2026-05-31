@@ -41,26 +41,15 @@ router.get('/:id/stream', streamDocumento);
 // Todas las demás rutas requieren autenticación
 router.use(authMiddleware);
 
-// GET /api/documentos - Obtener todos los documentos
 router.get('/', getAllDocumentos);
-
-// GET /api/documentos/proyecto/:proyectoId - Obtener documentos de un proyecto
 router.get('/proyecto/:proyectoId', getDocumentosByProyecto);
-
-// GET /api/documentos/:id/file - Descargar el archivo real (flujo móvil)
 router.get('/:id/file', downloadDocumentoFile);
-
-// GET /api/documentos/:id - Obtener un documento por ID
 router.get('/:id', getDocumentoById);
-
-// GET /api/documentos/:id/download - Descargar documento
 router.get('/:id/download', downloadDocumento);
 
-// POST /api/documentos/upload - Subir documento (solo admin)
 router.post('/upload', checkRole('admin'), (req, res, next) => {
   uploadDocumentos.single('file')(req, res, (err) => {
     if (err) {
-      // Error de multer (tipo no permitido, tamaño, etc.)
       return res.status(400).json({
         success: false,
         message: err.message || 'Error al procesar el archivo'
@@ -70,16 +59,9 @@ router.post('/upload', checkRole('admin'), (req, res, next) => {
   });
 }, uploadDocumento);
 
-// GET /api/documentos/:id/acceso-empleados - Obtener empleados con acceso (admin)
 router.get('/:id/acceso-empleados', checkRole('admin'), getAccesoEmpleados);
-
-// PUT /api/documentos/:id/acceso-empleados - Establecer empleados con acceso (admin)
 router.put('/:id/acceso-empleados', checkRole('admin'), setAccesoEmpleados);
-
-// PUT /api/documentos/:id - Actualizar documento (solo admin)
 router.put('/:id', checkRole('admin'), documentoUpdateValidation, updateDocumento);
-
-// DELETE /api/documentos/:id - Eliminar documento (solo admin)
 router.delete('/:id', checkRole('admin'), deleteDocumento);
 
 module.exports = router;
